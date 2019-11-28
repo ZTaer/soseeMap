@@ -1,0 +1,94 @@
+@import "./_OO7BTS.v2.1";
+
+/********** 公共 ******/
+a{
+    text-decoration: none;
+}
+body{
+    letter-spacing: 3px;
+    font-family: '微软雅黑' !important;
+    font-size:15px;
+}
+
+.more{
+    width:120px;
+    height:35px;
+    border:1px solid #ffc439;
+    border-radius: 5px;
+    @include display-flex();
+    @include xy-items(center,center);
+    @include font-style( $c:#ffc439 );
+    @include img-transition(0.3);
+    &:hover{
+        background: #ffc439;
+        color:#000;
+    }
+}
+
+@include help-lightbox-font();
+.modal-title{
+    margin-top:0 !important;
+}
+
+/********** 拓展 ******/
+.msg-time{
+    .container{
+        dl{
+            @include display-flex();
+            @include xy-content( center,center );
+            dt{
+                color:#ffc439;
+                width:40%;
+                text-align:right;
+            }
+            dd{
+                width:50%;
+                text-indent:1em;
+            }
+        }
+    }
+}
+
+.donate-container{
+    .wechat{
+        width:100px;
+        height:35px;
+        font-size:15px;
+        letter-spacing:3px;
+        text-align: center;
+        line-height: 35px;
+        border-radius: 5px;
+        background:#ffc439;
+        border:1px solid #ffc439;
+        color:#000;
+        font-weight:bold;
+        display:block;
+        margin:0px auto;
+        @include img-transition(0.3);
+        &:hover{
+            background:#000;
+            color:#f8f8f8;
+        }
+    }
+    .content-text{
+        font-size:14px;
+        letter-spacing: 3px;
+        padding:1rem;
+        color:#ccc;
+    }
+    .oo7-link{
+        color:#ffc439 !important;
+        font-size:14px;
+        text-decoration: dashed !important;   
+        @include img-transition(0.3);
+        &:hover{
+            color:#ccc !important;
+        }
+    }
+}
+
+.leaflet-popup-content{
+    h1{
+        font-weight:bold;
+    }
+}
