@@ -1,4 +1,33 @@
 # RDR2CollectorsMap
+<h1>
+注意：本项目是为改进出更适合亚洲中国地域附近而创建，并防止因改进过大影响原项目冲突<br/>
+Note: This project was created to improve the areas near Asia and China, and to prevent conflicts from affecting the original project due to excessive improvements
+<h1>
+<h2>
+    原作者( Author: jeanropke )：<a href="https://github.com/jeanropke/RDR2CollectorsMap">https://github.com/jeanropke/RDR2CollectorsMap</a><br/>
+    改进者( helper: __OO7__ ): <a href="https://github.com/ZTaer" >https://github.com/ZTaer</a>
+</h2>
+<pre>
+    已经更新:
+        0. 更换JS - CDN插件，使亚洲地区可高速访问
+        1. 优化字体显示
+        2. 补充部分字体翻译
+    正在更新:
+        0. 更多的翻译补充
+    准备更新:
+        0. 单击图标可显示物品在游戏中的位置图像
+</pre>
+<pre>
+    Already updated:
+         0. Replaced JS-CDN plug-in to enable high-speed access in Asia
+         Optimized font display
+         2. Supplement some font translation
+     Updating:
+         0. More translations added
+     Ready to update:
+         0. Click the icon to display the image of the item's location in the game
+</pre>
+
 Items locations credits to [GTA Series Videos](https://www.youtube.com/user/GTASeriesVideos), [Gtax Barrett](https://twitter.com/gtaxbarrett), [IronJeff80](https://github.com/IronJeff80) and [/r/RedDeadOnline](https://www.reddit.com/r/RedDeadOnline)
 
 Possible treasures locations by [IronJeff80](https://github.com/IronJeff80), [Dirty Tyler](https://www.youtube.com/channel/UC3LdKFizyou1RfkkmDUUVsg) and [Dean Nutz](https://www.youtube.com/channel/UCBSYrZQsPndOm-zckXNUItw)
