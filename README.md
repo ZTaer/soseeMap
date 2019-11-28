@@ -1,12 +1,12 @@
 # RDR2CollectorsMap
-<h1>
-注意：本项目是为改进出更适合亚洲中国地域附近而创建，并防止因改进过大影响原项目冲突<br/>
-Note: This project was created to improve the areas near Asia and China, and to prevent conflicts from affecting the original project due to excessive improvements
-<h1>
 <h2>
+注意：本项目是为改进出更适合亚洲中国地域附近而创建，并防止因改进过大影响原项目冲突<br/><br/>
+Note: This project was created to improve the areas near Asia and China, and to prevent conflicts from affecting the original project due to excessive improvements
+<h2>
+<h3>
     原作者( Author: jeanropke )：<a href="https://github.com/jeanropke/RDR2CollectorsMap">https://github.com/jeanropke/RDR2CollectorsMap</a><br/>
     改进者( helper: __OO7__ ): <a href="https://github.com/ZTaer" >https://github.com/ZTaer</a>
-</h2>
+</h3>
 <pre>
     已经更新:
         0. 更换JS - CDN插件，使亚洲地区可高速访问
