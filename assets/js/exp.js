@@ -1,6 +1,14 @@
 /************ 数据处理模块-BGN  */
 var dataModule = ( function(){
+
+    const langInit = (idName,lang) => {
+        let test = document.getElementById( idName ).value = lang;
+    }
+
     return{
+        langInit: ( idName,lang ) => {
+            langInit( idName,lang );
+        }
 
     }
 
@@ -25,14 +33,13 @@ var uiModule = ( function(){
         else{
             document.querySelector('body').style.letterSpacing = '3px';
         }
-        console.log('参数发生改变',lg);
     }
 
     return{
         controlFontSpace: ()=>{
             controlFontSpace();
-        }
-
+        },
+        string: String,
     }
 
 } )()
@@ -41,16 +48,13 @@ var uiModule = ( function(){
 
 /************ 主空模块-BGN  */
 var controlModule = ( function( data,ui ){
-    
     // 监听
     var setupEventLiteners = ()=>{
         document.getElementById('language').addEventListener('change',ui.controlFontSpace);
-        // window.addEventListener('load',ui.controlFontSpace);
+        window.addEventListener('load',  ui.controlFontSpace, data.langInit( ui.string.language, ui.string.zh_s ) );
     }
-    
     return{
         init: ()=>{
-            console.log('Start!!!');
             setupEventLiteners();
         }
     }
