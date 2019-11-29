@@ -7,6 +7,9 @@ Note: This project was created to improve the areas near Asia and China, and to 
     原作者( Author: jeanropke )：<a href="https://github.com/jeanropke/RDR2CollectorsMap">https://github.com/jeanropke/RDR2CollectorsMap</a><br/>
     改进者( helper: __OO7__ ): <a href="https://github.com/ZTaer" >https://github.com/ZTaer</a>
 </h3>
+<h4>
+    赞助商: <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe" > 雷神加速器快捷下载 </a>
+</h4>
 <pre>
     已经更新:
         0. 更换JS - CDN插件，使亚洲地区可高速访问
