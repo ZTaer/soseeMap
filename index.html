@@ -2,67 +2,155 @@
 <html lang="zh">
 
 <head>
+
+  <!-- ------------------------ 默认属性 ------------------------- -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="./favicon.png" />
   <title>荒野大镖客线上 - 收藏家地图 | Sosee地图</title>
+  
+  <!--
+    SEO
+  -->
   <meta name="description" content="荒野大镖客线上收藏家地图. 找到世界各地的所有收藏品，然后卖给纳扎尔夫人.">
   <meta name="keywords" content="荒野大镖客线上, 收藏家地图, 地图, 交互式地图, jeanropke地图, sosee地图, sosee, jeanropke, 地图攻略">
   
+  <!-- ------------------------ 扩展CSS ------------------------- -->
+
+  <!--
+    地图
+  -->
   <link rel="stylesheet" href="https://cdn.staticfile.org/leaflet/1.5.1/leaflet.css" />
+  
+  <!--
+    bootstrap
+  -->
   <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.staticfile.org/ekko-lightbox/5.3.0/ekko-lightbox.css" integrity="sha256-HAaDW5o2+LelybUhfuk0Zh2Vdk8Y2W2UeKmbaXhalfA=" crossorigin="anonymous">
-  
+  <link href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+
+  <!-- ------------------------ 主CSS ------------------------- -->
   <link rel="stylesheet" href="assets/css/styles.css?nocache=112" />
   <link rel="stylesheet" href="assets/css/exp.css"/>
 
 </head>
 <body>
+
+  <!-- 左边菜单-BGN -->
   <div class="side-menu">
+    
+    <!-- 头部-BGN -->
     <h2>
-      <span data-text="menu.collectables">Collectables</span>
+      收藏家资源图
       <span class="help-button">
-        <a href="https://github.com/jeanropke/RDR2CollectorsMap/wiki/RDO-Collectors-Map-User-Guide-(English)" target="_blank" class="wiki-page">[Wiki]</a>
       </span>
     </h2>
+    <!-- 头部-END -->
+
+    <!-- collectables-counter-BGN -->
     <div class="collectables-counter" data-text="menu.collectables_counter">Collected -- of --</div>
-    <div class="msg-time py-3 oo7">
+    <!-- collectables-counter-END -->
+
+    <!-- banner-BGN -->
+    <section id="title-banner" class="mt-4 sss" >
       <div class="container">
-        <dl class="mb-0">
-          <dt>
-            最近更新:
-          </dt>
-          <dd>
-            2019.11.29
-          </dd>
-          <dt>
-            更新内容:
-          </dt>
-          <dd>
-            更多物品位置
-          </dd>
-          <dt>
-            DDOS攻击:
-          </dt>
-          <dd>
-            已报警
-          </dd>
-          <dt>
-            最大嫌疑人:
-          </dt>
-          <dd>
-            网名'doubi'
-          </dd>
-        </dl>
-        <a href="./assets/images//exp/msg-qq.jpg"  data-toggle="lightbox" data-title="道友你好! 鄙人正在闭关冲击 - 中级前端工程师 - 瓶颈中 - 如有要紧之事请私信留言 - 回复不能及时请阁下见谅！" data-gallery="img-gallery" data-width="1200" class="more btn d-block mx-auto mt-3">
-          意见反馈
-        </a>
+        <div class="row">   
+          <div class="col-12">
+            <h5 class="text-center" >
+              <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe">
+              立即下载雷神加速器
+              </a>
+            </h5>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
+    <section id="banner" class="carousel sss slide scroll-watch-in-view scroll-watch-ignore" data-ride="carousel" data-scroll-watch="">
+      
+      <div class="carousel-inner">
+        <div class="carousel-item active" style=" background-image:url( ./assets/images/exp/banner2.jpg ) ; ">
+          <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe" class="carousel-click"></a>
+        </div>
+
+        <div class="carousel-item" style=" background-image:url( ./assets/images/exp/banner1.png ) ; ">
+          <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe" class="carousel-click"></a>
+        </div>
+
+        <div class="carousel-item" style=" background-image:url( ./assets/images/exp/banner3.jpg ) ; " >
+          <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe" class="carousel-click" ></a>
+        </div>
+
+      </div>
+
+      <!-- 按钮 -->
+      <a class="carousel-control-prev" href="#banner" data-slide="prev" >
+        <span class="carousel-control-prev-icon" ></span>
+      </a>
+      <a class="carousel-control-next" href="#banner" data-slide="next" >
+        <span class="carousel-control-next-icon"></span>
+      </a>
+
+    </section>
+    <!-- banner-END -->
+
+    <!-- 消息通知-OO7-BGN -->
+    <section id="msg-time" class="py-4">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+
+              <dl class="mb-0">
+                <dt>
+                  最近更新:
+                </dt>
+                <dd>
+                  2019.11.30
+                </dd>
+                <dt>
+                  服务赞助:
+                </dt>
+                <dd>
+                    <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe" data-toggle="tooltip" data-placement="left" title="立即下载加速器" class="click-link" target="_block"  >
+                      雷神加速器
+                    </a>
+                </dd>
+                <dt>
+                  新增站点:
+                </dt>
+                <dd>
+                  <a href="https://map.earthlees.com/" data-toggle="tooltip" data-placement="left" title="单击访问此站点" class="click-link" target="_block"  >
+                    动植物地图
+                  </a>
+                </dd>
+              </dl>
+
+              <a href="./assets/images/exp/cn.png"  data-toggle="lightbox" data-title="在菜单下方即可看到此选项" data-gallery="img-gallery" data-width="1200" class="more btn d-block mx-auto mt-3">
+                中文翻译
+              </a>
+
+              <a href="./assets/images/exp/msg-qq.jpg"  data-toggle="lightbox" data-title="道友你好! 鄙人正在闭关冲击 - 中级前端工程师 - 瓶颈中 - 如有要紧之事请私信留言 - 回复不能及时请阁下见谅！" data-gallery="img-gallery" data-width="1200" class="more btn d-block mx-auto mt-3">
+                意见反馈
+              </a>
+
+              <button id="toggle-hidden" class="more btn d-block mx-auto mt-3">
+                隐藏广告
+              </button>
+
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- 消息通知-OO7-END -->
+
+    <!-- 隐藏/显示-BGN -->
     <div class="hide-show-container">
       <a data-text="menu.hide_all" href="javascript:void(0);" onclick="Menu.hideAll()">Hide all</a>
       <a data-text="menu.show_all" href="javascript:void(0);" onclick="Menu.showAll()">Show all</a>
     </div>
+    <!-- 隐藏/显示-END -->
+
+    <!-- 物品选项-BGN -->
     <div>
       <div class="menu-option clickable" data-type="american_flowers">
         <img class="icon" src="./assets/images/icons/american-flowers.png" />
@@ -237,6 +325,9 @@
         <span data-text="menu.random_spots" class="disabled">Random Spots</span>
       </div>
     </div>
+    <!-- 物品选项-END -->
+
+    <!-- 实用工具-BGN -->
     <h2 data-text="menu.utils">Utils</h2>
     <div class="menu-option clickable" data-type="nazar">
       <img class="icon" src="./assets/images/icons/nazar.png" />
@@ -271,12 +362,16 @@
       <div class="menu-hidden" data-type="treasure">
       </div>
     </div>
+    <!-- 实用工具-END -->
 
+    <!-- 搜索栏-BGN -->
     <div class="search-container">
       <h2 data-text="menu.search">Search</h2>
       <input class="input-search" type="text" id="search" placeholder="Search items. Separated by ;" autocomplete="off">
     </div>
+    <!-- 搜索栏-END -->
 
+    <!-- 设置-BGN -->
     <div class="settings-container">
       <h2 data-text="menu.settings">Settings</h2>
       <div class="input-container">
@@ -331,6 +426,9 @@
         </select>
       </div>
     </div>
+    <!-- 设置-END -->
+
+    <!-- 自定义路线-BGN -->
     <h2 data-text="menu.custom_routes">Custom routes</h2>
     <div class="custom-routes-container">
       <a data-text="menu.import_route" href="javascript:void(0);" onclick="Routes.importCustomRoute()">Import route</a>
@@ -346,16 +444,9 @@
         </select>
       </div>
     </div>
-    <div class="issues-container">
-      <h2 data-text="menu.issues">Issues</h2>
-      <a data-text="menu.report_issues" href="https://github.com/jeanropke/RDR2CollectorsMap/issues" target="_blank">Report issues here!</a>
-    </div>
-    <div class="hide-show-container">
-      <a href="https://jeanropke.github.io/RDOMap/" target="_blank" data-text="menu.rdo_map">RDO Map</a>
-    </div>
-    <div class="issues-container">
-      <a href="./index-legacy.html" data-text="menu.return_legacy">Return to legacy version!</a>
-    </div> <br>
+    <!-- 自定义路线-END -->
+
+    <!-- 作者赞助信息-BGN -->
     <div class="donate-container">
       <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
         <input type="hidden" name="cmd" value="_donations" />
@@ -364,34 +455,62 @@
         <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
         <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
       </form>
-
-      <div class="container oo7">
-        <h4 class="pt-3 pb-2 mt-0" >
-          为了升级更牛逼的服务器<br/>
-          请'单击赞助'按钮<br/>
-        </h4>
-        <a href="./assets/images/exp/wechat.png"  data-toggle="lightbox" data-title="感谢您！为服务器做的一份贡献, 我将会更加努力更新维护好此站" data-gallery="img-gallery" data-width="1200" class="wechat" >单击赞助</a>
-        <p class="content-text" >
-          <b>站长声明:</b><br/> 
-          本项目为Github开源项目<br/>
-          站长只是方便国内用户快速访问<br/>
-          故创建此项目无广告无任何收费<br/>
-          如果阁下手头宽裕可以赞助站长<br/>
-          方便站长更换更牛逼的服务器
-        </p>
-
-        <a href="https://github.com/jeanropke/RDR2CollectorsMap" class="oo7-link" >
-          技术支持: JEANROPKE原作者
-        </a><br/>
-        <a href="http://oo7.fun" class="oo7-link" >
-          技术支持: OO7实验室
-        </a>
-      </div>
-
     </div>
     <br>
+    <!-- 作者赞助信息-END -->
+
+    <!-- 底部信息-BGN -->
+    <section id="bottom-msg" class="py-5" >
+      <div class="container">
+        
+          <div class="row click-add-money ">
+            <div class="col-12">
+              <h4 class="mt-0" >
+                为了升级更牛逼的服务器<br/>
+                请'单击赞助'按钮<br/>
+              </h4>
+              <a href="./assets/images/exp/wechat.png"  data-toggle="lightbox" data-title="感谢您！为服务器做的一份贡献, 我将会更加努力更新维护好此站" data-gallery="img-gallery" data-width="1200" class="btn more mx-auto my-3" >单击赞助</a>
+            </div>  
+          </div>  
+
+          <div class="row siteMsg">
+            <div class="col-12">
+              <p class="content-text text-center" >
+                <b>站长声明:</b><br/> 
+                本项目为Github开源项目<br/>
+                站长只是方便国内用户快速访问<br/>
+                故创建此项目无广告无任何收费<br/>
+                如果阁下手头宽裕可以赞助站长<br/>
+                方便站长更换更牛逼的服务器
+              </p>
+            </div>
+          </div>
+        </div>
+    </section>
+    <!-- 底部信息-END -->
+    <!-- end-BGN -->
+    <section id="end" class="py-4">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 text-center">
+
+            <a href="https://github.com/jeanropke/RDR2CollectorsMap" class="oo7-link" >
+              技术支持: JEANROPKE原作者
+            </a><br/>
+            <a href="https://github.com/ZTaer" class="oo7-link" >
+              技术支持: OO7实验室
+            </a>
+            
+        </div>          
+        </div>
+      </div>
+    </section>
+    <!-- end-END -->
 
   </div>
+  <!-- 左边菜单-END -->
+
+  <!-- 地图-BGN -->
   <div class="menu-toggle">></div>
 
   <div class="timer-container">
@@ -406,9 +525,19 @@
   <div class="lat-lng-container">
     <p></p><button id="lat-lng-container-close-button">×</button>
   </div>
+  <!-- 地图-END -->
   
-  <script src="https://cdn.staticfile.org/leaflet/1.5.1/leaflet.js"></script>
+  <!-- ------------------------ 必备JS-BGN ------------------------- -->
+
+  <!--
+    地图必备
+  -->
   <script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/leaflet/1.5.1/leaflet.js"></script>
+
+  <!--
+    主数据
+  -->
   <script src="assets/js/jquery.cookie.js"></script>
   <script src="assets/js/marker.js?nocache=112"></script>
   <script src="assets/js/treasures.js?nocache=112"></script>
@@ -418,15 +547,32 @@
   <script src="assets/js/menu.js?nocache=112"></script>
   <script src="assets/js/routes.js?nocache=112"></script>
   <script src="assets/js/scripts.js?nocache=112"></script>
-  <script src="assets/js/exp.js?nocache=112" ></script>
-  <!-- Global site tag (gtag.js) - Google Analytics -->
+
+  <!-- 
+    Global site tag (gtag.js) - Google Analytics 
+  -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-39999584-4"></script>
+  
+  <!-- ------------------------ 必备JS-END ------------------------- -->
+
+  <!-- ------------------------ 扩展JS-BGN ------------------------- -->
+
+  <!--
+    个人扩展
+  -->  
+  <script src="assets/js/exp.js?nocache=112" ></script>
+  
+  <!-- 
+    bootstrap及框架 
+  -->
   <script src="https://cdn.staticfile.org/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
   <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
   <script src="https://cdn.staticfile.org/ekko-lightbox/5.3.0/ekko-lightbox.min.js" integrity="sha256-Y1rRlwTzT5K5hhCBfAFWABD4cU13QGuRN6P5apfWzVs=" crossorigin="anonymous"></script>
 
+  <!-- ------------------------ 扩展JS-END ------------------------- -->
 
   
+  <!-- ------------------------ 初始化JS-END ------------------------- -->
   <script>
     window.dataLayer = window.dataLayer || [];
 
@@ -437,13 +583,23 @@
 
     gtag('config', 'UA-39999584-4');
 
-    // oo7
+    // 灯箱
     $(document).on('click', '[data-toggle="lightbox"]', function(event) {
-          event.preventDefault();
-          $(this).ekkoLightbox();
-      });
+        event.preventDefault();
+        $(this).ekkoLightbox();
+    });
+
+    // 提示框
+    $(document).ready( 
+      function(){
+      $('[data-toggle="tooltip"]').tooltip();
+
+      }
+    );
+
 
   </script>
+  <!-- ------------------------ 初始化JS-END ------------------------- -->
 
 </body>
 
