@@ -22,7 +22,16 @@ var uiModule = ( function(){
         zh_s: 'zh-s',
         zh_t: 'zh-t',
         language: 'language',
+        toggleHidden: 'toggle-hidden',
     };
+
+    const noneItems = ( items ) => {
+        document.querySelector( items ).style.display = 'none';
+    }
+
+    const blockItems = ( items ) => {
+        document.querySelector( items ).style.display = 'block';
+    }
 
     // 保证中英文字体字间距不同
     const controlFontSpace = () => {
@@ -40,6 +49,12 @@ var uiModule = ( function(){
             controlFontSpace();
         },
         string: String,
+        noneItems: ( items ) => {
+            noneItems(items);
+        },
+        blockItems: (items) => {
+            blockItems(items);
+        }
     }
 
 } )()
@@ -48,10 +63,21 @@ var uiModule = ( function(){
 
 /************ 主空模块-BGN  */
 var controlModule = ( function( data,ui ){
+
+    // 切换显示
+    var displayItems = () => {
+        let items = ['#title-banner','#banner'];
+        items.forEach( e => {
+            let now = document.querySelector(e).style.display;
+            now == 'none' ? ui.blockItems(e) : ui.noneItems(e); 
+        } );
+    }
+    
     // 监听
     var setupEventLiteners = ()=>{
         document.getElementById('language').addEventListener('change',ui.controlFontSpace);
         window.addEventListener('load',  ui.controlFontSpace, data.langInit( ui.string.language, ui.string.zh_s ) );
+        document.getElementById( ui.string.toggleHidden ).addEventListener('click',displayItems);
     }
     return{
         init: ()=>{
