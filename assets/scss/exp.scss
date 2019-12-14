@@ -145,10 +145,28 @@ body{
 .leaflet-popup-content{
     h1{
         font-weight:bold;
+        letter-spacing: 2px;
     }
 }
 
 // 时间编辑
 .timer-container {
     width: 120px !important;
+}
+
+// 2019.12.15 - 新更新的地图图标中文样式
+.leaflet-popup-content{
+    font-family: '微软雅黑' !important;
+    $ph:7px;
+    h1{
+      letter-spacing: 3px;  
+      font-size: 1rem !important;
+      padding-top:$ph !important;
+    }
+    p{
+        font-size: 14px !important;
+        letter-spacing: 3px !important;
+        text-align: center;
+        padding-bottom:$ph;
+    }
 }
