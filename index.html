@@ -106,7 +106,7 @@
                   最近更新:
                 </dt>
                 <dd>
-                  2019.12.21
+                  2019.12.23
                 </dd>
                 <dt>
                   服务赞助:
@@ -370,6 +370,7 @@
         <span data-text="menu.random_spots">Random Spots</span>
       </div>
     </div>
+    
     <!-- 物品选项-END -->
 
     <!-- 实用工具-BGN -->
@@ -420,6 +421,7 @@
       <div class="menu-hidden" data-type="treasure">
       </div>
     </div>
+
     <!-- 实用工具-END -->
 
     <!-- 搜索栏-BGN -->
@@ -430,6 +432,11 @@
     <!-- 搜索栏-END -->
 
     <!-- 设置-BGN -->
+
+    <div class="search-container">
+      <h2 data-text="menu.search">Search</h2>
+      <input class="input-search" type="text" id="search" placeholder="Search items. Separated by ;" autocomplete="off">
+    </div>
 
     <div class="settings-container">
       <h2 data-text="menu.settings">Settings</h2>
@@ -446,10 +453,11 @@
         <label for="tools" data-text="menu.language">Language</label>
         <select class="input-day" id="language">
           <option value="de-de">Deutsch</option>
-          <option value="en-us">English</option>
+          <option value="en-us" >English</option>
           <option value="es-es">Español</option>
           <option value="fr-fr">Français</option>
           <option value="it-it">Italiano</option>
+          <option value="hu-hu">Magyar nyelv</option>
           <option value="pt-br">Português</option>
           <option value="pl">Polski</option>
           <option value="ru">Русский</option>
@@ -467,6 +475,13 @@
           <option value="0" data-text="menu.no" selected>No</option>
         </select>
       </div-->
+      <div class="input-container">
+        <label for="marker-cluster" data-text="menu.marker_cluster">Markers cluster</label>
+        <select class="input-day" id="marker-cluster">
+          <option value="1" data-text="menu.yes">Yes</option>
+          <option value="0" data-text="menu.no" selected>No</option>
+        </select>
+      </div>
       <div class="input-container">
         <label for="show-coordinates" data-text="menu.show_coords">Show coordinates on click</label>
         <select class="input-day" id="show-coordinates">
