@@ -17,8 +17,6 @@ Note: This project was created to improve the areas near Asia and China, and to 
         2. 补充部分字体翻译
     正在更新:
         0. 更多的翻译补充
-    准备更新:
-        0. 单击图标可显示物品在游戏中的位置图像
 </pre>
 <pre>
     Already updated:

@@ -173,7 +173,7 @@
       <div class="menu-option clickable" data-type="american_flowers">
         <img class="icon" src="./assets/images/icons/american-flowers.png" />
         <span data-text="menu.american_flowers">American Wild Flowers</span>
-        <input class="input-day" type="number" min="1" max="9" name="american_flowers">
+        <input class="input-day" type="number" min="1" max="6" name="american_flowers">
         <div class="open-submenu"></div>
       </div>
       <div class="menu-hidden" data-type="american_flowers">
@@ -440,7 +440,7 @@
         <label for="tools" data-text="menu.language">Language</label>
         <select class="input-day" id="language">
           <option value="de-de">Deutsch</option>
-          <option value="en-us" selected>English</option>
+          <option value="en-us" >English</option>
           <option value="es-es">Español</option>
           <option value="fr-fr">Français</option>
           <option value="it-it">Italiano</option>
@@ -514,6 +514,90 @@
         </select>
       </div>
     </div>
+    <h2 data-text="menu.custom_routes">Custom routes</h2>
+    <div class="custom-routes-container">
+      <a data-text="menu.import_route" href="javascript:void(0);" onclick="Routes.importCustomRoute()">Import
+        route</a>
+      <a data-text="menu.export_route" href="javascript:void(0);" onclick="Routes.exportCustomRoute()">Export
+        route</a>
+    </div>
+    <div class="routes-container">
+      <div class="input-container">
+        <label for="custom-routes" data-text="menu.enable_custom_route">Enable custom route</label>
+        <select class="input-day" id="custom-routes">
+          <option value="1" data-text="menu.yes">Yes</option>
+          <option value="0" data-text="menu.no" selected>No</option>
+          <option value="clear" data-text="menu.clear">Clear</option>
+        </select>
+      </div>
+    </div>
+    <h2>
+      <span data-text="menu.route_generator">Route generator</span>
+      <span class="help-button">[Beta]</span>
+    </h2>
+    <div class="custom-routes-container">
+      <a data-text="menu.generate_route" href="javascript:void(0);" onclick="Routes.generatePath()">Generate route</a>
+      <a data-text="menu.generate_route_clear" href="javascript:void(0);" onclick="Routes.clearPath()">Clear route</a>
+    </div>
+    <div class="settings-container">
+      <div class="input-container">
+        <label for="generate-route-generate-on-visit" data-text="menu.generate_route_generate_on_visit">Generate route on every visit</label>
+        <select class="input-day" id="generate-route-generate-on-visit">
+          <option value="true" data-text="menu.yes">Yes</option>
+          <option value="false" data-text="menu.no" selected>No</option>
+        </select>
+      </div>
+      <div class="input-container">
+        <label for="generate-route-ignore-collected" data-text="menu.generate_route_ignore_collected">Ignore collected items</label>
+        <select class="input-day" id="generate-route-ignore-collected">
+          <option value="true" data-text="menu.yes">Yes</option>
+          <option value="false" data-text="menu.no" selected>No</option>
+        </select>
+      </div>
+      <div class="input-container">
+        <label for="generate-route-distance" data-text="menu.generate_route_distance">Maximum line length</label>
+        <input id="generate-route-distance" class="input-day" type="number" min="1" max="200" value="25">
+      </div>
+      <div class="input-container">
+        <label for="generate-route-start" data-text="menu.generate_route_start">Route starts at</label>
+        <select class="input-day" id="generate-route-start">
+          <option value="SW" data-text="menu.generate_route_start.sw">Southwest (↙)</option>
+          <option value="NE" data-text="menu.generate_route_start.ne">Northeast (↗)</option>
+          <option value="N" data-text="menu.generate_route_start.n">North (↑)</option>
+          <option value="SE" data-text="menu.generate_route_start.se">Southeast (↘)</option>
+          <option value="Custom" data-text="menu.generate_route_start.custom">Custom</option>
+        </select>
+      </div>
+      <div class="input-container">
+        <label for="generate-route-start-lat" data-text="menu.generate_route_start_lat">Route start lat.</label>
+        <input id="generate-route-start-lat" class="input-day" type="number" step="any" value="-119.9063">
+      </div>
+      <div class="input-container">
+        <label for="generate-route-start-lng" data-text="menu.generate_route_start_lng">Route start long.</label>
+        <input id="generate-route-start-lng" class="input-day" type="number" step="any" value="8.0313">
+      </div>
+    </div>
+    <h2>Debug marker</h2>
+    <div class="routes-container">
+      <div class="input-container">
+        <label for="debug-marker"></label>
+        <form name="debug-marker">
+          <p><input placeholder="lat" type="text" name="debug-marker-lat" class="input-day">
+            <input placeholder="lng" type="text" name="debug-marker-lng" class="input-day">
+          </p>
+          <p style="float: right; position: relative; padding-top: 5px;"><button type="button" class="btn btn-info"
+              onclick="MapBase.submitDebugForm()">Place</button></p>
+        </form>
+      </div>
+      <div class="input-container">
+        <label for="show-all-markers">Show all markers</label>
+        <select class="input-day" id="show-all-markers">
+          <option value="1" data-text="menu.yes">Yes</option>
+          <option value="0" data-text="menu.no" selected>No</option>
+        </select>
+      </div>
+    </div>
+    
     <!-- 自定义路线-END -->
 
     <!-- 作者赞助信息-BGN -->
@@ -609,19 +693,19 @@
 
   <!--
     主数据
--->
+  -->
   <script src="assets/js/jquery.cookie.js"></script>
-  <script src="assets/js/settings.js?nocache=177"></script>
-  <script src="assets/js/cycles.js?nocache=177"></script>
-  <script src="assets/js/marker.js?nocache=177"></script>
-  <script src="assets/js/inventory.js?nocache=177"></script>
-  <script src="assets/js/treasures.js?nocache=177"></script>
-  <script src="assets/js/encounters.js?nocache=177"></script>
-  <script src="assets/js/map.js?nocache=177"></script>
-  <script src="assets/js/language.js?nocache=177"></script>
-  <script src="assets/js/menu.js?nocache=177"></script>
-  <script src="assets/js/routes.js?nocache=177"></script>
-  <script src="assets/js/scripts.js?nocache=177"></script>
+  <script src="assets/js/settings.js?nocache=183"></script>
+  <script src="assets/js/cycles.js?nocache=183"></script>
+  <script src="assets/js/marker.js?nocache=183"></script>
+  <script src="assets/js/inventory.js?nocache=183"></script>
+  <script src="assets/js/treasures.js?nocache=183"></script>
+  <script src="assets/js/encounters.js?nocache=183"></script>
+  <script src="assets/js/map.js?nocache=183"></script>
+  <script src="assets/js/language.js?nocache=183"></script>
+  <script src="assets/js/menu.js?nocache=183"></script>
+  <script src="assets/js/routes.js?nocache=183"></script>
+  <script src="assets/js/scripts.js?nocache=183"></script>
 
   <!-- 
     Global site tag (gtag.js) - Google Analytics 
