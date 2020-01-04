@@ -66,7 +66,7 @@ var controlModule = ( function( data,ui ){
 
     // 切换显示
     var displayItems = () => {
-        let items = ['#title-banner','#banner'];
+        let items = ['#title-banner','#banner', '.tong-zhi'];
         items.forEach( e => {
             let now = document.querySelector(e).style.display;
             now == 'none' ? ui.blockItems(e) : ui.noneItems(e); 
