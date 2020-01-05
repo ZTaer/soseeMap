@@ -68,19 +68,5 @@
 	{"key": "menu.inventory", "value": "物品数量"},
 	{"key": "menu.enable_inventory", "value": "是否启用数量功能"},
 	{"key": "menu.inventory_stack", "value": "物品数量大小"},
-	{"key": "menu.marker_cluster", "value": "Markers cluster"},
-	{"key": "menu.route_generator", "value": "路线生成"},
-	{"key": "menu.generate_route", "value": "产生路线"},
-	{"key": "menu.generate_route_clear", "value": "清除路线"},
-	{"key": "menu.generate_route_generate_on_visit", "value": "每次访问都生成路线”"},
-	{"key": "menu.generate_route_ignore_collected", "value": "忽略已收集的目标"},
-	{"key": "menu.generate_route_distance", "value": "最大收集物品数量"},
-	{"key": "menu.generate_route_start", "value": "起点"},
-	{"key": "menu.generate_route_start.sw", "value": "西南 (↙)"},
-	{"key": "menu.generate_route_start.ne", "value": "东北 (↗)"},
-	{"key": "menu.generate_route_start.n", "value": "北 (↑)"},
-	{"key": "menu.generate_route_start.se", "value": "东南 (↘)"},
-	{"key": "menu.generate_route_start.custom", "value": "Custom"},
-	{"key": "menu.generate_route_start_lat", "value": "起点坐标X"},
-	{"key": "menu.generate_route_start_lng", "value": "起点坐标Y"}
+	{"key": "menu.marker_cluster", "value": "Markers cluster"}
 ]
