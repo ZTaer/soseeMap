@@ -1,176 +1,88 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 
 <head>
-
-  <!-- ------------------------ 默认属性 ------------------------- -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="shortcut icon" href="./favicon.png" />
-  <title>
-    荒野大镖客2收藏家地图中文 | Sosee地图
-  </title>
-  
-  <!--
-    SEO
-  -->
-  <meta name="keywords" content="荒野大镖客线上, 收藏家地图, 荒野大镖客,荒野大镖客地图,荒野大镖客中文站,荒野大镖客攻略,荒野大镖客教程,荒野大镖客收藏家, jeanropke地图, sosee地图, sosee, jeanropke">
-  <meta name="description" content="荒野大镖客线上收藏家地图. 找到世界各地的所有收藏品，然后卖给纳扎尔夫人.">
-  
-  <!-- ------------------------ 扩展CSS ------------------------- -->
+  <title>Red Dead Online - Collectors Map</title>
+  <meta name="description"
+    content="Red Dead Online Collectors Map. Find all collectibles across the world and sell to Madam Nazar.">
+  <meta name="keywords"
+    content="Red Dead Online, Collectors Map, Collectors Map, Map, Interactive Map, Interactive, jeanropke map, jeanropke">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
 
-  <!--
-    地图
-  -->
-  <link rel="stylesheet" href="https://cdn.staticfile.org/leaflet/1.5.1/leaflet.css" />
-  
-  
-  <!--
-    bootstrap
-  -->
-  <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.staticfile.org/ekko-lightbox/5.3.0/ekko-lightbox.css" integrity="sha256-HAaDW5o2+LelybUhfuk0Zh2Vdk8Y2W2UeKmbaXhalfA=" crossorigin="anonymous">
-  <link href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+  <!-- Beta only; Add draw plugin -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+  <style>
+    .leaflet-top.leaflet-left {
+      top: 30px !important;
+      left: -5px;
+    }
 
-  <!-- ------------------------ 主CSS ------------------------- -->
+    #delete,
+    #export {
+      position: absolute;
+      top: 310px;
+      left: 6px;
+      z-index: 998;
+      background: white;
+      color: black;
+      padding: 6px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      text-decoration: none;
+    }
+
+    #delete, .leaflet-draw-edit-remove {
+      background-color: lightcoral !important;
+    }
+
+    #export {
+      top: 345px;
+    }
+  </style>
+
+  <!-- Beta only; geodata script(s) -->
+  <script src="./data/geojson/lemoyne.js"></script>
+
+  <script src="assets/js/jquery-3.4.1.min.js"></script>
+  <script src="assets/js/jquery.cookie.js"></script>
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
   <link rel="stylesheet" href="assets/css/styles.css?nocache=189" />
-  <link rel="stylesheet" href="assets/css/exp.css"/>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier-Leaflet/0.2.6/oms.min.js"></script>
+  <script>
+    var nocache = 189;
+  </script>
 </head>
+
 <body>
-
-  <!-- 左边菜单-BGN -->
   <div class="side-menu">
-    
-    <!-- 头部-BGN -->
-    <h2>
-      收藏家资源图
-      <span class="help-button">
-      </span>
+    <h2 id="main-header">
+      <img id="main-header-left" src="./assets/images/header_bg_left.png" alt="">
+      <div id="main-header-center">
+        <span data-text="menu.collectables">Collectables</span>
+        <h3 id="sub-header">
+          <span class="cycle-data">Loading</span> - <span class="collectables-counter"
+            data-text="menu.collectables_counter">Collected -- of --</span>
+        </h3>
+      </div>
+      <img id="main-header-right" src="./assets/images/header_bg_right.png" alt="">
     </h2>
-    <!-- 头部-END -->
-
-    <!-- collectables-counter-BGN -->
-    <div class="collectables-counter" data-text="menu.collectables_counter">Collected -- of --</div>
-    <!-- collectables-counter-END -->
-
-    <!-- banner-BGN -->
-    <section id="title-banner" class="mt-4 sss" >
-      <div class="container">
-        <div class="row">   
-          <div class="col-12">
-            <h5 class="text-center" >
-              <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe">
-              立即下载雷神加速器
-              </a>
-            </h5>
-          </div>
-        </div>
+    <div class="settings-container">
+      <div class="input-container-noflex">
+        <input class="input-search" type="text" id="search" placeholder="Search items. Separated by ;"
+          autocomplete="off">
       </div>
-    </section>
-    <section id="banner" class="carousel sss slide scroll-watch-in-view scroll-watch-ignore" data-ride="carousel" data-scroll-watch="">
-      
-      <div class="carousel-inner">
-        <div class="carousel-item active" style=" background-image:url( ./assets/images/exp/banner2.jpg ) ; ">
-          <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe" class="carousel-click"></a>
-        </div>
-
-        <div class="carousel-item" style=" background-image:url( ./assets/images/exp/banner1.png ) ; ">
-          <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe" class="carousel-click"></a>
-        </div>
-
-        <div class="carousel-item" style=" background-image:url( ./assets/images/exp/banner3.jpg ) ; " >
-          <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe" class="carousel-click" ></a>
-        </div>
-
-      </div>
-
-      <!-- 按钮 -->
-      <a class="carousel-control-prev" href="#banner" data-slide="prev" >
-        <span class="carousel-control-prev-icon" ></span>
-      </a>
-      <a class="carousel-control-next" href="#banner" data-slide="next" >
-        <span class="carousel-control-next-icon"></span>
-      </a>
-
-    </section>
-    <!-- banner-END -->
-
-    <!-- 消息通知-OO7-BGN -->
-    <section id="msg-time" class="py-4">
-      <div class="container">
-        <div class="row">
-          <div class="col-12">
-
-              <dl class="mb-0">
-                <dt>
-                  最近更新:
-                </dt>
-                <dd>
-                  2020.01.07
-                </dd>
-                <dt>
-                  服务赞助:
-                </dt>
-                <dd>
-                    <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe" data-toggle="tooltip" data-placement="left" title="立即下载加速器" class="click-link" target="_block"  >
-                      雷神加速器
-                    </a>
-                </dd>
-                <dt>
-                  新增站点:
-                </dt>
-                <dd>
-                  <a href="https://map.earthlees.com/" data-toggle="tooltip" data-placement="left" title="单击访问此站点" class="click-link" target="_block"  >
-                    动植物地图
-                  </a>
-                </dd>
-              </dl>
-
-              <a href="https://fanyi.baidu.com/" data-title="加载有延迟请稍等 - 如显示白板请等待几秒加载完毕即可正常显示" data-toggle="lightbox" data-width="1200" data-height="600" class="more btn d-none d-md-block mx-auto mt-3">
-                在线翻译
-              </a>
-
-              <a href="./assets/images/exp/msg-qq.jpg"  data-toggle="lightbox" data-title="道友你好! 鄙人正在闭关冲击 - 中级前端工程师 - 瓶颈中 - 如有要紧之事请私信留言 - 回复不能及时请阁下见谅！" data-gallery="img-gallery" data-width="1200" class="more btn d-block mx-auto mt-3">
-                意见反馈
-              </a>
-
-              <a href="https://ztaer.github.io/RD2timeList/" data-title="加载有延迟请稍等 - 如显示白板请等待几秒加载完毕即可正常显示" data-toggle="lightbox" data-width="1920" data-height="1080" class="more btn d-none d-md-block mx-auto mt-3">
-                线上活动
-              </a>
-
-              <a href="https://ztaer.github.io/RD2timeList/"  data-title="加载有延迟请稍等几秒 - :)" data-toggle="lightbox" data-width="1080" data-height="1620" class="more btn d-block d-md-none mx-auto mt-3">
-                线上活动
-              </a>
-
-              <button id="toggle-hidden" class="more btn d-block mx-auto mt-3">
-                隐藏广告
-              </button>
-
-              <p class="text-center mx-auto mt-4 tong-zhi" >
-                R星最近更新频繁小部分坐标可能不准确 - 
-                注意: 如显示不正常,是因浏览器缓存文件引起<br/>
-                请使用"谷歌浏览器"无痕窗口
-                (Ctrl+Shift+N)
-              </p>
-
-          </div>
-        </div>
-      </div>
-    </section>
-    
-    <!-- 消息通知-OO7-END -->
-
-    <!-- 隐藏/显示-BGN -->
+    </div>
     <div class="hide-show-container">
       <a data-text="menu.hide_all" href="javascript:void(0);" onclick="Menu.hideAll()">Hide all</a>
       <a data-text="menu.show_all" href="javascript:void(0);" onclick="Menu.showAll()">Show all</a>
     </div>
-    <div class="cycle-data">December 28</div>
-    <!-- 隐藏/显示-END -->
-
-    <!-- 物品选项-BGN -->
-    
     <div>
       <div class="menu-option clickable" data-type="american_flowers">
         <img class="icon" src="./assets/images/icons/american-flowers.png" />
@@ -445,7 +357,7 @@
         <label for="tools" data-text="menu.language">Language</label>
         <select class="input-day wide-select-menu" id="language">
           <option value="de-de">Deutsch</option>
-          <option value="en-us" >English</option>
+          <option value="en-us" selected>English</option>
           <option value="es-es">Español</option>
           <option value="fr-fr">Français</option>
           <option value="it-it">Italiano</option>
@@ -456,7 +368,7 @@
           <option value="ar-ar">ٱلْعَرَبِيَّة</option>
           <option value="ko">한국어</option>
           <option value="th-th">ภาษาไทย</option>
-          <option value="zh-s" selected>简体中文</option>
+          <option value="zh-s">简体中文</option>
           <option value="zh-t">繁体中文</option>
         </select>
       </div>
@@ -576,141 +488,169 @@
       </div>
     </div>
 
-    <!-- 自定义路线-END -->
+    <div class="header">
+      <span class="header-border"></span>
+      <h2 class="header-title">Debug marker</h2>
+      <span class="header-border"></span>
+    </div>
+    <div class="routes-container">
+      <div class="input-container">
+        <label for="show-all-markers">Show all markers</label>
+        <select class="input-day narrow-select-menu" id="show-all-markers">
+          <option value="1" data-text="menu.yes">Yes</option>
+          <option value="0" data-text="menu.no" selected>No</option>
+        </select>
+      </div>
+      <div class="input-container">
+        <label for="show-coordinates" data-text="menu.show_coords">Show coordinates on click</label>
+        <select class="input-day narrow-select-menu" id="show-coordinates">
+          <option value="1" data-text="menu.yes">Yes</option>
+          <option value="0" data-text="menu.no" selected>No</option>
+        </select>
+      </div>
+      <div class="input-container-noflex">
+        <input id="debug-marker-lat" placeholder="Lat." type="text" name="debug-marker-lat" class="input-day" value="">
+        <input id="debug-marker-lng" placeholder="Long." type="text" name="debug-marker-lng" class="input-day" value="">
+      </div>
+      <div class="input-container-noflex">
+        <input id="debug-marker-name" placeholder="Enter Debug Marker Name" type="text" class="input-search"
+          autocomplete="off">
+      </div>
+      <div class="input-container-noflex">
+        <button id="import-custom-markers" type="button" class="btn btn-default narrow-select-menu"
+          onclick="MapBase.importCustomMarkers()">Import [Beta]</button>
+        <button id="export-custom-markers" type="button" class="btn btn-default narrow-select-menu"
+          onclick="MapBase.exportCustomMarkers()">Export [Beta]</button>
+        <button id="debug-place-marker" type="button" class="btn btn-default btn-special narrow-select-menu"
+          onclick="MapBase.submitDebugForm()">Place</button>
+      </div>
+    </div>
 
-    <!-- 作者赞助信息-BGN -->
+    <div class="header">
+      <span class="header-border"></span>
+      <h2 class="header-title" data-text="menu.issues">Issues</h2>
+      <span class="header-border"></span>
+    </div>
+    <div class="issues-container">
+      <a data-text="menu.report_issues" href="https://github.com/jeanropke/RDR2CollectorsMap/issues"
+        target="_blank">Report issues here!</a>
+    </div>
+
+    <div class="hide-show-container">
+      <a href="https://jeanropke.github.io/RDOMap/" target="_blank" data-text="menu.rdo_map">RDO Map</a>
+    </div>
+
+    <div class="issues-container">
+      <a href="./index-legacy.html" data-text="menu.return_legacy">Return to legacy version!</a>
+    </div>
+    <div class="hide-show-container">
+      <span class="help-button">
+        <a href="https://github.com/jeanropke/RDR2CollectorsMap/wiki/RDO-Collectors-Map-User-Guide-(English)"
+          target="_blank" class="wiki-page">About this map: [Wiki]</a>
+      </span>
+    </div>
+
+    <br>
     <div class="donate-container">
       <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
         <input type="hidden" name="cmd" value="_donations" />
         <input type="hidden" name="business" value="X3A9DHBPW3B2A" />
-        <input type="hidden" name="currency_code" value="USD" />
-        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+        <select class="input-day" name="currency_code">
+          <option value="AUD">AUD $</option>
+          <option value="BRL">BRL R$</option>
+          <option value="CAD">CAD $</option>
+          <option value="CHF">CHF Fr.</option>
+          <option value="CZK">CZK Kč</option>
+          <option value="DKK">DKK kr.</option>
+          <option value="EUR">EUR €</option>
+          <option value="GBP">GBP £</option>
+          <option value="HKD">HKD $</option>
+          <option value="HUF">HUF Ft</option>
+          <option value="ILS">ILS ₪</option>
+          <option value="JPY">JPY ‎¥‎</option>
+          <option value="MXN">‎MXN $‎</option>
+          <option value="MYR">MYR RM</option>
+          <option value="NOK">NOK kr</option>
+          <option value="NZD">NZD $</option>
+          <option value="PHP">‎PHP ₱</option>
+          <option value="PLN">PLN gr</option>
+          <option value="RUB">RUB ₽</option>
+          <option value="SEK">SEK kr</option>
+          <option value="SGD">SGD $</option>
+          <option value="THB">THB ฿</option>
+          <option value="TWD">TWD $</option>
+          <option value="USD" selected>USD $</option>
+        </select>
+        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit"
+          title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
         <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
       </form>
     </div>
     <br>
-    <!-- 作者赞助信息-END -->
-
-    <!-- 底部信息-BGN -->
-    <section id="bottom-msg" class="py-5" >
-      <div class="container">
-        
-          <div class="row click-add-money ">
-            <div class="col-12">
-              <h4 class="mt-0" >
-                为了升级更牛逼的服务器<br/>
-                请'单击赞助'按钮<br/>
-              </h4>
-              <a href="./assets/images/exp/wechat.png"  data-toggle="lightbox" data-title="感谢您！为服务器做的一份贡献, 我将会更加努力更新维护好此站" data-gallery="img-gallery" data-width="1200" class="btn more mx-auto my-3" >单击赞助</a>
-            </div>  
-          </div>  
-
-          <div class="row siteMsg">
-            <div class="col-12">
-              <p class="content-text text-center" >
-                <b>站长声明:</b><br/> 
-                本项目为Github开源项目<br/>
-                站长只是方便国内用户快速访问<br/>
-                广告是为垫付CDN和服务器费用<br/>
-                如果阁下手头宽裕可以赞助站长<br/>
-                方便站长更好的维护此站
-              </p>
-            </div>
-          </div>
-        </div>
-    </section>
-    <!-- 底部信息-END -->
-    <!-- end-BGN -->
-    <section id="end" class="py-4">
-      <div class="container">
-        <div class="row">
-          <div class="col-12 text-center">
-
-            <a href="https://github.com/jeanropke/RDR2CollectorsMap" class="oo7-link" >
-              技术支持: JEANROPKE原作者
-            </a><br/>
-            <a href="https://github.com/ZTaer" class="oo7-link" >
-              技术支持: OO7实验室
-            </a>
-            
-        </div>          
-        </div>
-      </div>
-    </section>
-    <!-- end-END -->
 
   </div>
-  <!-- 左边菜单-END -->
-
-  <!-- 地图-BGN -->
   <div class="menu-toggle">></div>
 
-  <div class="timer-container">
+  <div class="timer-container display-in-front">
     <div id="countdown">--:--:--</div>
     <div id="day-cycle"></div>
+  </div>
+  <div class="clock-container">
+    <div id="time-in-game">--:--</div>
+    <div id="am-pm-time"></div>
   </div>
   <div class="counter-container">
     <p id="item-counter">-- of --</p>
   </div>
-  <div id="map"></div>
 
+  <div id="map">
+    <div id='delete'>Clear all</div>
+    <a href='#' id='export'>Export to .geojson</a>
+
+  </div>
   <div class="lat-lng-container">
     <p></p><button id="lat-lng-container-close-button">×</button>
   </div>
-  <!-- 地图-END -->
-  
-  <!-- ------------------------ 必备JS-BGN ------------------------- -->
 
-  <!--
-    地图必备
-  -->
-  <script src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js"></script>
-  <script src="https://cdn.staticfile.org/leaflet/1.5.1/leaflet.js"></script>
-  <script src="assets/js/jquery.cookie.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier-Leaflet/0.2.6/oms.min.js"></script>
-  <script>
-    var nocache = 189;
-  </script>
-  <!--
-    主数据
-  -->
+  <!--div class="map-alert">
+    Cycles are setted manually after Moonshiners update. Usually takes 20 minutes to update.
+    <button class="close-button">×</button>
+  </div-->
+
+
   <script src="assets/js/settings.js?nocache=189"></script>
   <script src="assets/js/cycles.js?nocache=189"></script>
   <script src="assets/js/marker.js?nocache=189"></script>
   <script src="assets/js/inventory.js?nocache=189"></script>
   <script src="assets/js/treasures.js?nocache=189"></script>
   <script src="assets/js/encounters.js?nocache=189"></script>
-  <script src="assets/js/map.js?nocache=189"></script>
+  <script src="assets/js/map-beta.js?nocache=189"></script>
   <script src="assets/js/language.js?nocache=189"></script>
   <script src="assets/js/menu.js?nocache=189"></script>
   <script src="assets/js/routes.js?nocache=189"></script>
   <script src="assets/js/scripts.js?nocache=189"></script>
 
-  <!-- 
-    Global site tag (gtag.js) - Google Analytics 
-  -->
+  <!-- Beta only -->
+  <script>
+    document.getElementById('delete').onclick = function (e) {
+      MapBase.drawnItems.clearLayers();
+    }
+
+    document.getElementById('export').onclick = function (e) {
+      // Extract GeoJson from MapBase.drawnItems
+      var data = MapBase.drawnItems.toGeoJSON();
+
+      // Stringify the GeoJson
+      var convertedData = 'text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data));
+
+      // Create export
+      document.getElementById('export').setAttribute('href', 'data:' + convertedData);
+      document.getElementById('export').setAttribute('download', 'data.geojson');
+    }
+  </script>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-39999584-4"></script>
-  
-  <!-- ------------------------ 必备JS-END ------------------------- -->
-
-  <!-- ------------------------ 扩展JS-BGN ------------------------- -->
-
-  <!--
-    个人扩展
-  -->  
-  <script src="assets/js/exp.js?nocache=112" ></script>
-  
-  <!-- 
-    bootstrap及框架 
-  -->
-  <script src="https://cdn.staticfile.org/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-  <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  <script src="https://cdn.staticfile.org/ekko-lightbox/5.3.0/ekko-lightbox.min.js" integrity="sha256-Y1rRlwTzT5K5hhCBfAFWABD4cU13QGuRN6P5apfWzVs=" crossorigin="anonymous"></script>
-
-  <!-- ------------------------ 扩展JS-END ------------------------- -->
-
-  
-  <!-- ------------------------ 初始化JS-END ------------------------- -->
   <script>
     window.dataLayer = window.dataLayer || [];
 
@@ -721,24 +661,7 @@
 
     gtag('config', 'UA-39999584-4');
 
-    // 灯箱
-    $(document).on('click', '[data-toggle="lightbox"]', function(event) {
-        event.preventDefault();
-        $(this).ekkoLightbox();
-    });
-
-    // 提示框
-    $(document).ready( 
-      function(){
-      $('[data-toggle="tooltip"]').tooltip();
-
-      }
-    );
-
-
   </script>
-
-  <!-- ------------------------ 初始化JS-END ------------------------- -->
 
 </body>
 
