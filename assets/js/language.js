@@ -18,7 +18,7 @@ var Language = {
   ,
   get: function(value) {
     if(Settings.language == null)
-    Settings.language = 'en-us';
+    Settings.language = 'zh-s';
       
     if(Language.data[Settings.language][value]) {
       return Language.data[Settings.language][value];
