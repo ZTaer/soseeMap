@@ -29,9 +29,10 @@ body{
     }
 }
 
-@include help-lightbox-font();
+@include help-lightbox-font($fz:1.5rem ,$c:#f8f8f8);
 .modal-title{
     margin-top:0 !important;
+    font-family: 'ZCOOL KuaiLe', cursive;
 }
 
 .cycle-data,.collectables-counter{
