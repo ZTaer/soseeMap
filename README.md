@@ -8,7 +8,7 @@ Note: This project was created to improve the areas near Asia and China, and to 
     改进者( helper: __OO7__ ): <a href="https://github.com/ZTaer" >https://github.com/ZTaer</a>
 </h3>
 <h4>
-    赞助商: <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe" > 雷神加速器快捷下载 </a>
+    赞助广告: <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe" > 雷神加速器快捷下载 </a>
 </h4>
 <pre>
     已经更新:
