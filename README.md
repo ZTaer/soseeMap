@@ -10,13 +10,34 @@ Note: This project was created to improve the areas near Asia and China, and to 
 <h4>
     赞助广告: <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe" > 雷神加速器快捷下载 </a>
 </h4>
-<pre>
-    已经更新:
-        0. 更换JS - CDN插件，使亚洲地区可高速访问
-        1. 优化字体显示
-        2. 补充部分字体翻译
-    正在更新:
-        0. 更多的翻译补充
+<pre style=" color:f8f8f8; " >
+    文件解析:
+        0. 默认zh-s: 
+           a) script.js: Settings.language = 'zh-s';
+           b) language.js: Settings.language = 'zh-s';
+           c) index.html: <option value="zh-s" selected >简体中文</option>
+        1. 修改天数:
+           a) cycles.json: current: "选择天数";
+        2. 设定地图图片地址:
+           a) 使用本地地图图片( 切忌不要使用默认的cdn图片链接 )
+           var mapLayers = [
+                L.tileLayer('https://s.rsg.sc/sc/images/games/RDR2/map/game/{z}/{x}/{y}.jpg', {
+                    noWrap: true,
+                    bounds: L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176))
+                }),
+                L.tileLayer('assets/maps/detailed/{z}/{x}_{y}.jpg', {
+                    noWrap: true,
+                    bounds: L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176))
+                }),
+                L.tileLayer('assets/maps/darkmode/{z}/{x}_{y}.jpg', {
+                    noWrap: true,
+                    bounds: L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176))
+                })
+            ];
+        3. 设置收藏品分享链接:
+           a) map.js中
+           b) 找到变量'shareText'修改如下
+           c) var shareText = `<a href="javascript:void(0)" onclick="setClipboardText('https://map.sosee.org/?m=${marker.text}')">${Language.get('map.copy_link')}</a>`;
 </pre>
 <pre>
     Already updated:
