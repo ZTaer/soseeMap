@@ -10,7 +10,7 @@ Note: This project was created to improve the areas near Asia and China, and to 
 <h4>
     赞助广告: <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe" > 雷神加速器快捷下载 </a>
 </h4>
-<pre style=" color:f8f8f8; " >
+<pre style=" color:#f8f8f8; " >
     文件解析:
         0. 默认zh-s: 
            a) script.js: Settings.language = 'zh-s';
