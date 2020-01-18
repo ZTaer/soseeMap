@@ -33,8 +33,8 @@
   <link href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
 
   <!-- ------------------------ 主CSS ------------------------- -->
-  <link rel="stylesheet" href="assets/css/styles.css?nocache=229" />
-  <link rel="stylesheet" href="assets/css/exp.css?nocache=229"/>
+  <link rel="stylesheet" href="assets/css/styles.css?nocache=230" />
+  <link rel="stylesheet" href="assets/css/exp.css?nocache=230"/>
 
 </head>
 <body>
@@ -107,7 +107,7 @@
                   最近更新:
                 </dt>
                 <dd>
-                  2020.01.16
+                  2020.01.18
                 </dd>
                 <dt>
                   手持目录:
@@ -487,6 +487,25 @@
     </div>
     <div class="settings-container">
       <div class="input-container">
+        <label for="tools" data-text="menu.language">Language</label>
+        <select class="input-day wide-select-menu" id="language">
+          <option value="de-de">Deutsch</option>
+          <option value="en-us" selected>English</option>
+          <option value="es-es">Español</option>
+          <option value="fr-fr">Français</option>
+          <option value="it-it">Italiano</option>
+          <option value="hu-hu">Magyar nyelv</option>
+          <option value="pt-br">Português</option>
+          <option value="pl">Polski</option>
+          <option value="ru">Русский</option>
+          <option value="ar-ar">ٱلْعَرَبِيَّة</option>
+          <option value="ko">한국어</option>
+          <option value="th-th">ภาษาไทย</option>
+          <option value="zh-s">简体中文</option>
+          <option value="zh-t">繁体中文</option>
+        </select>
+      </div>
+      <div class="input-container">
         <label for="tools" data-text="menu.tool_type">Tool type</label>
         <select class="input-day wide-select-menu" id="tools">
           <option value="0" data-text="menu.tool_type.no_tools">No tools</option>
@@ -576,25 +595,6 @@
           <label class="input-checkbox-label" for="show-coordinates"></label>
         </div>
       </div>
-      <div class="input-container">
-        <label for="tools" data-text="menu.language">Language</label>
-        <select class="input-day wide-select-menu" id="language">
-          <option value="de-de">Deutsch</option>
-          <option value="en-us" >English</option>
-          <option value="es-es">Español</option>
-          <option value="fr-fr">Français</option>
-          <option value="it-it">Italiano</option>
-          <option value="hu-hu">Magyar nyelv</option>
-          <option value="pt-br">Português</option>
-          <option value="pl">Polski</option>
-          <option value="ru">Русский</option>
-          <option value="ar-ar">ٱلْعَرَبِيَّة</option>
-          <option value="ko">한국어</option>
-          <option value="th-th">ภาษาไทย</option>
-          <option value="zh-s" selected >简体中文</option>
-          <option value="zh-t">繁体中文</option>
-        </select>
-      </div>
     </div>
 
     <div class="header">
@@ -604,11 +604,6 @@
         <span class="help-button">[Beta]</span>
       </h2>
       <span class="header-border"></span>
-    </div>
-    <div class="links-container">
-      <a data-text="menu.generate_route" href="javascript:void(0);" onclick="Routes.generatePath(true)">Generate
-        route</a>
-      <a data-text="menu.generate_route_clear" href="javascript:void(0);" onclick="Routes.clearPath()">Clear route</a>
     </div>
     <div class="settings-container">
       <div class="input-container">
@@ -662,14 +657,34 @@
         <label for="generate-route-start-lng" data-text="menu.generate_route_start_lng">Route start long.</label>
         <input id="generate-route-start-lng" class="input-day wide-select-menu" type="number" step="any" value="8.0313">
       </div>
+      <hr class="menu-divider">
+      <div class="input-container">
+        <label for="generate-route-use-pathfinder" data-text="menu.generate_route_use_pathfinder">Use path finder
+          (very slow)</label>
+        <div class="input-checkbox-wrapper">
+          <input class="input-checkbox" type="checkbox" name="generate-route-use-pathfinder" value="1"
+            id="generate-route-use-pathfinder" />
+          <label class="input-checkbox-label" for="generate-route-use-pathfinder"></label>
+        </div>
+      </div>
+      <div class="input-container">
+        <label for="generate-route-allow-fasttravel" data-text="menu.generate_route_allow_fasttravel">Allow fast travel
+          (path finder)</label>
+        <div class="input-checkbox-wrapper">
+          <input class="input-checkbox" type="checkbox" name="generate-route-allow-fasttravel" value="1"
+            id="generate-route-allow-fasttravel" />
+          <label class="input-checkbox-label" for="generate-route-allow-fasttravel"></label>
+        </div>
+      </div>
     </div>
-
-    <h4 data-text="menu.custom_routes">Custom routes</h4>
     <div class="links-container">
-      <a data-text="menu.import_route" href="javascript:void(0);" onclick="Routes.importCustomRoute()">Import
-        route</a>
-      <a data-text="menu.export_route" href="javascript:void(0);" onclick="Routes.exportCustomRoute()">Export
-        route</a>
+      <button data-text="menu.generate_route_clear" href="javascript:void(0);" onclick="Routes.clearPath()">Clear route</button>
+      <button data-text="menu.generate_route" href="javascript:void(0);" onclick="Routes.generatePath(true)">Generate route</button>
+    </div>
+    <div class="header">
+      <span class="header-border"></span>
+      <h2 class="header-title" data-text="menu.custom_routes">Custom routes</h2>
+      <span class="header-border"></span>
     </div>
     <div class="settings-container">
       <div class="input-container">
@@ -683,6 +698,12 @@
         <label data-text="menu.clear_custom_routes">Clear custom route</label>
         <div class="input-action"></div>
       </div>
+    </div>
+    <div class="links-container">
+      <button data-text="menu.import_route" href="javascript:void(0);" onclick="Routes.importCustomRoute()">Import
+        route</button>
+      <button data-text="menu.export_route" href="javascript:void(0);" onclick="Routes.exportCustomRoute()">Export
+        route</button>
     </div>
 
     <!-- 自定义路线-END -->
@@ -892,24 +913,25 @@
   <script src="https://cdn.staticfile.org/leaflet/1.5.1/leaflet.js"></script>
   <script src="assets/js/lib/oms.min.js"></script>
   <script>
-    var nocache = 229;
+    var nocache = 230;
   </script>
   <!--
     主数据
   -->
-  <script src="assets/js/settings.js?nocache=229"></script>
-  <script src="assets/js/cycles.js?nocache=229"></script>
-  <script src="assets/js/marker.js?nocache=229"></script>
-  <script src="assets/js/inventory.js?nocache=229"></script>
-  <script src="assets/js/treasures.js?nocache=229"></script>
-  <script src="assets/js/encounters.js?nocache=229"></script>
-  <script src="assets/js/pins.js?nocache=229"></script>
-  <script src="assets/js/map.js?nocache=229"></script>
-  <script src="assets/js/language.js?nocache=229"></script>
-  <script src="assets/js/menu.js?nocache=229"></script>
-  <script src="assets/js/routes.js?nocache=229"></script>
-  <script src="assets/js/loot.js?nocache=229"></script>
-  <script src="assets/js/scripts.js?nocache=229"></script>
+  <script src="assets/js/settings.js?nocache=230"></script>
+  <script src="assets/js/cycles.js?nocache=230"></script>
+  <script src="assets/js/marker.js?nocache=230"></script>
+  <script src="assets/js/inventory.js?nocache=230"></script>
+  <script src="assets/js/treasures.js?nocache=230"></script>
+  <script src="assets/js/encounters.js?nocache=230"></script>
+  <script src="assets/js/pins.js?nocache=230"></script>
+  <script src="assets/js/map.js?nocache=230"></script>
+  <script src="assets/js/language.js?nocache=230"></script>
+  <script src="assets/js/menu.js?nocache=230"></script>
+  <script src="assets/js/routes.js?nocache=230"></script>
+  <script src="assets/js/pathfinder.js?nocache=230"></script>
+  <script src="assets/js/loot.js?nocache=230"></script>
+  <script src="assets/js/scripts.js?nocache=230"></script>
 
   <!-- 
     Global site tag (gtag.js) - Google Analytics 
@@ -923,7 +945,7 @@
   <!--
     个人扩展
   -->  
-  <script src="assets/js/exp.js?nocache=229" ></script>
+  <script src="assets/js/exp.js?nocache=230" ></script>
   
   <!-- 
     bootstrap及框架 
