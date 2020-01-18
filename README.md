@@ -10,7 +10,7 @@ Note: This project was created to improve the areas near Asia and China, and to 
 <h4>
     赞助广告: <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe" > 雷神加速器快捷下载 </a>
 </h4>
-<pre>
+<pre style=" color:f8f8f8; " >
     文件解析:
         0. 默认zh-s: 
            a) script.js: Settings.language = 'zh-s';
@@ -34,6 +34,10 @@ Note: This project was created to improve the areas near Asia and China, and to 
                     bounds: L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176))
                 })
             ];
+        3. 设置收藏品分享链接:
+           a) map.js中
+           b) 找到变量'shareText'修改如下
+           c) var shareText = `<a href="javascript:void(0)" onclick="setClipboardText('https://map.sosee.org/?m=${marker.text}')">${Language.get('map.copy_link')}</a>`;
 </pre>
 <pre>
     Already updated:
