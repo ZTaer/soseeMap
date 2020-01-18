@@ -98,7 +98,7 @@ function init() {
     $.cookie('map-layer', 1, { expires: 999 });
 
   if (!Language.availableLanguages.includes(Settings.language))
-    Settings.language = 'en-us';
+    Settings.language = 'zh-s';
 
   if (typeof $.cookie('remove-markers-daily') === 'undefined') {
     Settings.resetMarkersDaily = true;
