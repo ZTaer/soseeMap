@@ -109,7 +109,34 @@ function init() {
     $.cookie('marker-cluster', '1', { expires: 999 });
   }
 
+  if (typeof $.cookie('enable-marker-popups') === 'undefined') {
+    Settings.isPopupsEnabled = true;
+    $.cookie('enable-marker-popups', '1', { expires: 999 });
+  }
+
+  if (typeof $.cookie('enable-dclick-zoom') === 'undefined') {
+    Settings.isDoubleClickZoomEnabled = true;
+    $.cookie('enable-dclick-zoom', '1', { expires: 999 });
+  }
+
+  if (typeof $.cookie('show-help') === 'undefined') {
+    Settings.showHelp = true;
+    $.cookie('show-help', '1', { expires: 999 });
+  }
+
+  if (typeof $.cookie('marker-opacity') === 'undefined') {
+    Settings.markerOpacity = 1;
+    $.cookie('marker-opacity', '1', { expires: 999 });
+  }
+
+  if (typeof $.cookie('overlay-opacity') === 'undefined') {
+    Settings.overlayOpacity = 0.5;
+    $.cookie('overlay-opacity', '0.5', { expires: 999 });
+  }
+
   MapBase.init();
+  MapBase.setOverlays(Settings.overlayOpacity);
+
   Language.setMenuLanguage();
 
   setMapBackground($.cookie('map-layer'));
@@ -119,12 +146,23 @@ function init() {
 
   $('#tools').val(Settings.toolType);
   $('#language').val(Settings.language);
+  $('#marker-opacity').val(Settings.markerOpacity);
+  $('#overlay-opacity').val(Settings.overlayOpacity);
 
   $('#reset-markers').prop("checked", Settings.resetMarkersDaily);
   $('#marker-cluster').prop("checked", Settings.markerCluster);
+  $('#enable-marker-popups').prop("checked", Settings.isPopupsEnabled);
+  $('#enable-dclick-zoom').prop("checked", Settings.isDoubleClickZoomEnabled);
   $('#pins-place-mode').prop("checked", Settings.isPinsPlacingEnabled);
   $('#pins-edit-mode').prop("checked", Settings.isPinsEditingEnabled);
+  $('#show-help').prop("checked", Settings.showHelp);
   $('#show-coordinates').prop("checked", Settings.isCoordsEnabled);
+
+  if (Settings.showHelp) {
+    $("#help-container").show();
+  } else {
+    $("#help-container").hide();
+  }
 
   Pins.addToMap();
   changeCursor();
@@ -236,19 +274,18 @@ setInterval(function () {
 }, 1000);
 
 // toggle timer and clock after click the container
-$('.timer-container').on('click', function () {
-  $(this).toggleClass("display-in-front");
-  $('.clock-container').toggleClass("display-in-front");
+$('.timer-container, .clock-container').on('click', function () {
+  $('.timer-container, .clock-container').toggleClass("display-in-front");
 });
-$('.clock-container').on('click', function () {
-  $(this).toggleClass("display-in-front");
-  $('.timer-container').toggleClass("display-in-front");
-});
-
 
 /**
  * jQuery triggers
  */
+
+//Toggle debug container
+$("#toggle-debug").on("click", function () {
+  $("#debug-container").toggleClass('opened');
+});
 
 //Show all markers on map
 $("#show-all-markers").on("change", function () {
@@ -368,9 +405,25 @@ $("#language").on("change", function () {
   Cycles.setLocaleDate();
 });
 
+//Change & save overlay opacity
+$("#marker-opacity").on("change", function () {
+  var parsed = parseFloat($("#marker-opacity").val());
+  Settings.markerOpacity = parsed ? parsed : 1;
+  $.cookie('marker-opacity', Settings.markerOpacity, { expires: 999 });
+  MapBase.addMarkers();
+});
+
+$("#overlay-opacity").on("change", function () {
+  var parsed = parseFloat($("#overlay-opacity").val());
+  Settings.overlayOpacity = parsed ? parsed : 0.5;
+  $.cookie('overlay-opacity', Settings.overlayOpacity, { expires: 999 });
+  MapBase.setOverlays(parsed);
+});
+
 //Disable & enable collection category
 $('.clickable').on('click', function () {
   var menu = $(this);
+  if (typeof menu.data('type') === 'undefined') return;
 
   $('[data-type=' + menu.data('type') + ']').toggleClass('disabled');
   var isDisabled = menu.hasClass('disabled');
@@ -486,6 +539,24 @@ $('#marker-cluster').on("change", function () {
   MapBase.addMarkers();
 });
 
+$('#enable-marker-popups').on("change", function () {
+  Settings.isPopupsEnabled = $("#enable-marker-popups").prop('checked');
+  $.cookie('enable-marker-popups', Settings.isPopupsEnabled ? '1' : '0', { expires: 999 });
+
+  MapBase.map.removeLayer(Layers.itemMarkersLayer);
+  MapBase.addMarkers();
+});
+
+$('#enable-dclick-zoom').on("change", function () {
+  Settings.isDoubleClickZoomEnabled = $("#enable-dclick-zoom").prop('checked');
+  $.cookie('enable-dclick-zoom', Settings.isDoubleClickZoomEnabled ? '1' : '0', { expires: 999 });
+
+  if (Settings.isDoubleClickZoomEnabled) {
+    MapBase.map.doubleClickZoom.enable();
+  } else {
+    MapBase.map.doubleClickZoom.disable();
+  }
+});
 
 /**
  * User Pins
@@ -502,6 +573,10 @@ $('#pins-edit-mode').on("change", function () {
 
   Pins.addToMap();
 });
+
+$('#pins-place-new').on("click", function () {
+  Pins.addPinToCenter();
+})
 
 $('#pins-export').on("click", function () {
   try {
@@ -778,6 +853,26 @@ $('#detailed-loot-modal').on('show.bs.modal', function (event) {
   if (table == 'unknown') table = null;
   modal.find('.modal-body').html(Loot.generateTable(table));
 })
+
+/**
+ * Tutorial logic
+ */
+$('[data-help]').hover(function (e) {
+  $('#help-container p').text(Language.get(`help.${$(this).data('help')}`));
+}, function () {
+  $('#help-container p').text(Language.get(`help.default`));
+});
+
+$('#show-help').on("change", function () {
+  Settings.showHelp = $("#show-help").prop('checked');
+  $.cookie('show-help', Settings.isHelpEnabled ? '1' : '0', { expires: 999 });
+
+  if (Settings.showHelp) {
+    $("#help-container").show();
+  } else {
+    $("#help-container").hide();
+  }
+});
 
 /**
  * Leaflet plugins
