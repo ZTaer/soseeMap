@@ -17,6 +17,7 @@ var MapBase = {
   map: null,
   overlays: [],
   markers: [],
+  itemsMarkedAsImportant: [],
 
   init: function () {
 
@@ -37,6 +38,7 @@ var MapBase = {
   ];
 
     MapBase.map = L.map('map', {
+      attributionControl: false,
       preferCanvas: true,
       minZoom: this.minZoom,
       maxZoom: this.maxZoom,
@@ -44,6 +46,13 @@ var MapBase = {
       crs: L.CRS.Simple,
       layers: [mapLayers[parseInt($.cookie('map-layer'))]]
     }).setView([-70, 111.75], 3);
+
+    MapBase.map.addControl(
+      L.control.attribution({
+        position: 'bottomleft',
+        prefix: '<span data-text="map.attribution_prefix">Tiles provided by</span>'
+      })
+    );
 
     L.control.zoom({
       position: 'bottomright'
@@ -113,7 +122,7 @@ var MapBase = {
     Layers.overlaysLayer.clearLayers();
 
     if (opacity == 0) return;
-    
+
     $.each(MapBase.overlays, function (key, value) {
       Layers.overlaysLayer.addLayer(L.imageOverlay(value.img, value.bounds, { opacity: opacity }));
     });
@@ -153,7 +162,7 @@ var MapBase = {
     $.each(data, function (_category, _cycles) {
       $.each(_cycles, function (day, _markers) {
         $.each(_markers, function (key, marker) {
-          MapBase.markers.push(new Marker(marker.text, marker.lat, marker.lng, marker.tool, day, _category, marker.subdata, marker.video, marker.loot_table));
+          MapBase.markers.push(new Marker(marker.text, marker.lat, marker.lng, marker.tool, day, _category, marker.subdata, marker.video));
         });
       });
     });
@@ -169,15 +178,19 @@ var MapBase = {
       var markers = MapBase.markers;
 
       $.each(markers, function (key, value) {
-        if (inventory[value.text])
-          inventory[value.text].isCollected = false;
+        if (Inventory.items[value.text])
+          Inventory.items[value.text].isCollected = false;
 
         markers[key].isCollected = false;
-        markers[key].canCollect = value.amount < Inventory.stackSize;
+
+        if (Inventory.isEnabled)
+          markers[key].canCollect = value.amount < Inventory.stackSize;
+        else
+          markers[key].canCollect = true;
       });
 
       MapBase.markers = markers;
-      MapBase.save();
+      Inventory.save();
     }
 
     $.cookie('date', date, { expires: 999 });
@@ -264,6 +277,8 @@ var MapBase = {
 
     if (Routes.generateOnVisit)
       Routes.generatePath(true);
+
+    MapBase.loadImportantItems();
   },
 
   loadWeeklySet: function () {
@@ -399,15 +414,15 @@ var MapBase = {
       var weeklyText = marker.weeklyCollection != null ? Language.get("weekly.desc").replace('{collection}', Language.get('weekly.desc.' + marker.weeklyCollection)) : '';
       popupContent += (marker.tool == '-1' ? Language.get('map.item.unable') : '') + ' ' + marker.description + ' ' + weeklyText;
     } else {
-      popupContent += Language.get('menu.loot_table.table_' + (marker.lootTable || 'unknown') + '.desc');
+      // Todo: Maybe make this link translatable on the Wiki?
+      popupContent += Language.get('map.random_spot.desc').replace('{link}', `<a href="https://github.com/jeanropke/RDR2CollectorsMap/wiki/Random-Item-Possible-Loot" target="_blank">${Language.get('map.random_spot.link')}</a>`);
     }
 
     var shareText = `<a href="javascript:void(0)" onclick="setClipboardText('https://map.sosee.org/?m=${marker.text}')">${Language.get('map.copy_link')}</a>`;
-    var lootText = marker.category == 'random' ? ` | <a href="javascript:void(0)" data-toggle="modal" data-target="#detailed-loot-modal" data-table="${marker.lootTable || 'unknown'}">${Language.get('menu.loot_table.view_loot')}</a>` : '';
     var videoText = marker.video != null ? ' | <a href="' + marker.video + '" target="_blank">' + Language.get('map.video') + '</a>' : '';
     var importantItem = ((marker.subdata != 'agarita' && marker.subdata != 'blood_flower') ? ` | <a href="javascript:void(0)" onclick="MapBase.highlightImportantItem('${marker.text || marker.subdata}')">${Language.get('map.mark_important')}</a>` : '');
 
-    var linksElement = $('<p>').addClass('marker-popup-links').append(shareText).append(lootText).append(videoText).append(importantItem);
+    var linksElement = $('<p>').addClass('marker-popup-links').append(shareText).append(videoText).append(importantItem);
 
     var buttons = marker.category == 'random' ? '' : `<div class="marker-popup-buttons">
     <button class="btn btn-danger" onclick="Inventory.changeMarkerAmount('${marker.subdata || marker.text}', -1)">↓</button>
@@ -504,30 +519,10 @@ var MapBase = {
     Layers.itemMarkersLayer.addLayer(tempMarker);
     if (Settings.markerCluster)
       Layers.oms.addMarker(tempMarker);
+
+    MapBase.loadImportantItems();
   },
 
-  save: function () {
-    //Before saving, remove previous cookies peepoSmart
-    $.removeCookie('removed-items');
-    $.each($.cookie(), function (key, value) {
-      if (key.startsWith('removed-items')) {
-        $.removeCookie(key)
-      }
-    });
-    var temp = "";
-    $.each(MapBase.markers, function (key, marker) {
-      if (marker.day == Cycles.data.cycles[Cycles.data.current][marker.category] && (marker.amount > 0 || marker.isCollected))
-        temp += `${marker.text}:${marker.isCollected ? '1' : '0'}:${marker.amount};`;
-    });
-
-    var collectedItemsArray = temp.match(/.{1,2000}/g);
-
-    $.each(collectedItemsArray, function (key, value) {
-      $.cookie('removed-items-' + key, value, {
-        expires: 999
-      });
-    });
-  },
   gameToMap: function (lat, lng, name = "Debug Marker") {
     MapBase.debugMarker((0.01552 * lng + -63.6), (0.01552 * lat + 111.29), name);
   },
@@ -536,7 +531,29 @@ var MapBase = {
   },
 
   highlightImportantItem(text) {
-    $(`[data-marker*=${text}]`).toggleClass('highlightItems');
+    $(`[data-marker*=${text}]`).toggleClass('highlight-items');
+
+    if ($(`[data-marker*=${text}].highlight-items`).length)
+      MapBase.itemsMarkedAsImportant.push(text);
+    else
+      MapBase.itemsMarkedAsImportant.splice(MapBase.itemsMarkedAsImportant.indexOf(text), 1);
+
+    $.each(localStorage, function (key) {
+      localStorage.removeItem('importantItems');
+    });
+
+    localStorage.setItem('importantItems', JSON.stringify(MapBase.itemsMarkedAsImportant));
+  },
+
+  loadImportantItems() {
+    if (typeof localStorage.importantItems === 'undefined')
+      localStorage.importantItems = "[]";
+
+    MapBase.itemsMarkedAsImportant = JSON.parse(localStorage.importantItems) || [];
+
+    $.each(MapBase.itemsMarkedAsImportant, function (key, value) {
+      $(`[data-marker*=${value}]`).addClass('highlight-items');
+    });
   }
 };
 
