@@ -27,10 +27,10 @@ var date;
 
 var wikiLanguage = [];
 
-var inventory = [];
 var tempInventory = [];
 
 var debugMarkersArray = [];
+var tempCollectedMarkers = "";
 
 function init() {
 
@@ -39,7 +39,7 @@ function init() {
   wikiLanguage['fr-fr'] = 'https://github.com/jeanropke/RDR2CollectorsMap/wiki/RDO-Collectors-Map-Guide-d\'Utilisateur-(French)';
   wikiLanguage['pt-br'] = 'https://github.com/jeanropke/RDR2CollectorsMap/wiki/Guia-do-Usu%C3%A1rio---Mapa-de-Colecionador-(Portuguese)';
 
-  var tempCollectedMarkers = "";
+
   //sometimes, cookies are saved in the wrong order
   var cookiesList = [];
   $.each($.cookie(), function (key, value) {
@@ -63,16 +63,7 @@ function init() {
 
   tempInventory = tempInventory.split(';');
 
-  $.each(tempInventory, function (key, value) {
-    if (!value.includes(':'))
-      return;
-    var tempItem = value.split(':');
-    inventory[tempItem[0]] = {
-      'isCollected': tempItem[1] == '1',
-      'amount': tempItem[2]
-    };
-
-  });
+  Inventory.load();
 
   if (typeof $.cookie('alert-closed-1') == 'undefined') {
     $('.map-alert').show();
@@ -94,7 +85,7 @@ function init() {
   });
 
   if (typeof $.cookie('map-layer') === 'undefined' || isNaN(parseInt($.cookie('map-layer'))))
-    $.cookie('map-layer', 1, { expires: 999 });
+    $.cookie('map-layer', 0, { expires: 999 });
 
   if (!Language.availableLanguages.includes(Settings.language))
     Settings.language = 'zh-s';
@@ -176,15 +167,15 @@ function setMapBackground(mapIndex) {
   switch (parseInt(mapIndex)) {
     default:
     case 0:
-      $('#map').css('background-color', '#d2b790');
+      $('#map').removeClass('leaflet-dark-mode').css('background-color', '#d2b790');
       break;
 
     case 1:
-      $('#map').css('background-color', '#d2b790');
+      $('#map').removeClass('leaflet-dark-mode').css('background-color', '#d2b790');
       break;
 
     case 2:
-      $('#map').css('background-color', '#3d3d3d');
+      $('#map').addClass('leaflet-dark-mode').css('background-color', '#3d3d3d');
       break;
   }
 
@@ -333,14 +324,18 @@ $("#reset-markers").on("change", function () {
 
 $("#clear-markers").on("click", function () {
   $.each(MapBase.markers, function (key, value) {
-    if (inventory[value.text])
-      inventory[value.text].isCollected = false;
+    if (Inventory.items[value.text])
+      Inventory.items[value.text].isCollected = false;
 
     value.isCollected = false;
-    value.canCollect = value.amount < Inventory.stackSize;
+
+    if (Inventory.isEnabled)
+      value.canCollect = value.amount < Inventory.stackSize;
+    else
+      value.canCollect = true;
   });
 
-  MapBase.save();
+  Inventory.save();
   Menu.refreshMenu();
 
   Menu.refreshItemsCounter();
@@ -349,17 +344,22 @@ $("#clear-markers").on("click", function () {
 
 //Clear inventory on menu
 $("#clear-inventory").on("click", function () {
-  $.each(Object.keys(inventory), function (key, value) {
-    inventory[value].amount = 0;
-    var marker = MapBase.markers.filter(function (marker) {
-      return marker.text == value && marker.day == Cycles.data.cycles[Cycles.data.current][marker.category];
-    })[0];
 
-    if (marker != null)
+  $.each(MapBase.markers, function (key, marker) {
+    if (marker.day == Cycles.data.cycles[Cycles.data.current][marker.category] && (marker.amount > 0 || marker.isCollected)) {
+      if (Inventory.items[marker.text])
+        Inventory.items[marker.text].amount = 0;
+
       marker.amount = 0;
+
+      if (Inventory.isEnabled)
+        marker.canCollect = marker.amount < Inventory.stackSize && !marker.isCollected;
+      else
+        marker.canCollect = !marker.isCollected;
+    }
   });
 
-  MapBase.save();
+  Inventory.save();
   MapBase.addMarkers();
   Menu.refreshMenu();
 });
@@ -490,8 +490,8 @@ $('.collection-reset').on('click', function (e) {
     if (value.canCollect)
       return;
 
-    if (inventory[value.text])
-      inventory[value.text].isCollected = false;
+    if (Inventory.items[value.text])
+      Inventory.items[value.text].isCollected = false;
 
     value.isCollected = false;
     value.canCollect = true;
@@ -504,7 +504,7 @@ $('.collection-reset').on('click', function (e) {
 
     $(this).removeClass('disabled');
   });
-  MapBase.save();
+  Inventory.save();
 });
 
 //Remove item from map when using the menu
@@ -661,13 +661,21 @@ $('#inventory-stack').on("change", function () {
 $('#cookie-export').on("click", function () {
   try {
     var cookies = $.cookie();
+    var storage = localStorage;
 
-    // Google Analytics cookie isn't relevant.
-    delete cookies._ga;
+    // Remove irrelevant properties.
+    delete cookies['_ga'];
+    delete storage['randid'];
+    delete storage['pinned-items'];
 
-    var cookiesJson = JSON.stringify(cookies, null, 4);
+    var settings = {
+      'cookies': cookies,
+      'local': storage
+    };
 
-    downloadAsFile("collectible-map-settings.json", cookiesJson);
+    var settingsJson = JSON.stringify(settings, null, 4);
+
+    downloadAsFile("collectible-map-settings.json", settingsJson);
   } catch (error) {
     console.error(error);
     alert(Language.get('alerts.feature_not_supported'));
@@ -684,25 +692,37 @@ $('#cookie-import').on('click', function () {
     }
 
     file.text().then(function (res) {
-      var json = null;
+      var settings = null;
 
       try {
-        json = JSON.parse(res);
+        settings = JSON.parse(res);
       } catch (error) {
         alert(Language.get('alerts.file_not_valid'));
         return;
       }
 
-      // Remove all current cookies.
-      var currentCookies = $.cookie();
+      // Remove all current settings.
+      $.each($.cookie(), function (key, value) {
+        $.removeCookie(key);
+      })
 
-      Object.keys(currentCookies).forEach(cookie => {
-        $.removeCookie(cookie);
+      $.each(localStorage, function (key, value) {
+        localStorage.removeItem(key);
+      })
+
+      // Import all the settings from the file.
+      if (typeof settings.cookies === 'undefined' && typeof settings.local === 'undefined') {
+        $.each(settings, function (key, value) {
+          $.cookie(key, value, { expires: 999 });
+        });
+      }
+
+      $.each(settings.cookies, function (key, value) {
+        $.cookie(key, value, { expires: 999 });
       });
 
-      // Import all the cookies from the file.
-      Object.keys(json).forEach(key => {
-        $.cookie(key, json[key], { expires: 999 });
+      $.each(settings.local, function (key, value) {
+        localStorage.setItem(key, value);
       });
 
       // Do this for now, maybe look into refreshing the menu completely (from init) later.
@@ -841,20 +861,6 @@ $('#generate-route-allow-fasttravel').on("change", function () {
 });
 
 /**
- * Loot table modal
- */
-$('#detailed-loot-modal').on('show.bs.modal', function (event) {
-  var button = $(event.relatedTarget);
-  var table = button.data('table');
-
-  var modal = $(this)
-  modal.find('.modal-title').text(Language.get('menu.loot_table.table_' + table));
-
-  if (table == 'unknown') table = null;
-  modal.find('.modal-body').html(Loot.generateTable(table));
-})
-
-/**
  * Tutorial logic
  */
 $('[data-help]').hover(function (e) {
@@ -907,6 +913,5 @@ window.addEventListener("DOMContentLoaded", MapBase.loadFastTravels());
 window.addEventListener("DOMContentLoaded", MadamNazar.loadMadamNazar());
 window.addEventListener("DOMContentLoaded", Treasures.load());
 window.addEventListener("DOMContentLoaded", Encounters.load());
-window.addEventListener("DOMContentLoaded", Loot.load());
 window.addEventListener("DOMContentLoaded", MapBase.loadMarkers());
 window.addEventListener("DOMContentLoaded", Routes.init());

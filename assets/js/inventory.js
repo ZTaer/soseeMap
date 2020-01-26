@@ -4,6 +4,7 @@ var Inventory = {
   isMenuUpdateEnabled: $.cookie('inventory-menu-update-enabled') == '1',
   stackSize: parseInt($.cookie('inventory-stack')) ? parseInt($.cookie('inventory-stack')) : 10,
   resetButtonUpdatesInventory: $.cookie('reset-updates-inventory-enabled') == '1',
+  items: [],
 
   init: function () {
     if (typeof $.cookie('inventory-popups-enabled') === 'undefined') {
@@ -30,6 +31,26 @@ var Inventory = {
     this.toggleMenuItemsDisabled();
   },
 
+  load: function () {
+    var _items = localStorage.getItem("inventory-items") || tempCollectedMarkers;
+
+    if (_items == null)
+      return;
+
+    _items.split(';').forEach(item => {
+      if (item == '') return;
+
+      var properties = item.split(':');
+
+      Inventory.items[properties[0]] = {
+        'isCollected': properties[1] == '1',
+        'amount': properties[2]
+      };
+
+    });
+
+  },
+
   changeMarkerAmount: function (name, amount, skipInventory = false) {
     var marker = MapBase.markers.filter(_m => {
       return (_m.text == name || _m.subdata == name);
@@ -46,9 +67,12 @@ var Inventory = {
           _m.amount = 0;
       }
 
-      _m.canCollect = _m.amount < Inventory.stackSize && !_m.isCollected;
+      if (Inventory.isEnabled)
+        _m.canCollect = _m.amount < Inventory.stackSize && !_m.isCollected;
+      else
+        _m.canCollect = !_m.isCollected;
 
-      if ((_m.isCollected || _m.amount >= Inventory.stackSize) && _m.day == Cycles.data.cycles[Cycles.data.current][_m.category]) {
+      if ((_m.isCollected || (Inventory.isEnabled && _m.amount >= Inventory.stackSize)) && _m.day == Cycles.data.cycles[Cycles.data.current][_m.category]) {
         $(`[data-marker=${_m.text}]`).css('opacity', Settings.markerOpacity / 3);
         $(`[data-type=${_m.subdata || _m.text}]`).addClass('disabled');
       } else if (_m.day == Cycles.data.cycles[Cycles.data.current][_m.category]) {
@@ -67,8 +91,27 @@ var Inventory = {
     if ($("#routes").val() == 1)
       Routes.drawLines();
 
-    MapBase.save();
+    Inventory.save();
     Menu.refreshItemsCounter();
+  },
+  
+  save: function () {
+    //Remove cookies from removed items
+    $.removeCookie('removed-items');
+    $.each($.cookie(), function (key, value) {
+      if (key.startsWith('removed-items')) {
+        $.removeCookie(key)
+      }
+    });
+
+    var temp = "";
+    $.each(MapBase.markers, function (key, marker) {
+      if (marker.day == Cycles.data.cycles[Cycles.data.current][marker.category] && (marker.amount > 0 || marker.isCollected))
+        temp += `${marker.text}:${marker.isCollected ? '1' : '0'}:${marker.amount};`;
+    });
+
+    localStorage.setItem("inventory-items", temp);
+   
   },
 
   toggleMenuItemsDisabled: function () {
