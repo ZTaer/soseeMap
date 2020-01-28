@@ -38,12 +38,15 @@ Menu.refreshMenu = function () {
     var collectibleText = null;
     var collectibleTitle = null;
 
-    if (marker.category == 'american_flowers') {
-      collectibleKey = `flower_${marker.subdata}`;
-    } else if (marker.category == 'bird_eggs') {
-      collectibleKey = `egg_${marker.subdata}`;
-    } else {
-      collectibleKey = marker.text;
+    switch (marker.category) {
+      case 'american_flowers':
+        collectibleKey = `flower_${marker.subdata}`;
+        break;
+      case 'bird_eggs':
+        collectibleKey = `egg_${marker.subdata}`;
+        break;
+      default:
+        collectibleKey = marker.text;
     }
 
     if (marker.subdata) {
@@ -70,12 +73,18 @@ Menu.refreshMenu = function () {
 
     collectibleCountDecreaseElement.on('click', function (e) {
       e.stopPropagation();
-      Inventory.changeMarkerAmount(collectibleText, -1)
+      Inventory.changeMarkerAmount(collectibleText, -1);
     });
 
     collectibleCountIncreaseElement.on('click', function (e) {
       e.stopPropagation();
-      Inventory.changeMarkerAmount(collectibleText, 1)
+      Inventory.changeMarkerAmount(collectibleText, 1);
+    });
+
+    collectibleElement.on('contextmenu', function (event) {
+      event.preventDefault();
+      if (marker.subdata != 'agarita' && marker.subdata != 'blood_flower')
+        MapBase.highlightImportantItem(marker.subdata || marker.text);
     });
 
     var collectibleCountElement = $('<span>').addClass('counter').append(collectibleCountDecreaseElement).append(collectibleCountTextElement).append(collectibleCountIncreaseElement);
@@ -83,8 +92,10 @@ Menu.refreshMenu = function () {
     if (!Inventory.isEnabled)
       collectibleCountElement.hide();
 
-    if (marker.lat.length == 0 || marker.tool == -1)
+    if (marker.lat.length == 0 || marker.tool == -1) {
       collectibleElement.addClass('not-found');
+      $(`.menu-option[data-type=${marker.category}]`).attr('data-help', 'item_category_unavailable_items').addClass('not-found');
+    }
 
     if (Inventory.isEnabled && marker.amount >= Inventory.stackSize)
       collectibleElement.addClass('disabled');
@@ -111,7 +122,7 @@ Menu.refreshMenu = function () {
     }
 
     $.each(weeklyItems, function (key, weeklyItem) {
-      if (`flower_${marker.subdata}` == weeklyItem.item || `egg_${marker.subdata}` == weeklyItem.item || marker.text == weeklyItem.item) {
+      if (collectibleKey == weeklyItem.item) {
         collectibleElement.attr('data-help', 'item_weekly');
         collectibleElement.addClass('weekly-item');
       }
@@ -125,7 +136,7 @@ Menu.refreshMenu = function () {
       var language = Language.get(`help.${$(this).data('help')}`);
 
       if (language.indexOf('{collection}') !== -1) {
-        language = language.replace('{collection}', Language.get('weekly.desc.' + weeklySetData.current))
+        language = language.replace('{collection}', Language.get('weekly.desc.' + weeklySetData.current));
       }
 
       $('#help-container p').text(language);
@@ -153,6 +164,7 @@ Menu.refreshMenu = function () {
       element.children('.same-cycle-warning-menu').remove();
     }
 
+    if (!Settings.sortItemsAlphabetically) return;
     if (category.data('type').includes('card_')) return;
 
     var children = category.children('.collectible-wrapper');
@@ -211,3 +223,11 @@ Menu.liveUpdateDebugMarkersInputs = function (lat, lng) {
   $('#debug-marker-lat').val(lat);
   $('#debug-marker-lng').val(lng);
 }
+
+// Remove highlight from all important items
+$('#clear_highlights').on('click', function () {
+  var tempArray = MapBase.itemsMarkedAsImportant;
+  $.each(tempArray, function () {
+    MapBase.highlightImportantItem(tempArray[0]);
+  });
+});
