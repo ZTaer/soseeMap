@@ -22,8 +22,6 @@
   <!--
     地图
   -->
-  <link rel="preconnect" href="https://pepegapi.jeanropke.net">
-  <link rel="preconnect" href="https://jeanropke.b-cdn.net">
   <link rel="stylesheet" href="https://cdn.staticfile.org/leaflet/1.5.1/leaflet.css" />
   
   
@@ -35,10 +33,10 @@
   <link href="https://fonts.googleapis.com/css?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
 
   <!-- ------------------------ 主CSS ------------------------- -->
-  <link rel="stylesheet" href="assets/css/styles.css?nocache=279" />
-  <link rel="stylesheet" href="assets/css/exp.css?nocache=279"/>
+  <link rel="stylesheet" href="assets/css/styles.css?nocache=284" />
+  <link rel="stylesheet" href="assets/css/exp.css?nocache=284"/>
   <script>
-    var nocache = 279;
+    var nocache = 284;
   </script>
 </head>
 <body>
@@ -111,7 +109,7 @@
                   最近更新:
                 </dt>
                 <dd>
-                  2020.01.31
+                  2020.02.01
                 </dd>
                 <dt>
                   手持目录:
@@ -272,7 +270,7 @@
       </div>
       <div class="menu-hidden" data-type="lost_bracelet">
         <div class="collection-value">
-          <span data-help="item_value"><span data-text="menu.collectables_value">Value</span>: $279.50</span>
+          <span data-help="item_value"><span data-text="menu.collectables_value">Value</span>: $271.50</span>
           <span class="collection-reset" data-text="menu.reset" data-help="item_reset">Reset</span>
           <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
         </div>
@@ -421,50 +419,56 @@
       <span data-text="menu.user_pins">User Pins</span>
     </div>
     <div>
-      <div class="menu-option submenu-only" data-help="item_category_encouters">
-        <img class="icon" src="./assets/images/icons/random.png">
+      <div class="menu-option submenu-only" data-help="item_category_encounters">
+        <img class="icon" src="./assets/images/icons/random_encounter.png">
         <span data-text="menu.random_encounters">Random Encounters</span>
         <div class="open-submenu" style="margin: auto 0 auto auto;"></div>
       </div>
       <div class="menu-hidden">
+        <div class="collectible-wrapper clickable" data-type="dog_encounter" data-help="item_category">
+          <img src="./assets/images/icons/dog_encounter.png" class="collectible-icon random-encounter" />
+          <span class="collectible-text">
+            <p class="collectible" data-text="menu.dog_encounter">Dog Encounter</p>
+          </span>
+        </div>
         <div class="collectible-wrapper clickable" data-type="egg_encounter" data-help="item_category">
-          <img src="./assets/images/icons/egg_encounter.png" class="collectible-icon" />
+          <img src="./assets/images/icons/egg_encounter.png" class="collectible-icon random-encounter" />
           <span class="collectible-text">
             <p class="collectible" data-text="menu.egg_encounter">Egg Encounter</p>
           </span>
         </div>
         <div class="collectible-wrapper clickable" data-type="grave_robber" data-help="item_category">
-          <img src="./assets/images/icons/grave_robber.png" class="collectible-icon" />
+          <img src="./assets/images/icons/grave_robber.png" class="collectible-icon random-encounter" />
           <span class="collectible-text">
             <p class="collectible" data-text="menu.grave_robber">Grave Robber</p>
           </span>
         </div>
-        <div class="collectible-wrapper clickable" data-type="dog_encounter" data-help="item_category">
-          <img src="./assets/images/icons/dog_encounter.png" class="collectible-icon" />
+        <div class="collectible-wrapper clickable" data-type="moonshiner_camp" data-help="item_category">
+          <img src="./assets/images/icons/moonshiner_camp.png" class="collectible-icon random-encounter" />
           <span class="collectible-text">
-            <p class="collectible" data-text="menu.dog_encounter">Dog Encounter</p>
+            <p class="collectible" data-text="menu.moonshiner_camp">Moonshiner Camp</p>
+          </span>
+        </div>
+        <div class="collectible-wrapper clickable" data-type="rival_collector" data-help="item_category">
+          <img src="./assets/images/icons/rival_collector.png" class="collectible-icon random-encounter" />
+          <span class="collectible-text">
+            <p class="collectible" data-text="menu.rival_collector">Rival Collector</p>
           </span>
         </div>
         <div class="collectible-wrapper clickable" data-type="treasure_hunter" data-help="item_category">
-          <img src="./assets/images/icons/treasure_hunter.png" class="collectible-icon" />
+          <img src="./assets/images/icons/treasure_hunter.png" class="collectible-icon random-encounter" />
           <span class="collectible-text">
             <p class="collectible" data-text="menu.treasure_hunter">Treasure Hunter</p>
           </span>
         </div>
         <div class="collectible-wrapper clickable" data-type="tree_map" data-help="item_category">
-          <img src="./assets/images/icons/tree_map.png" class="collectible-icon" />
+          <img src="./assets/images/icons/tree_map.png" class="collectible-icon random-encounter" />
           <span class="collectible-text">
             <p class="collectible" data-text="menu.tree_map">Treasure Map</p>
           </span>
         </div>
-        <div class="collectible-wrapper clickable" data-type="fame_seeker" data-help="item_category">
-          <img src="./assets/images/icons/fame_seeker.png" class="collectible-icon" />
-          <span class="collectible-text">
-            <p class="collectible" data-text="menu.fame_seeker">Fame Seeker</p>
-          </span>
-        </div>
         <div class="collectible-wrapper clickable" data-type="wounded_animal" data-help="item_category">
-          <img src="./assets/images/icons/wounded_animal.png" class="collectible-icon" />
+          <img src="./assets/images/icons/wounded_animal.png" class="collectible-icon random-encounter" />
           <span class="collectible-text">
             <p class="collectible" data-text="menu.wounded_animal">Wounded Animal</p>
           </span>
@@ -538,20 +542,6 @@
           <option value="0.75" data-text="menu.overlay_opacity.75" selected>75%</option>
           <option value="1" data-text="menu.overlay_opacity.100" selected>Opaque</option>
         </select>
-      </div>
-      <div class="input-container" data-help="sort_items_alphabetically">
-        <label for="sort-items-alphabetically" data-text="menu.sort_items_alphabetically">Sort items alphabetically</label>
-        <div class="input-checkbox-wrapper">
-          <input class="input-checkbox" type="checkbox" name="sort-items-alphabetically" value="1" id="sort-items-alphabetically" />
-          <label class="input-checkbox-label" for="sort-items-alphabetically"></label>
-        </div>
-      </div>
-      <div class="input-container" data-help="marker_cluster">
-        <label for="marker-cluster" data-text="menu.marker_cluster">Markers cluster</label>
-        <div class="input-checkbox-wrapper">
-          <input class="input-checkbox" type="checkbox" name="marker-cluster" value="1" id="marker-cluster" />
-          <label class="input-checkbox-label" for="marker-cluster"></label>
-        </div>
       </div>
       <div class="input-container" data-help="reset_markers_daily">
         <label for="reset-markers" data-text="menu.reset_markers_daily">Reset markers daily</label>
@@ -633,11 +623,26 @@
         <div class="input-action"></div>
       </div>
       <hr class="menu-divider">
-      <div class="input-container" data-help="enable_dclick_zoom">
-        <label for="enable-dclick-zoom" data-text="menu.enable_dclick_zoom">Double-click to zoom in</label>
+      <div class="input-container" data-help="sort_items_alphabetically">
+        <label for="sort-items-alphabetically" data-text="menu.sort_items_alphabetically">Sort items alphabetically</label>
         <div class="input-checkbox-wrapper">
-          <input class="input-checkbox" type="checkbox" name="enable-dclick-zoom" value="1" id="enable-dclick-zoom" />
-          <label class="input-checkbox-label" for="enable-dclick-zoom"></label>
+          <input class="input-checkbox" type="checkbox" name="sort-items-alphabetically" value="1" id="sort-items-alphabetically" />
+          <label class="input-checkbox-label" for="sort-items-alphabetically"></label>
+        </div>
+      </div>
+      <div class="input-container" data-help="marker_cluster">
+        <label for="marker-cluster" data-text="menu.marker_cluster">Markers cluster</label>
+        <div class="input-checkbox-wrapper">
+          <input class="input-checkbox" type="checkbox" name="marker-cluster" value="1" id="marker-cluster" />
+          <label class="input-checkbox-label" for="marker-cluster"></label>
+        </div>
+      </div>
+      <div class="input-container" data-help="enable_marker_shadows">
+        <label for="enable-marker-shadows" data-text="menu.enable_marker_shadows">Marker shadows enabled</label>
+        <div class="input-checkbox-wrapper">
+          <input class="input-checkbox" type="checkbox" name="enable-marker-shadows" value="1"
+            id="enable-marker-shadows" />
+          <label class="input-checkbox-label" for="enable-marker-shadows"></label>
         </div>
       </div>
       <div class="input-container" data-help="enable_marker_popups">
@@ -646,6 +651,13 @@
           <input class="input-checkbox" type="checkbox" name="enable-marker-popups" value="1"
             id="enable-marker-popups" />
           <label class="input-checkbox-label" for="enable-marker-popups"></label>
+        </div>
+      </div>
+      <div class="input-container" data-help="enable_dclick_zoom">
+        <label for="enable-dclick-zoom" data-text="menu.enable_dclick_zoom">Double-click to zoom in</label>
+        <div class="input-checkbox-wrapper">
+          <input class="input-checkbox" type="checkbox" name="enable-dclick-zoom" value="1" id="enable-dclick-zoom" />
+          <label class="input-checkbox-label" for="enable-dclick-zoom"></label>
         </div>
       </div>
       <div class="input-container" data-help="show_help">
@@ -723,6 +735,15 @@
           <input class="input-checkbox" type="checkbox" name="generate-route-allow-fasttravel" value="1"
             id="generate-route-allow-fasttravel" />
           <label class="input-checkbox-label" for="generate-route-allow-fasttravel"></label>
+        </div>
+      </div>
+      <div class="input-container" data-help="generate_route_allow_railroad">
+        <label for="generate-route-allow-railroad" data-text="menu.generate_route_allow_railroad">Use rail roads in
+          path finder</label>
+        <div class="input-checkbox-wrapper">
+          <input class="input-checkbox" type="checkbox" name="generate-route-allow-railroad" value="1"
+            id="generate-route-allow-railroad" />
+          <label class="input-checkbox-label" for="generate-route-allow-railroad"></label>
         </div>
       </div>
       <div class="input-container" data-help="generate_route_distance">
@@ -841,6 +862,13 @@
           <div class="input-checkbox-wrapper">
             <input class="input-checkbox" type="checkbox" name="show-all-markers" value="1" id="show-all-markers" />
             <label class="input-checkbox-label" for="show-all-markers"></label>
+          </div>
+        </div>
+        <div class="input-container">
+          <label for="enable-right-click">Give me back my right-click</label>
+          <div class="input-checkbox-wrapper">
+            <input class="input-checkbox" type="checkbox" name="enable-right-click" value="1" id="enable-right-click" />
+            <label class="input-checkbox-label" for="enable-right-click"></label>
           </div>
         </div>
         <div class="input-container-noflex">
@@ -1046,25 +1074,29 @@
   <script src="assets/js/lib/jquery-3.4.1.min.js"></script>
   <script src="assets/js/jquery.cookie.js"></script>
   <script src="https://cdn.staticfile.org/leaflet/1.5.1/leaflet.js"></script>
-  <script src="assets/js/lib/oms.min.js"></script>
   <!--
     主数据
   -->
-  <script src="assets/js/layers.js?nocache=279"></script>
-  <script src="assets/js/settings.js?nocache=279"></script>
-  <script src="assets/js/nazar.js?nocache=279"></script>
-  <script src="assets/js/cycles.js?nocache=279"></script>
-  <script src="assets/js/marker.js?nocache=279"></script>
-  <script src="assets/js/inventory.js?nocache=279"></script>
-  <script src="assets/js/treasures.js?nocache=279"></script>
-  <script src="assets/js/encounters.js?nocache=279"></script>
-  <script src="assets/js/pins.js?nocache=279"></script>
-  <script src="assets/js/map.js?nocache=279"></script>
-  <script src="assets/js/language.js?nocache=279"></script>
-  <script src="assets/js/menu.js?nocache=279"></script>
-  <script src="assets/js/routes.js?nocache=279"></script>
-  <script src="assets/js/pathfinder.js?nocache=279"></script>
-  <script src="assets/js/scripts.js?nocache=279"></script>
+  <script src="assets/js/lib/oms.min.js"></script>
+  <script src="assets/js/lib/rbush.js"></script>
+  <script>var module = {};</script>
+  <script src="assets/js/lib/leaflet.canvas-markers.js"></script>
+  <script>module.exports(L);</script>
+  <script src="assets/js/layers.js?nocache=284"></script>
+  <script src="assets/js/settings.js?nocache=284"></script>
+  <script src="assets/js/nazar.js?nocache=284"></script>
+  <script src="assets/js/cycles.js?nocache=284"></script>
+  <script src="assets/js/marker.js?nocache=284"></script>
+  <script src="assets/js/inventory.js?nocache=284"></script>
+  <script src="assets/js/treasures.js?nocache=284"></script>
+  <script src="assets/js/encounters.js?nocache=284"></script>
+  <script src="assets/js/pins.js?nocache=284"></script>
+  <script src="assets/js/map.js?nocache=284"></script>
+  <script src="assets/js/language.js?nocache=284"></script>
+  <script src="assets/js/menu.js?nocache=284"></script>
+  <script src="assets/js/routes.js?nocache=284"></script>
+  <script src="assets/js/pathfinder.js?nocache=284"></script>
+  <script src="assets/js/scripts.js?nocache=284"></script>
 
   <!-- 
     Global site tag (gtag.js) - Google Analytics 
@@ -1078,7 +1110,7 @@
   <!--
     个人扩展
   -->  
-  <script src="assets/js/exp.js?nocache=279" ></script>
+  <script src="assets/js/exp.js?nocache=284" ></script>
   
   <!-- 
     bootstrap及框架 
