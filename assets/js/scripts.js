@@ -262,12 +262,16 @@ setInterval(function () {
   correctTime.setHours(correctTime.getUTCHours());
   correctTime.setMinutes(correctTime.getUTCMinutes() - 3); //for some reason time in game is 3 sec. delayed to normal time
 
-  if (display_24)
+  if (display_24) {
     $('#time-in-game').text(addZeroToNumber(correctTime.getHours()) + ":" + addZeroToNumber(correctTime.getMinutes()));
+  } else {
+    $('#time-in-game').text(addZeroToNumber(correctTime.getHours() % 12) + ":" + addZeroToNumber(correctTime.getMinutes()) + " " + ((correctTime.getHours() < 12) ? "AM" : "PM"));
+  }
 
-  else {
-    $('#time-in-game').text(addZeroToNumber(correctTime.getHours() % 12) + ":" + addZeroToNumber(correctTime.getMinutes()));
-    $('#am-pm-time').text(((correctTime.getHours() < 12) ? "AM" : "PM"));
+  if (correctTime.getHours() >= 22 || correctTime.getHours() < 5) {
+    $('.day-cycle').css('background', 'url(assets/images/moon.png)');
+  } else {
+    $('.day-cycle').css('background', 'url(assets/images/sun.png)');
   }
 
   //Countdown for the next cycle
@@ -278,11 +282,9 @@ setInterval(function () {
   $('#countdown').text(addZeroToNumber(hours) + ':' + addZeroToNumber(minutes) + ':' + addZeroToNumber(seconds));
 
   if (correctTime.getHours() >= 22 || correctTime.getHours() < 5) {
-    $('#day-cycle').css('background', 'url(assets/images/moon.png)');
     $('[data-marker*="flower_agarita"], [data-marker*="flower_blood"]').css('filter', 'drop-shadow(0 0 .5rem #fff) drop-shadow(0 0 .25rem #fff)');
   }
   else {
-    $('#day-cycle').css('background', 'url(assets/images/sun.png)');
     $('[data-marker*="flower_agarita"], [data-marker*="flower_blood"]').css('filter', 'none');
   }
 }, 1000);
@@ -885,13 +887,13 @@ $('#generate-route-use-pathfinder').on("change", function () {
   if (Routes.usePathfinder) {
     $('#generate-route-distance').parent().hide();
     $('#generate-route-auto-update').parent().parent().hide();
-    $('#generate-route-allow-fasttravel').parent().parent().show();
-    $('#generate-route-allow-railroad').parent().parent().show();
+    $('#generate-route-fasttravel-weight').parent().show();
+    $('#generate-route-railroad-weight').parent().show();
   } else {
     $('#generate-route-distance').parent().show();
     $('#generate-route-auto-update').parent().parent().show();
-    $('#generate-route-allow-fasttravel').parent().parent().hide();
-    $('#generate-route-allow-railroad').parent().parent().hide();
+    $('#generate-route-fasttravel-weight').parent().hide();
+    $('#generate-route-railroad-weight').parent().hide();
   }
 
   // Prevent both routes being stuck on screen.
@@ -900,16 +902,16 @@ $('#generate-route-use-pathfinder').on("change", function () {
   Routes.generatePath();
 });
 
-$('#generate-route-allow-fasttravel').on("change", function () {
-  Routes.allowFasttravel = $("#generate-route-allow-fasttravel").prop('checked');
-  $.cookie('generator-path-allow-fasttravel', Routes.allowFasttravel ? '1' : '0', { expires: 999 });
+$('#generate-route-fasttravel-weight').on("change", function () {
+  Routes.fasttravelWeight = parseFloat($("#generate-route-fasttravel-weight").val());
+  $.cookie('generator-path-fasttravel-weight', Routes.fasttravelWeight.toString(), { expires: 999 });
 
   Routes.generatePath();
 });
 
-$('#generate-route-allow-railroad').on("change", function () {
-  Routes.allowRailroad = $("#generate-route-allow-railroad").prop('checked');
-  $.cookie('generator-path-allow-railroad', Routes.allowRailroad ? '1' : '0', { expires: 999 });
+$('#generate-route-railroad-weight').on("change", function () {
+  Routes.railroadWeight = parseFloat($("#generate-route-railroad-weight").val());
+  $.cookie('generator-path-railroad-weight', Routes.railroadWeight.toString(), { expires: 999 });
 
   Routes.generatePath();
 });
