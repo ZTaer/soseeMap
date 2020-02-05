@@ -333,6 +333,9 @@ var MapBase = {
 
           marker.canCollect = true;
         }
+        if(typeof(PathFinder) !== 'undefined') {
+          PathFinder.wasRemovedFromMap(marker)
+        }
       });
 
       if (subdata != '' && day != null && day == Cycles.data.cycles[Cycles.data.current][category]) {
