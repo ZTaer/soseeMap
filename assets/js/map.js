@@ -131,7 +131,9 @@ var MapBase = {
   },
 
   setMarkers: function (data) {
-    console.log(`Categories disabled: ${categoriesDisabledByDefault}`);
+    if (Settings.isDebugEnabled)
+      console.log(`Categories disabled: ${categoriesDisabledByDefault}`);
+
     $.each(data, function (_category, _cycles) {
       $.each(_cycles, function (day, _markers) {
         $.each(_markers, function (key, marker) {
@@ -173,7 +175,7 @@ var MapBase = {
     // Do search via URL.
     var searchParam = getParameterByName('search');
     if (searchParam != null && searchParam) {
-      $('#search').val(searchParam)
+      $('#search').val(searchParam);
       MapBase.onSearch(searchParam);
     }
 
@@ -219,7 +221,7 @@ var MapBase = {
 
         searchMarkers = searchMarkers.concat(MapBase.markers.filter(function (_marker) {
           if (_marker.title != null)
-            return _marker.title.toLowerCase().includes(term.toLowerCase())
+            return _marker.title.toLowerCase().includes(term.toLowerCase());
         }));
 
         $.each(searchMarkers, function (i, el) {
@@ -333,8 +335,8 @@ var MapBase = {
 
           marker.canCollect = true;
         }
-        if(typeof(PathFinder) !== 'undefined') {
-          PathFinder.wasRemovedFromMap(marker)
+        if (typeof (PathFinder) !== 'undefined') {
+          PathFinder.wasRemovedFromMap(marker);
         }
       });
 
@@ -357,28 +359,20 @@ var MapBase = {
     switch (value) {
       case "day_1":
         return "blue";
-        break;
       case "day_2":
         return "orange";
-        break;
       case "day_3":
         return "purple";
-        break;
       case "day_4":
         return "darkpurple";
-        break;
       case "day_5":
         return "darkred";
-        break;
       case "day_6":
         return "darkblue";
-        break;
       case "weekly":
         return "green";
-        break;
       default:
         return "lightred";
-        break;
     }
   },
 
@@ -413,6 +407,9 @@ var MapBase = {
 
     var warningText = Cycles.isSameAsYesterday(marker.category) ? `<span class="marker-warning-wrapper"><div><img class="warning-icon" src="./assets/images/same-cycle-alert.png" alt="Alert"></div><p>${Language.get("map.same_cycle_yesterday")}</p></span>` : '';
 
+    if (marker.day == Settings.cycleForUnknownCycles)
+      warningText = `<span class="marker-warning-wrapper"><div><img class="warning-icon" src="./assets/images/same-cycle-alert.png" alt="Alert"></div><p>${Language.get("map.unknown_cycle_description").replace('{GitHub}', '<a href="https://github.com/jeanropke/RDR2CollectorsMap/issues" target="_blank">GitHub</a>').replace('{Discord}', '<a href="https://discord.gg/WWru8cP" target="_blank">Discord</a>')}</p></span>`;
+
     if (marker.category != 'random') {
       var weeklyText = marker.weeklyCollection != null ? Language.get("weekly.desc").replace('{collection}', Language.get('weekly.desc.' + marker.weeklyCollection)) : '';
       popupContent += (marker.tool == '-1' ? Language.get('map.item.unable') : '') + ' ' + marker.description + ' ' + weeklyText;
@@ -425,8 +422,8 @@ var MapBase = {
     var videoText = marker.video != null ? ' | <a href="' + marker.video + '" target="_blank">' + Language.get('map.video') + '</a>' : '';
     var importantItem = ((marker.subdata != 'agarita' && marker.subdata != 'blood_flower') ? ` | <a href="javascript:void(0)" onclick="MapBase.highlightImportantItem('${marker.text || marker.subdata}', '${marker.category}')">${Language.get('map.mark_important')}</a>` : '');
 
-
     var linksElement = $('<p>').addClass('marker-popup-links').append(shareText).append(videoText).append(importantItem);
+    var debugDisplayLatLng = $('<small>').text(`Latitude: ${marker.lat} / Longitude: ${marker.lng}`);
 
     var buttons = marker.category == 'random' ? '' : `<div class="marker-popup-buttons">
     <button class="btn btn-danger" onclick="Inventory.changeMarkerAmount('${marker.subdata || marker.text}', -1)">↓</button>
@@ -434,13 +431,14 @@ var MapBase = {
     <button class="btn btn-success" onclick="Inventory.changeMarkerAmount('${marker.subdata || marker.text}', 1)">↑</button>
     </div>`;
 
-    return `<h1>${marker.title} - ${Language.get("menu.day")} ${marker.day}</h1>
+    return `<h1>${marker.title} - ${Language.get("menu.day")} ${(marker.day != Settings.cycleForUnknownCycles ? marker.day : Language.get('map.unknown_cycle'))}</h1>
         ${warningText}
         <span class="marker-content-wrapper">
         <div>${MapBase.getToolIcon(marker.tool)}</div>
         <p>${popupContent}</p>
         </span>
         ${linksElement.prop('outerHTML')}
+        ${Settings.isDebugEnabled ? debugDisplayLatLng.prop('outerHTML') : ''}
         ${(Inventory.isEnabled && Inventory.isPopupEnabled) ? buttons : ''}
         <button type="button" class="btn btn-info remove-button" onclick="MapBase.removeItemFromMap('${marker.day || ''}', '${marker.text || ''}', '${marker.subdata || ''}', '${marker.category || ''}')" data-item="${marker.text}">${Language.get("map.remove_add")}</button>
         `;
@@ -471,18 +469,22 @@ var MapBase = {
       background = './assets/images/icons/marker_lightgray.png';
     }
 
+    // highlight unknown cycles markers on red
+    if (marker.day == Settings.cycleForUnknownCycles)
+      background = './assets/images/icons/marker_red.png';
+
     // Height overlays
     if (marker.height == '1') {
-      overlay = '<img class="overlay" src="./assets/images/icons/overlay_high.png" alt="Overlay">'
+      overlay = '<img class="overlay" src="./assets/images/icons/overlay_high.png" alt="Overlay">';
     }
 
     if (marker.height == '-1') {
-      overlay = '<img class="overlay" src="./assets/images/icons/overlay_low.png" alt="Overlay">'
+      overlay = '<img class="overlay" src="./assets/images/icons/overlay_low.png" alt="Overlay">';
     }
 
     // Timed flower overlay override
     if (marker.subdata == 'agarita' || marker.subdata == 'blood_flower') {
-      overlay = '<img class="overlay" src="./assets/images/icons/overlay_time.png" alt="Overlay">'
+      overlay = '<img class="overlay" src="./assets/images/icons/overlay_time.png" alt="Overlay">';
     }
 
     var tempMarker = L.marker([marker.lat, marker.lng], {
@@ -508,11 +510,11 @@ var MapBase = {
     marker.weeklyCollection = isWeekly ? weeklySetData.current : null;
 
     if (marker.category == 'random')
-      marker.title = `${Language.get("random_item.name")} #${marker.text.split('_').pop()}`
+      marker.title = `${Language.get("random_item.name")} #${marker.text.split('_').pop()}`;
     else if (marker.category == 'american_flowers')
-      marker.title = `${Language.get(`flower_${marker.subdata}.name`)} #${marker.text.split('_').pop()}`
+      marker.title = `${Language.get(`flower_${marker.subdata}.name`)} #${marker.text.split('_').pop()}`;
     else if (marker.category == 'bird_eggs' && (marker.subdata == 'eagle' || marker.subdata == 'hawk'))
-      marker.title = `${Language.get(`egg_${marker.subdata}.name`)} #${marker.text.split('_').pop()}`
+      marker.title = `${Language.get(`egg_${marker.subdata}.name`)} #${marker.text.split('_').pop()}`;
     else
       marker.title = Language.get(`${marker.text}.name`);
 
