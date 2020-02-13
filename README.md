@@ -21,7 +21,7 @@ Note: This project was created to improve the areas near Asia and China, and to 
         2. 设定地图图片地址:
            a) 使用本地地图图片( 切忌不要使用默认的cdn图片链接 )
            var mapLayers = [
-                L.tileLayer('https://s.rsg.sc/sc/images/games/RDR2/map/game/{z}/{x}/{y}.jpg', {
+                L.tileLayer('assets/maps/detailed/{z}/{x}_{y}.jpg', {
                     noWrap: true,
                     bounds: L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176))
                 }),

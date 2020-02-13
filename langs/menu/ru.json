@@ -51,7 +51,6 @@
 	{"key": "menu.random_encounters", "value": "Случайные события"},
 	{"key": "menu.egg_encounter", "value": "Птичьи гнезда"},
 	{"key": "menu.grave_robber", "value": "Ограбления могил"},
-	{"key": "menu.moonshiner_camp", "value": "Лагерь самогонщиков"},
 	{"key": "menu.dog_encounter", "value": "Встреча с собакой"},
 	{"key": "menu.treasure_hunter", "value": "Охотники за сокровищем"},
 	{"key": "menu.wounded_animal", "value": "Раненое животное"},
@@ -211,6 +210,15 @@
 	{"key": "map.user_pins.default_title", "value": "Ваша метка"},
 	{"key": "map.user_pins.placeholder_desc", "value": "Описание"},
 	{"key": "map.user_pins.default_desc", "value": "Это ваша пользовательская метка. На ней можно изменить имя и описание. Не забудьте сохранить её."},
+	
+	{"key": "map.refresh_for_updates_alert", "value": "Циклы на сегодня ещё не были обновлены. Обновите страницу, чтобы проверить обновление циклов на сайте."},
+	{"key": "map.unknown_cycle_description", "value": "This item is in unknown cycle, if you find something here, report it on: {GitHub} or {Discord}."},
+	{"key": "map.unknown_cycle", "value": "unknown"},
+	{"key": "menu.delete_all_settings", "value": "Сброс всех настроек"},
+	{"key": "menu.modal_delete_all_settings_title", "value": "Сбросить все настройки?"},
+	{"key": "menu.modal_delete_all_settings_body", "value": "Эта функция сбросить все ваши настройки, метки, очистит инвентарь и обновит веб-страницу."},
+	{"key": "menu.enable_marker_popups_hover", "value": "Инфо о маркерах через наведение курсором"},
+	{"key": "menu.more_encounters_link", "value": "Больше полезных меток в RDO Map"},
 	
 	{"key": "help.default", "value": "Hover over or long-press (mobile) any setting to get information about it."},
 	{"key": "help.clear_custom_routes", "value": "Clears all the custom routes currently on the map."},

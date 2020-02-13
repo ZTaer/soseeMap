@@ -15,7 +15,7 @@ var MapBase = {
 
     //Please, do not use the GitHub map tiles. Thanks
     var mapLayers = [
-      L.tileLayer('https://s.rsg.sc/sc/images/games/RDR2/map/game/{z}/{x}/{y}.jpg', {
+      L.tileLayer('assets/maps/detailed/{z}/{x}_{y}.jpg', {
           noWrap: true,
           bounds: L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176))
       }),
@@ -27,7 +27,55 @@ var MapBase = {
           noWrap: true,
           bounds: L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176))
       })
-    ];
+  ];
+
+    // Override bindPopup to include mouseover and mouseout logic.
+    L.Layer.include({
+      bindPopup: function (content, options) {
+        // TODO: Check if we can move this from here.
+        if (content instanceof L.Popup) {
+          Util.setOptions(content, options);
+          this._popup = content;
+          content._source = this;
+        } else {
+          if (!this._popup || options) {
+            this._popup = new L.Popup(options, this);
+          }
+          this._popup.setContent(content);
+        }
+
+        if (!this._popupHandlersAdded) {
+          this.on({
+            click: this._openPopup,
+            keypress: this._onKeyPress,
+            remove: this.closePopup,
+            move: this._movePopup
+          });
+          this._popupHandlersAdded = true;
+        }
+
+        this.on('mouseover', function (e) {
+          if (!Settings.isPopupsHoverEnabled) return;
+          this.openPopup();
+        });
+
+        this.on('mouseout', function (e) {
+          if (!Settings.isPopupsHoverEnabled) return;
+
+          var that = this;
+          var timeout = setTimeout(function () {
+            that.closePopup();
+          }, 100);
+
+          $('.leaflet-popup').on('mouseover', function (e) {
+            clearTimeout(timeout);
+            $('.leaflet-popup').off('mouseover');
+          });
+        });
+
+        return this;
+      }
+    });
 
     MapBase.map = L.map('map', {
       preferCanvas: true,
@@ -182,7 +230,7 @@ var MapBase = {
     // Navigate to marker via URL.
     var markerParam = getParameterByName('m');
     if (markerParam != null && markerParam != '') {
-      var goTo = MapBase.markers.filter(_m => _m.text == markerParam && _m.day == Cycles.data.cycles[Cycles.data.current][_m.category])[0];
+      var goTo = MapBase.markers.filter(_m => _m.text == markerParam && _m.day == Cycles.categories[_m.category])[0];
 
       //if a marker is passed on url, check if is valid
       if (typeof goTo == 'undefined' || goTo == null) return;
@@ -263,8 +311,9 @@ var MapBase = {
     Encounters.addToMap();
     MadamNazar.addMadamNazar();
 
-    if (refreshMenu)
+    if (refreshMenu) {
       Menu.refreshMenu();
+    }
     else {
       Routes.generatePath();
       return;
@@ -319,7 +368,7 @@ var MapBase = {
           return;
 
         if ((marker.subdata == subdata && subdataCategoryIsDisabled) || marker.canCollect) {
-          if (marker.day == Cycles.data.cycles[Cycles.data.current][marker.category]) {
+          if (marker.day == Cycles.categories[marker.category]) {
             marker.isCollected = true;
 
             Inventory.changeMarkerAmount(marker.subdata || marker.text, 1, skipInventory);
@@ -327,7 +376,7 @@ var MapBase = {
 
           marker.canCollect = false;
         } else {
-          if (marker.day == Cycles.data.cycles[Cycles.data.current][marker.category]) {
+          if (marker.day == Cycles.categories[marker.category]) {
             marker.isCollected = false;
 
             Inventory.changeMarkerAmount(marker.subdata || marker.text, -1, skipInventory);
@@ -340,7 +389,7 @@ var MapBase = {
         }
       });
 
-      if (subdata != '' && day != null && day == Cycles.data.cycles[Cycles.data.current][category]) {
+      if (subdata != '' && day != null && day == Cycles.categories[category]) {
         if ((_marker.length == 1 && !_marker[0].canCollect) || _marker.every(function (marker) { return !marker.canCollect; })) {
           $(`[data-type=${subdata}]`).addClass('disabled');
         } else {
@@ -407,7 +456,7 @@ var MapBase = {
 
     var warningText = Cycles.isSameAsYesterday(marker.category) ? `<span class="marker-warning-wrapper"><div><img class="warning-icon" src="./assets/images/same-cycle-alert.png" alt="Alert"></div><p>${Language.get("map.same_cycle_yesterday")}</p></span>` : '';
 
-    if (marker.day == Settings.cycleForUnknownCycles)
+    if (marker.day == Cycles.unknownCycleNumber)
       warningText = `<span class="marker-warning-wrapper"><div><img class="warning-icon" src="./assets/images/same-cycle-alert.png" alt="Alert"></div><p>${Language.get("map.unknown_cycle_description").replace('{GitHub}', '<a href="https://github.com/jeanropke/RDR2CollectorsMap/issues" target="_blank">GitHub</a>').replace('{Discord}', '<a href="https://discord.gg/WWru8cP" target="_blank">Discord</a>')}</p></span>`;
 
     if (marker.category != 'random') {
@@ -431,7 +480,9 @@ var MapBase = {
     <button class="btn btn-success" onclick="Inventory.changeMarkerAmount('${marker.subdata || marker.text}', 1)">↑</button>
     </div>`;
 
-    return `<h1>${marker.title} - ${Language.get("menu.day")} ${(marker.day != Settings.cycleForUnknownCycles ? marker.day : Language.get('map.unknown_cycle'))}</h1>
+
+
+    return `<h1>${marker.title} - ${Language.get("menu.day")} ${(marker.day != Cycles.unknownCycleNumber ? marker.day : Language.get('map.unknown_cycle'))}</h1>
         ${warningText}
         <span class="marker-content-wrapper">
         <div>${MapBase.getToolIcon(marker.tool)}</div>
@@ -445,7 +496,7 @@ var MapBase = {
   },
 
   addMarkerOnMap: function (marker, opacity = 1) {
-    if (marker.day != Cycles.data.cycles[Cycles.data.current][marker.category] && !Settings.showAllMarkers) return;
+    if (marker.day != Cycles.categories[marker.category] && !Settings.showAllMarkers) return;
 
     if (!uniqueSearchMarkers.includes(marker))
       return;
@@ -461,7 +512,7 @@ var MapBase = {
     var overlay = '';
     var icon = `./assets/images/icons/${marker.category}.png`;
     var background = `./assets/images/icons/marker_${MapBase.getIconColor(isWeekly ? 'weekly' : 'day_' + marker.day)}.png`;
-    var shadow = Settings.isShadowsEnabled ? '<img class="shadow" src="./assets/images/markers-shadow.png" alt="Shadow">' : '';
+    var shadow = Settings.isShadowsEnabled ? '<img class="shadow" width="' + 35 * Settings.markerSize + '" height="' + 16 * Settings.markerSize + '" src="./assets/images/markers-shadow.png" alt="Shadow">' : '';
 
     // Random items override
     if (marker.category == 'random') {
@@ -470,7 +521,7 @@ var MapBase = {
     }
 
     // highlight unknown cycles markers on red
-    if (marker.day == Settings.cycleForUnknownCycles)
+    if (marker.day == Cycles.unknownCycleNumber)
       background = './assets/images/icons/marker_red.png';
 
     // Height overlays
@@ -490,10 +541,9 @@ var MapBase = {
     var tempMarker = L.marker([marker.lat, marker.lng], {
       opacity: marker.canCollect ? opacity : opacity / 3,
       icon: new L.DivIcon.DataMarkup({
-        iconSize: [35, 45],
-        iconAnchor: [17, 42],
-        popupAnchor: [1, -32],
-        shadowAnchor: [10, 12],
+        iconSize: [35 * Settings.markerSize, 45 * Settings.markerSize],
+        iconAnchor: [17 * Settings.markerSize, 42 * Settings.markerSize],
+        popupAnchor: [0 * Settings.markerSize, -28 * Settings.markerSize],
         html: `
           ${overlay}
           <img class="icon" src="${icon}" alt="Icon">
@@ -604,13 +654,12 @@ var MapBase = {
   addFastTravelMarker: function () {
     if (enabledCategories.includes('fast_travel')) {
       $.each(fastTravelData, function (key, value) {
-        var shadow = Settings.isShadowsEnabled ? '<img class="shadow" src="./assets/images/markers-shadow.png" alt="Shadow">' : '';
+        var shadow = Settings.isShadowsEnabled ? '<img class="shadow" width="' + 35 * Settings.markerSize + '" height="' + 16 * Settings.markerSize + '" src="./assets/images/markers-shadow.png" alt="Shadow">' : '';
         var marker = L.marker([value.x, value.y], {
           icon: L.divIcon({
-            iconSize: [35, 45],
-            iconAnchor: [17, 42],
-            popupAnchor: [1, -32],
-            shadowAnchor: [10, 12],
+            iconSize: [35 * Settings.markerSize, 45 * Settings.markerSize],
+            iconAnchor: [17 * Settings.markerSize, 42 * Settings.markerSize],
+            popupAnchor: [0 * Settings.markerSize, -28 * Settings.markerSize],
             html: `
               <img class="icon" src="./assets/images/icons/fast_travel.png" alt="Icon">
               <img class="background" src="./assets/images/icons/marker_gray.png" alt="Background">
@@ -634,13 +683,12 @@ var MapBase = {
   },
 
   debugMarker: function (lat, long, name = 'Debug Marker') {
-    var shadow = Settings.isShadowsEnabled ? '<img class="shadow" src="./assets/images/markers-shadow.png" alt="Shadow">' : '';
+    var shadow = Settings.isShadowsEnabled ? '<img class="shadow" width="' + 35 * Settings.markerSize + '" height="' + 16 * Settings.markerSize + '" src="./assets/images/markers-shadow.png" alt="Shadow">' : '';
     var marker = L.marker([lat, long], {
       icon: L.divIcon({
-        iconSize: [35, 45],
-        iconAnchor: [17, 42],
-        popupAnchor: [1, -32],
-        shadowAnchor: [10, 12],
+        iconSize: [35 * Settings.markerSize, 45 * Settings.markerSize],
+        iconAnchor: [17 * Settings.markerSize, 42 * Settings.markerSize],
+        popupAnchor: [0 * Settings.markerSize, -28 * Settings.markerSize],
         html: `
           <img class="icon" src="./assets/images/icons/random.png" alt="Icon">
           <img class="background" src="./assets/images/icons/marker_darkblue.png" alt="Background">
@@ -676,10 +724,11 @@ var MapBase = {
   },
 
   formatDate: function (date) {
+    var pad = (e, s) => (1e3 + e + '').slice(-s);
     var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     var _day = date.split('/')[2];
     var _month = monthNames[date.split('/')[1] - 1];
     var _year = date.split('/')[0];
-    return `${_month} ${_day}, ${_year}`;
+    return `${_month} ${pad(_day, 2)} ${_year}`;
   }
 };
