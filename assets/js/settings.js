@@ -3,6 +3,7 @@ var Settings = {
   isMenuOpened: $.cookie('menu-opened') == '1',
   isCoordsEnabled: $.cookie('coords-enabled') == '1',
   isPopupsEnabled: $.cookie('enable-marker-popups') == '1',
+  isPopupsHoverEnabled: $.cookie('enable-marker-popups-hover') == '1',
   isShadowsEnabled: $.cookie('enable-marker-shadows') == '1',
   isDoubleClickZoomEnabled: $.cookie('enable-dclick-zoom') == '1',
   isPinsPlacingEnabled: $.cookie('pins-place-enabled') == '1',
@@ -17,5 +18,5 @@ var Settings = {
   language: $.cookie('language') ? $.cookie('language') : navigator.language.toLowerCase(),
   sortItemsAlphabetically: $.cookie('sort-items-alphabetically') == '1',
   displayClockHideTimer: $.cookie('clock-or-timer') == 'true',
-  cycleForUnknownCycles: 7
+  markerSize: parseFloat($.cookie('marker-size')) ? parseFloat($.cookie('marker-size')) : 1
 };
