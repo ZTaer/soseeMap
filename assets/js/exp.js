@@ -19,8 +19,8 @@ var dataModule = ( function(){
 /************ ui界面处理模块-BGN  */
 var uiModule = ( function(){
     const String = {
-        zh_s: 'zh-s',
-        zh_t: 'zh-t',
+        zh_s: 'zh-hans',
+        zh_t: 'zh-hant',
         language: 'language',
         toggleHidden: 'toggle-hidden',
     };
