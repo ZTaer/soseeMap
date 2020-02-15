@@ -86,7 +86,7 @@ function init() {
     $.cookie('map-layer', 0, { expires: 999 });
 
   if (!Language.availableLanguages.includes(Settings.language))
-    Settings.language = 'zh-s';
+    Settings.language = 'zh-hans';
 
   if (typeof $.cookie('remove-markers-daily') === 'undefined') {
     Settings.resetMarkersDaily = true;
@@ -836,6 +836,13 @@ $('#generate-route-generate-on-visit').on("change", function () {
 $('#generate-route-ignore-collected').on("change", function () {
   Routes.ignoreCollected = $("#generate-route-ignore-collected").prop('checked');
   $.cookie('generator-path-ignore-collected', Routes.ignoreCollected ? '1' : '0', { expires: 999 });
+
+  Routes.generatePath();
+});
+
+$('#generate-route-important-only').on("change", function () {
+  Routes.importantOnly = $("#generate-route-important-only").prop('checked');
+  $.cookie('generator-path-important-only', Routes.importantOnly ? '1' : '0', { expires: 999 });
 
   Routes.generatePath();
 });

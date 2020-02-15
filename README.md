@@ -12,10 +12,10 @@ Note: This project was created to improve the areas near Asia and China, and to 
 </h4>
 <pre>
     文件解析:
-        0. 默认zh-s: 
-           a) script.js: Settings.language = 'zh-s';
-           b) language.js: Settings.language = 'zh-s';
-           c) index.html: <option value="zh-s" selected >简体中文</option>
+        0. 默认zh-hans: 
+           a) script.js: Settings.language = 'zh-hans';
+           b) language.js: Settings.language = 'zh-hans';
+           c) index.html: <option value="zh-hans" selected >简体中文</option>
         1. 修改天数:
            a) cycles.json: current: "选择天数";
         2. 设定地图图片地址:
