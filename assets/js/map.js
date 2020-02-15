@@ -27,7 +27,7 @@ var MapBase = {
           noWrap: true,
           bounds: L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176))
       })
-  ];
+    ];
 
     // Override bindPopup to include mouseover and mouseout logic.
     L.Layer.include({
@@ -480,8 +480,6 @@ var MapBase = {
     <button class="btn btn-success" onclick="Inventory.changeMarkerAmount('${marker.subdata || marker.text}', 1)">↑</button>
     </div>`;
 
-
-
     return `<h1>${marker.title} - ${Language.get("menu.day")} ${(marker.day != Cycles.unknownCycleNumber ? marker.day : Language.get('map.unknown_cycle'))}</h1>
         ${warningText}
         <span class="marker-content-wrapper">
@@ -554,7 +552,6 @@ var MapBase = {
       })
     });
 
-
     tempMarker.id = marker.text;
     marker.isVisible = true;
     marker.weeklyCollection = isWeekly ? weeklySetData.current : null;
@@ -606,7 +603,6 @@ var MapBase = {
   game2Map: function ({ x, y, z }) {
     MapBase.debugMarker((0.01552 * y + -63.6), (0.01552 * x + 111.29), z);
   },
-
 
   highlightImportantItem(text, category) {
     if (category === 'american_flowers' || category === 'bird_eggs')
@@ -675,13 +671,6 @@ var MapBase = {
     }
   },
 
-  submitDebugForm: function () {
-    var lat = $('input[name=debug-marker-lat]').val();
-    var lng = $('input[name=debug-marker-lng]').val();
-    if (!isNaN(lat) && !isNaN(lng))
-      MapBase.debugMarker(lat, lng);
-  },
-
   debugMarker: function (lat, long, name = 'Debug Marker') {
     var shadow = Settings.isShadowsEnabled ? '<img class="shadow" width="' + 35 * Settings.markerSize + '" height="' + 16 * Settings.markerSize + '" src="./assets/images/markers-shadow.png" alt="Shadow">' : '';
     var marker = L.marker([lat, long], {
@@ -714,9 +703,6 @@ var MapBase = {
       $('#lat-lng-container-close-button').click(function () {
         $('.lat-lng-container').css('display', 'none');
       });
-
-      // Auto fill debug markers inputs
-      Menu.liveUpdateDebugMarkersInputs(coords.latlng.lat, coords.latlng.lng);
     }
 
     if (Settings.isPinsPlacingEnabled)
