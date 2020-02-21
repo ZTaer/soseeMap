@@ -63,14 +63,9 @@ function init() {
 
   Inventory.load();
 
-  if (typeof $.cookie('alert-closed-1') == 'undefined') {
-    $('.map-alert').show();
-  }
-  else {
-    $('.map-alert').hide();
-  }
+  $('.map-alert').toggle($.cookie('alert-closed-1') === undefined);
 
-  if (typeof $.cookie('disabled-categories') !== 'undefined')
+  if ($.cookie('disabled-categories') !== undefined)
     categoriesDisabledByDefault = $.cookie('disabled-categories').split(',');
 
   categoriesDisabledByDefault = categoriesDisabledByDefault.filter(function (item) {
@@ -82,60 +77,70 @@ function init() {
     return categoriesDisabledByDefault.indexOf(item) === -1;
   });
 
-  if (typeof $.cookie('map-layer') === 'undefined' || isNaN(parseInt($.cookie('map-layer'))))
+  if ($.cookie('map-layer') === undefined || isNaN(parseInt($.cookie('map-layer'))))
     $.cookie('map-layer', 0, { expires: 999 });
 
   if (!Language.availableLanguages.includes(Settings.language))
     Settings.language = 'zh-hans';
 
-  if (typeof $.cookie('remove-markers-daily') === 'undefined') {
+  if ($.cookie('remove-markers-daily') === undefined) {
     Settings.resetMarkersDaily = true;
     $.cookie('remove-markers-daily', '1', { expires: 999 });
   }
 
-  if (typeof $.cookie('marker-cluster') === 'undefined') {
+  if ($.cookie('marker-cluster') === undefined) {
     Settings.markerCluster = true;
     $.cookie('marker-cluster', '1', { expires: 999 });
   }
 
-  if (typeof $.cookie('enable-marker-popups') === 'undefined') {
+  if ($.cookie('enable-marker-popups') === undefined) {
     Settings.isPopupsEnabled = true;
     $.cookie('enable-marker-popups', '1', { expires: 999 });
   }
 
-  if (typeof $.cookie('enable-marker-shadows') === 'undefined') {
+  if ($.cookie('enable-marker-shadows') === undefined) {
     Settings.isShadowsEnabled = true;
     $.cookie('enable-marker-shadows', '1', { expires: 999 });
   }
 
-  if (typeof $.cookie('enable-dclick-zoom') === 'undefined') {
+  if ($.cookie('enable-dclick-zoom') === undefined) {
     Settings.isDoubleClickZoomEnabled = true;
     $.cookie('enable-dclick-zoom', '1', { expires: 999 });
   }
 
-  if (typeof $.cookie('show-help') === 'undefined') {
+  if ($.cookie('show-help') === undefined) {
     Settings.showHelp = true;
     $.cookie('show-help', '1', { expires: 999 });
   }
 
-  if (typeof $.cookie('marker-opacity') === 'undefined') {
+  if ($.cookie('marker-opacity') === undefined) {
     Settings.markerOpacity = 1;
     $.cookie('marker-opacity', '1', { expires: 999 });
   }
 
-  if (typeof $.cookie('marker-size') === 'undefined') {
+  if ($.cookie('marker-size') === undefined) {
     Settings.markerSize = 1;
     $.cookie('marker-size', '1', { expires: 999 });
   }
 
-  if (typeof $.cookie('overlay-opacity') === 'undefined') {
+  if ($.cookie('overlay-opacity') === undefined) {
     Settings.overlayOpacity = 0.5;
     $.cookie('overlay-opacity', '0.5', { expires: 999 });
   }
 
-  if (typeof $.cookie('clock-or-timer') === 'undefined') {
+  if ($.cookie('cycle-input-enabled') === undefined) {
+    Settings.isCycleInputEnabled = 1;
+    $.cookie('cycle-input-enabled', '1', { expires: 999 });
+  }
+
+  if ($.cookie('clock-or-timer') === undefined) {
     Settings.displayClockHideTimer = false;
     $.cookie('clock-or-timer', 'false', { expires: 999 });
+  }
+
+  if ($.cookie('timestamps-24') === undefined) {
+    Settings.display24HoursTimestamps = false;
+    $.cookie('timestamps-24', 'false', { expires: 999 });
   }
 
   MapBase.init();
@@ -164,30 +169,19 @@ function init() {
   $('#pins-edit-mode').prop("checked", Settings.isPinsEditingEnabled);
   $('#show-help').prop("checked", Settings.showHelp);
   $('#show-coordinates').prop("checked", Settings.isCoordsEnabled);
+  $('#timestamps-24').prop("checked", Settings.display24HoursTimestamps);
   $('#sort-items-alphabetically').prop("checked", Settings.sortItemsAlphabetically);
+  $('#enable-cycle-input').prop("checked", Settings.isCycleInputEnabled);
   $("#enable-right-click").prop('checked', $.cookie('right-click') != null);
   $("#enable-debug").prop('checked', $.cookie('debug') != null);
+  $("#enable-cycle-changer").prop('checked', $.cookie('cycle-changer-enabled') != null);
 
-  if (Settings.showHelp) {
-    $("#help-container").show();
-  } else {
-    $("#help-container").hide();
-  }
+  $("#help-container").toggle(Settings.showHelp);
 
-  if (Settings.displayClockHideTimer) {
-    $('.clock-container').removeClass('hidden');
-    $('.timer-container').addClass('hidden');
-  }
-  else {
-    $('.clock-container').addClass('hidden');
-    $('.timer-container').removeClass('hidden');
-  }
-
-  if (Settings.isDebugEnabled) {
-    $('#cycle-changer-container').removeClass('hidden');
-  } else {
-    $('#cycle-changer-container').addClass('hidden');
-  }
+  $('.timer-container').toggleClass('hidden', Settings.displayClockHideTimer);
+  $('.clock-container').toggleClass('hidden', !(Settings.displayClockHideTimer));
+  $('.input-cycle').toggleClass('hidden', !(Settings.isCycleInputEnabled));
+  $('#cycle-changer-container').toggleClass('hidden', !(Settings.isCycleChangerEnabled));
 
   Pins.addToMap();
   changeCursor();
@@ -222,9 +216,12 @@ function setMapBackground(mapIndex) {
 function changeCursor() {
   if (Settings.isCoordsEnabled || Routes.customRouteEnabled)
     $('.leaflet-grab').css('cursor', 'pointer');
-  else
+  else {
     $('.leaflet-grab').css('cursor', 'grab');
+    $('.lat-lng-container').css('display', 'none');
+  }
 }
+
 function addZeroToNumber(number) {
   if (number < 10)
     number = '0' + number;
@@ -268,7 +265,7 @@ function downloadAsFile(filename, text) {
 setInterval(function () {
 
   // Clock in game created by Michal__d
-  var display_24 = false,
+  var display_24 = Settings.display24HoursTimestamps,
     newDate = new Date(),
     startTime = newDate.valueOf(),
     factor = 30,
@@ -339,13 +336,24 @@ $('#enable-debug').on("change", function () {
   if ($("#enable-debug").prop('checked')) {
     Settings.isDebugEnabled = true;
     $.cookie('debug', '1', { expires: 999 });
-
-    $('#cycle-changer-container').removeClass('hidden');
   } else {
     Settings.isDebugEnabled = false;
     $.removeCookie('debug');
+  }
+});
+
+$('#enable-cycle-changer').on("change", function () {
+  if ($("#enable-cycle-changer").prop('checked')) {
+    Settings.isCycleChangerEnabled = true;
+    $.cookie('cycle-changer-enabled', '1', { expires: 999 });
+
+    $('#cycle-changer-container').removeClass('hidden');
+  } else {
+    Settings.isCycleChangerEnabled = false;
+    $.removeCookie('cycle-changer-enabled');
 
     $('#cycle-changer-container').addClass('hidden');
+    Cycles.resetCycle();
   }
 });
 
@@ -457,6 +465,11 @@ $('#show-coordinates').on('change', function () {
   changeCursor();
 });
 
+$('#timestamps-24').on('change', function () {
+  Settings.display24HoursTimestamps = $("#timestamps-24").prop('checked');
+  $.cookie('timestamps-24', Settings.display24HoursTimestamps ? '1' : '0', { expires: 999 });
+});
+
 //Change & save language option
 $("#language").on("change", function () {
   Settings.language = $("#language").val();
@@ -491,10 +504,17 @@ $("#marker-size").on("change", function () {
   Treasures.set();
 });
 
+//Enable cycle input
+$("#enable-cycle-input").on("change", function () {
+  Settings.isCycleInputEnabled = $("#enable-cycle-input").prop('checked');
+  $.cookie('cycle-input-enabled', Settings.isCycleInputEnabled ? '1' : '0', { expires: 999 });
+  $('.input-cycle').toggleClass('hidden', !(Settings.isCycleInputEnabled));
+});
+
 //Disable & enable collection category
 $('.clickable').on('click', function () {
   var menu = $(this);
-  if (typeof menu.data('type') === 'undefined') return;
+  if (menu.data('type') === undefined) return;
 
   $('[data-type=' + menu.data('type') + ']').toggleClass('disabled');
   var isDisabled = menu.hasClass('disabled');
@@ -680,15 +700,31 @@ $('#pins-export').on("click", function () {
 $('#pins-import').on('click', function () {
   try {
     var file = $('#pins-import-file').prop('files')[0];
+    var fallback = false;
 
     if (!file) {
       alert(Language.get('alerts.file_not_found'));
       return;
     }
 
-    file.text().then(function (text) {
-      Pins.importPins(text);
-    });
+    try {
+      file.text().then((text) => {
+        Pins.importPins(text);
+      });
+    } catch (error) {
+      fallback = true;
+    }
+
+    if (fallback) {
+      var reader = new FileReader();
+
+      reader.addEventListener('loadend', (e) => {
+        var text = e.srcElement.result;
+        Pins.importPins(text);
+      });
+
+      reader.readAsText(file);
+    }
   } catch (error) {
     console.error(error);
     alert(Language.get('alerts.feature_not_supported'));
@@ -708,10 +744,7 @@ $('#enable-inventory').on("change", function () {
 
   Inventory.toggleMenuItemsDisabled();
 
-  if (Inventory.isEnabled)
-    $('.collection-sell, .counter').show();
-  else
-    $('.collection-sell, .counter').hide();
+  $('.collection-sell, .counter').toggle(Inventory.isEnabled);
 });
 
 $('#enable-inventory-popups').on("change", function () {
@@ -731,10 +764,7 @@ $('#reset-collection-updates-inventory').on("change", function () {
   $.cookie('reset-updates-inventory-enabled', Inventory.resetButtonUpdatesInventory ? '1' : '0', { expires: 999 });
 });
 
-if (Inventory.isEnabled)
-  $('.collection-sell, .counter').show();
-else
-  $('.collection-sell, .counter').hide();
+$('.collection-sell, .counter').toggle(Inventory.isEnabled);
 
 //Enable & disable inventory on menu
 $('#inventory-stack').on("change", function () {
@@ -772,52 +802,80 @@ $('#cookie-export').on("click", function () {
   }
 });
 
+function setSettings(settings) {
+     // Import all the settings from the file.
+     if (settings.cookies === undefined && settings.local === undefined) {
+      $.each(settings, function (key, value) {
+        $.cookie(key, value, { expires: 999 });
+      });
+    }
+
+    $.each(settings.cookies, function (key, value) {
+      $.cookie(key, value, { expires: 999 });
+    });
+
+    $.each(settings.local, function (key, value) {
+      localStorage.setItem(key, value);
+    });
+
+    // Do this for now, maybe look into refreshing the menu completely (from init) later.
+    location.reload();
+}
+
 $('#cookie-import').on('click', function () {
   try {
+    var settings = null;
     var file = $('#cookie-import-file').prop('files')[0];
+    var fallback = false;
 
     if (!file) {
       alert(Language.get('alerts.file_not_found'));
       return;
     }
 
-    file.text().then(function (res) {
-      var settings = null;
+    try {
+      file.text().then((text) => {
+        try {  
+          settings = JSON.parse(text);
 
-      try {
-        settings = JSON.parse(res);
-      } catch (error) {
-        alert(Language.get('alerts.file_not_valid'));
-        return;
-      }
+          setSettings(settings);
 
-      // Remove all current settings.
-      $.each($.cookie(), function (key, value) {
-        $.removeCookie(key);
+        } catch (error) {
+          alert(Language.get('alerts.file_not_valid'));
+          return;
+        }
+      });
+    } catch (error) {
+      fallback = true;
+    }
+   
+    if (fallback) {
+      var reader = new FileReader();
+
+      reader.addEventListener('loadend', (e) => {
+        var text = e.srcElement.result;
+
+        try {
+          settings = JSON.parse(text);
+          setSettings(settings);
+        } catch (error) {
+          alert(Language.get('alerts.file_not_valid'));
+          return;
+        }
       });
 
-      $.each(localStorage, function (key, value) {
-        localStorage.removeItem(key);
-      });
+      reader.readAsText(file);
+    }
 
-      // Import all the settings from the file.
-      if (typeof settings.cookies === 'undefined' && typeof settings.local === 'undefined') {
-        $.each(settings, function (key, value) {
-          $.cookie(key, value, { expires: 999 });
-        });
-      }
-
-      $.each(settings.cookies, function (key, value) {
-        $.cookie(key, value, { expires: 999 });
-      });
-
-      $.each(settings.local, function (key, value) {
-        localStorage.setItem(key, value);
-      });
-
-      // Do this for now, maybe look into refreshing the menu completely (from init) later.
-      location.reload();
+    // Remove all current settings.
+    $.each($.cookie(), function (key, value) {
+      $.removeCookie(key);
     });
+
+    $.each(localStorage, function (key, value) {
+      localStorage.removeItem(key);
+    });
+
   } catch (error) {
     console.error(error);
     alert(Language.get('alerts.feature_not_supported'));
@@ -982,13 +1040,9 @@ $('[data-help]').hover(function (e) {
 
 $('#show-help').on("change", function () {
   Settings.showHelp = $("#show-help").prop('checked');
-  $.cookie('show-help', Settings.isHelpEnabled ? '1' : '0', { expires: 999 });
+  $.cookie('show-help', Settings.showHelp ? '1' : '0', { expires: 999 });
 
-  if (Settings.showHelp) {
-    $("#help-container").show();
-  } else {
-    $("#help-container").hide();
-  }
+  $("#help-container").toggle(Settings.showHelp);
 });
 
 /**
@@ -1013,10 +1067,9 @@ L.LayerGroup.include({
 });
 
 // Disable annoying menu on right mouse click
-$('*').on('contextmenu', function (event) {
-  if ($.cookie('right-click') != null)
-    return;
-  event.preventDefault();
+$('*').on('contextmenu', function (e) {
+  if ($.cookie('right-click') == null)
+    e.preventDefault();
 });
 
 // reset all settings & cookies
@@ -1031,6 +1084,29 @@ $('#delete-all-settings').on('click', function () {
   });
 
   location.reload(true);
+});
+
+/**
+ * Modals
+ */
+$('#open-clear-markers-modal').on('click', function () {
+  $('#clear-markers-modal').modal();
+});
+
+$('#open-clear-important-items-modal').on('click', function () {
+  $('#clear-important-items-modal').modal();
+});
+
+$('#open-clear-inventory-modal').on('click', function () {
+  $('#clear-inventory-modal').modal();
+});
+
+$('#open-clear-routes-modal').on('click', function () {
+  $('#clear-routes-modal').modal();
+});
+
+$('#open-delete-all-settings-modal').on('click', function () {
+  $('#delete-all-settings-modal').modal();
 });
 
 /**
