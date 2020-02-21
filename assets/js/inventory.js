@@ -7,17 +7,17 @@ var Inventory = {
   items: [],
 
   init: function () {
-    if (typeof $.cookie('inventory-popups-enabled') === 'undefined') {
+    if ($.cookie('inventory-popups-enabled') === undefined) {
       Inventory.isPopupEnabled = true;
       $.cookie('inventory-popups-enabled', '1', { expires: 999 });
     }
 
-    if (typeof $.cookie('inventory-menu-update-enabled') === 'undefined') {
+    if ($.cookie('inventory-menu-update-enabled') === undefined) {
       Inventory.isMenuUpdateEnabled = true;
       $.cookie('inventory-menu-update-enabled', '1', { expires: 999 });
     }
 
-    if (typeof $.cookie('reset-updates-inventory-enabled') === 'undefined') {
+    if ($.cookie('reset-updates-inventory-enabled') === undefined) {
       Inventory.resetButtonUpdatesInventory = false;
       $.cookie('reset-updates-inventory-enabled', '0', { expires: 999 });
     }
@@ -120,13 +120,13 @@ var Inventory = {
       $('#enable-inventory-menu-update').parent().parent().hide();
       $('#reset-collection-updates-inventory').parent().parent().hide();
       $('#inventory-stack').parent().hide();
-      $('[data-target="#clear-inventory-modal"]').hide();
+      $('#open-clear-inventory-modal').hide();
     } else {
       $('#enable-inventory-popups').parent().parent().show();
       $('#enable-inventory-menu-update').parent().parent().show();
       $('#reset-collection-updates-inventory').parent().parent().show();
       $('#inventory-stack').parent().show();
-      $('[data-target="#clear-inventory-modal"]').show();
+      $('#open-clear-inventory-modal').show();
     }
   }
 };
