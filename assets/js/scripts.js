@@ -128,11 +128,6 @@ function init() {
     $.cookie('overlay-opacity', '0.5', { expires: 999 });
   }
 
-  if ($.cookie('cycle-input-enabled') === undefined) {
-    Settings.isCycleInputEnabled = 1;
-    $.cookie('cycle-input-enabled', '1', { expires: 999 });
-  }
-
   if ($.cookie('clock-or-timer') === undefined) {
     Settings.displayClockHideTimer = false;
     $.cookie('clock-or-timer', 'false', { expires: 999 });
@@ -141,6 +136,26 @@ function init() {
   if ($.cookie('timestamps-24') === undefined) {
     Settings.display24HoursTimestamps = false;
     $.cookie('timestamps-24', 'false', { expires: 999 });
+  }
+
+  if ($.cookie('show-utilities') === undefined) {
+    Settings.showUtilitiesSettings = 1;
+    $.cookie('show-utilities', '1', { expires: 999 });
+  }
+
+  if ($.cookie('show-customization') === undefined) {
+    Settings.showCustomizationSettings = 1;
+    $.cookie('show-customization', '1', { expires: 999 });
+  }
+
+  if ($.cookie('show-routes') === undefined) {
+    Settings.showRoutesSettings = 1;
+    $.cookie('show-routes', '1', { expires: 999 });
+  }
+
+  if ($.cookie('show-import-export') === undefined) {
+    Settings.showImportExportSettings = 1;
+    $.cookie('show-import-export', '1', { expires: 999 });
   }
 
   MapBase.init();
@@ -176,12 +191,25 @@ function init() {
   $("#enable-debug").prop('checked', $.cookie('debug') != null);
   $("#enable-cycle-changer").prop('checked', $.cookie('cycle-changer-enabled') != null);
 
+  $("#show-utilities").prop('checked', Settings.showUtilitiesSettings);
+  $("#show-customization").prop('checked', Settings.showCustomizationSettings);
+  $("#show-routes").prop('checked', Settings.showRoutesSettings);
+  $("#show-import-export").prop('checked', Settings.showImportExportSettings);
+  $("#show-debug").prop('checked', Settings.showDebugSettings);
+
   $("#help-container").toggle(Settings.showHelp);
 
   $('.timer-container').toggleClass('hidden', Settings.displayClockHideTimer);
   $('.clock-container').toggleClass('hidden', !(Settings.displayClockHideTimer));
   $('.input-cycle').toggleClass('hidden', !(Settings.isCycleInputEnabled));
+  $('.cycle-icon').toggleClass('hidden', Settings.isCycleInputEnabled);
   $('#cycle-changer-container').toggleClass('hidden', !(Settings.isCycleChangerEnabled));
+
+  $("#utilities-container").toggleClass('opened', Settings.showUtilitiesSettings);
+  $("#customization-container").toggleClass('opened', Settings.showCustomizationSettings);
+  $("#routes-container").toggleClass('opened', Settings.showRoutesSettings);
+  $("#import-export-container").toggleClass('opened', Settings.showImportExportSettings);
+  $("#debug-container").toggleClass('opened', Settings.showDebugSettings);
 
   Pins.addToMap();
   changeCursor();
@@ -262,21 +290,21 @@ function downloadAsFile(filename, text) {
   document.body.removeChild(element);
 }
 
-setInterval(function () {
-
+function clockTick() {
   // Clock in game created by Michal__d
-  var display_24 = Settings.display24HoursTimestamps,
-    newDate = new Date(),
-    startTime = newDate.valueOf(),
-    factor = 30,
-    correctTime = new Date(startTime * factor);
+  var display_24 = Settings.display24HoursTimestamps;
+  var newDate = new Date();
+  var startTime = newDate.valueOf();
+  var factor = 30;
+  var correctTime = new Date(startTime * factor);
+
   correctTime.setHours(correctTime.getUTCHours());
   correctTime.setMinutes(correctTime.getUTCMinutes() - 3); //for some reason time in game is 3 sec. delayed to normal time
 
   if (display_24) {
     $('#time-in-game').text(addZeroToNumber(correctTime.getHours()) + ":" + addZeroToNumber(correctTime.getMinutes()));
   } else {
-    $('#time-in-game').text(addZeroToNumber(correctTime.getHours() % 12) + ":" + addZeroToNumber(correctTime.getMinutes()) + " " + ((correctTime.getHours() < 12) ? "AM" : "PM"));
+    $('#time-in-game').text((addZeroToNumber(correctTime.getHours() % 12) == '00' ? '12' : addZeroToNumber(correctTime.getHours() % 12)) + ":" + addZeroToNumber(correctTime.getMinutes()) + " " + ((correctTime.getHours() < 12) ? "AM" : "PM"));
   }
 
   if (correctTime.getHours() >= 22 || correctTime.getHours() < 5) {
@@ -298,7 +326,9 @@ setInterval(function () {
   else {
     $('[data-marker*="flower_agarita"], [data-marker*="flower_blood"]').css('filter', 'none');
   }
-}, 1000);
+}
+
+setInterval(clockTick, 1000);
 
 // toggle timer and clock after click the container
 $('.timer-container, .clock-container').on('click', function () {
@@ -310,11 +340,6 @@ $('.timer-container, .clock-container').on('click', function () {
 /**
  * jQuery triggers
  */
-
-//Toggle debug container
-$("#toggle-debug").on("click", function () {
-  $("#debug-container").toggleClass('opened');
-});
 
 //Show all markers on map
 $("#show-all-markers").on("change", function () {
@@ -329,6 +354,42 @@ $('#enable-right-click').on("change", function () {
   } else {
     $.removeCookie('right-click');
   }
+});
+
+//Toggle settings containers
+$("#show-utilities").on("change", function () {
+  Settings.showUtilitiesSettings = $("#show-utilities").prop('checked');
+  $.cookie('show-utilities', Settings.showUtilitiesSettings ? '1' : '0', { expires: 999 });
+
+  $("#utilities-container").toggleClass('opened', Settings.showUtilitiesSettings);
+});
+
+$("#show-customization").on("change", function () {
+  Settings.showCustomizationSettings = $("#show-customization").prop('checked');
+  $.cookie('show-customization', Settings.showCustomizationSettings ? '1' : '0', { expires: 999 });
+
+  $("#customization-container").toggleClass('opened', Settings.showCustomizationSettings);
+});
+
+$("#show-routes").on("change", function () {
+  Settings.showRoutesSettings = $("#show-routes").prop('checked');
+  $.cookie('show-routes', Settings.showRoutesSettings ? '1' : '0', { expires: 999 });
+
+  $("#routes-container").toggleClass('opened', Settings.showRoutesSettings);
+});
+
+$("#show-import-export").on("change", function () {
+  Settings.showImportExportSettings = $("#show-import-export").prop('checked');
+  $.cookie('show-import-export', Settings.showImportExportSettings ? '1' : '0', { expires: 999 });
+
+  $("#import-export-container").toggleClass('opened', Settings.showImportExportSettings);
+});
+
+$("#show-debug").on("change", function () {
+  Settings.showDebugSettings = $("#show-debug").prop('checked');
+  $.cookie('show-debug', Settings.showDebugSettings ? '1' : '0', { expires: 999 });
+
+  $("#debug-container").toggleClass('opened', Settings.showDebugSettings);
 });
 
 // :-)
@@ -468,6 +529,7 @@ $('#show-coordinates').on('change', function () {
 $('#timestamps-24').on('change', function () {
   Settings.display24HoursTimestamps = $("#timestamps-24").prop('checked');
   $.cookie('timestamps-24', Settings.display24HoursTimestamps ? '1' : '0', { expires: 999 });
+  clockTick();
 });
 
 //Change & save language option
@@ -509,6 +571,7 @@ $("#enable-cycle-input").on("change", function () {
   Settings.isCycleInputEnabled = $("#enable-cycle-input").prop('checked');
   $.cookie('cycle-input-enabled', Settings.isCycleInputEnabled ? '1' : '0', { expires: 999 });
   $('.input-cycle').toggleClass('hidden', !(Settings.isCycleInputEnabled));
+  $('.cycle-icon').toggleClass('hidden', Settings.isCycleInputEnabled);
 });
 
 //Disable & enable collection category
@@ -741,11 +804,14 @@ $('#enable-inventory').on("change", function () {
   $.cookie('inventory-enabled', Inventory.isEnabled ? '1' : '0', { expires: 999 });
 
   MapBase.addMarkers();
-
   Inventory.toggleMenuItemsDisabled();
+
+  $('#items-value').toggleClass('hidden', !Inventory.isEnabled);
 
   $('.collection-sell, .counter').toggle(Inventory.isEnabled);
 });
+
+$('#items-value').toggleClass('hidden', !Inventory.isEnabled);
 
 $('#enable-inventory-popups').on("change", function () {
   Inventory.isPopupEnabled = $("#enable-inventory-popups").prop('checked');
@@ -803,23 +869,23 @@ $('#cookie-export').on("click", function () {
 });
 
 function setSettings(settings) {
-     // Import all the settings from the file.
-     if (settings.cookies === undefined && settings.local === undefined) {
-      $.each(settings, function (key, value) {
-        $.cookie(key, value, { expires: 999 });
-      });
-    }
-
-    $.each(settings.cookies, function (key, value) {
+  // Import all the settings from the file.
+  if (settings.cookies === undefined && settings.local === undefined) {
+    $.each(settings, function (key, value) {
       $.cookie(key, value, { expires: 999 });
     });
+  }
 
-    $.each(settings.local, function (key, value) {
-      localStorage.setItem(key, value);
-    });
+  $.each(settings.cookies, function (key, value) {
+    $.cookie(key, value, { expires: 999 });
+  });
 
-    // Do this for now, maybe look into refreshing the menu completely (from init) later.
-    location.reload();
+  $.each(settings.local, function (key, value) {
+    localStorage.setItem(key, value);
+  });
+
+  // Do this for now, maybe look into refreshing the menu completely (from init) later.
+  location.reload();
 }
 
 $('#cookie-import').on('click', function () {
@@ -835,7 +901,7 @@ $('#cookie-import').on('click', function () {
 
     try {
       file.text().then((text) => {
-        try {  
+        try {
           settings = JSON.parse(text);
 
           setSettings(settings);
@@ -848,7 +914,7 @@ $('#cookie-import').on('click', function () {
     } catch (error) {
       fallback = true;
     }
-   
+
     if (fallback) {
       var reader = new FileReader();
 
