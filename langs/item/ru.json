@@ -1,7 +1,7 @@
 [
 	{"key": "fasttravel.tumbleweed.name",   	"value": "Тамблвид"},
 	{"key": "fasttravel.armadillo.name",    	"value": "Армадилло"},
-	{"key": "fasttravel.macfarlanes.name",  	"value": "Ранчо Макфаралейн"},
+	{"key": "fasttravel.macfarlanes.name",  	"value": "Ранчо Макфарлейн"},
 	{"key": "fasttravel.manzanita.name",     	"value": "Пост Манзанита"},
 	{"key": "fasttravel.blackwater.name",    	"value": "Блэкуотер"},
 	{"key": "fasttravel.strawberry.name", 	   	"value": "Строуберри"},
@@ -1264,7 +1264,7 @@
 	{"key": "weekly.desc.sacred_set", "value": "Sacred"},
 	{"key": "weekly.desc.veteran_set", "value": "Veteran's"},
 	{"key": "weekly.desc.herbalist_set", "value": "Предметы травника"},
-	{"key": "weekly.desc.gold_panner_set", "value": "Gold Panners' Dream"},
+	{"key": "weekly.desc.gold_panner_set", "value": "Мечта золотоискателя"},
 	{"key": "weekly.desc.pearls_set", "value": "Pearls of the Sea"},
 	{"key": "weekly.desc.gambler_set", "value": "Gambler's Choice"},
 	{"key": "weekly.desc.naturalist_set", "value": "Naturalists"},
@@ -1296,5 +1296,11 @@
 	{"key": "weekly.desc.festive_feast_set", "value": "Festive Feast"},
 	{"key": "weekly.desc.new_year_set", "value": "New Year"},
 	{"key": "weekly.desc.lovers_set", "value": "Влюбленные"},
-	{"key": "weekly.desc.egg_hunt_set", "value": "Egg Hunt"}
+	{"key": "weekly.desc.egg_hunt_set", "value": "Egg Hunt"},
+	
+	{"key": "item_pocket_watch_gold.name", "value": "Золотые карманные часы"},
+    	{"key": "item_carcass_squirrel_perfect.name", "value": "Perfect Squirrel Carcass"},
+    	{"key": "item_gold_tooth.name", "value": "Gold Tooth"},
+    	{"key": "item_cooked_plump_bird_thyme.name", "value": "Cooked Plump Bird (Thyme)"},
+   	 {"key": "item_pocket_watch_platinum.name", "value": "Platinum Pocket Watch"}
 ]
