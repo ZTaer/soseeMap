@@ -123,12 +123,15 @@ input, textarea, select, .btn {
     line-height: normal;
     margin: 0 12px;
     text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .header-border {
     -webkit-box-flex: 1;
     flex: 1 0 auto;
-    min-width: 40px;
+    min-width: 12px;
     position: relative;
 }
 
@@ -178,7 +181,40 @@ input, textarea, select, .btn {
     text-align: center;
 }
 
-.map-alert .close-button, .map-cycle-alert .close-button {
+@media (max-width: 1024px) {
+    .filter-alert {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 20px;
+        z-index: 990;
+        text-align: center;
+    }
+}
+
+@media (min-width: 1025px) {
+    .filter-alert {
+        position: absolute;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        bottom: 20px;
+        z-index: 990;
+        text-align: center;
+    }
+}
+
+.filter-alert span {
+    background-image: url(../images/menu_hover.png);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    color: #fff;
+    padding: 10px 25px;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.map-alert .close-button, .map-cycle-alert .close-button, .filter-alert .close-button {
     position: absolute;
     top: 0;
     right: 15px;
@@ -508,13 +544,13 @@ input, textarea, select, .btn {
     transform: rotate(180deg);
 }
 
-.side-menu .menu-hidden, #utilities-container, #customization-container, #routes-container, #import-export-container, #debug-container {
+.side-menu .menu-hidden, #weekly-container, #utilities-container, #customization-container, #routes-container, #import-export-container, #debug-container {
     max-height: 0;
     overflow: hidden;
     transition: max-height 250ms ease-out;
 }
 
-.side-menu .menu-hidden.opened, #utilities-container.opened, #customization-container.opened, #routes-container.opened, #import-export-container.opened, #debug-container.opened {
+.side-menu .menu-hidden.opened, #weekly-container.opened, #utilities-container.opened, #customization-container.opened, #routes-container.opened, #import-export-container.opened, #debug-container.opened {
     max-height: 2000px;
     transition: max-height 400ms linear;
 }
@@ -883,6 +919,28 @@ a.no-style:visited {
     display: none !important;
 }
 
+#weekly-container {
+    user-select: none;
+}
+
+.weekly-item-listings p {
+    text-align: center;
+    font-size: 14px;
+    margin: 0 12px 14px 12px !important;
+}
+
+.weekly-item-listing {
+    cursor: default;
+    display: flex;
+    justify-content: start;
+    padding: 2px 12px;
+}
+
+.weekly-item-listing .icon {
+    height: 28px;
+    margin-right: 10px;
+}
+
 /* Bootstrap modal styling */
 
 .modal {
@@ -974,6 +1032,17 @@ a.no-style:visited {
     }
     .counter-menu-opened {
         display: none;
+    }
+    .side-menu .menu-hidden .collectible-icon {
+        margin-top: 7px;
+    }
+    .counter-button {
+        height: 32px;
+        width: 32px;
+        line-height: 1.5;
+    }
+    .side-menu .menu-hidden .collectible, .input-container label {
+        line-height: 38px;
     }
 }
 

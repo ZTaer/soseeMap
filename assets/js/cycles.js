@@ -38,6 +38,7 @@ var Cycles = {
     if (cycleIndex < 1) {
       // either -1 (not found) or 0 (first day) for which there is no yesterday
       console.error('[Cycles] Cycle not found: ' + selectedDayStr);
+      $('.map-cycle-alert').removeClass('hidden');
       return;
     }
 
@@ -112,7 +113,7 @@ var Cycles = {
   setLocaleDate: function () {
     'use strict';
     const locale = Settings.language;
-    const options = {timeZone: "UTC", day: "2-digit", month: "long"};
+    const options = { timeZone: "UTC", day: "2-digit", month: "long" };
     $('.cycle-data').text(Cycles.selectedDay.toLocaleString(locale, options));
   },
 
@@ -231,7 +232,7 @@ var Cycles = {
         break;
 
       default:
-        console.log(`Category '${category}' invalid`);
+        console.error(`Category '${category}' invalid.`);
         break;
     }
     return _cycles;
@@ -263,6 +264,7 @@ var Cycles = {
 
   prevCycle: function () {
     Cycles.offset--;
+
     $('#cycle-next').removeClass('disable-cycle-changer-arrow');
 
     if (Cycles.offset <= -Cycles.backwardMaxOffset)
@@ -273,12 +275,12 @@ var Cycles = {
       return;
     }
 
-    Inventory.save();
     Cycles.getTodayCycle();
   },
 
   nextCycle: function () {
     Cycles.offset++;
+
     $('#cycle-prev').removeClass('disable-cycle-changer-arrow');
 
     if (Cycles.offset >= Cycles.forwardMaxOffset)
@@ -289,13 +291,11 @@ var Cycles = {
       return;
     }
 
-    Inventory.save();
     Cycles.getTodayCycle();
   },
 
   resetCycle: function () {
     Cycles.offset = 0;
-    Inventory.save();
     Cycles.getTodayCycle();
   }
 };
