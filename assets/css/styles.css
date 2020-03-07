@@ -72,6 +72,18 @@ input, textarea, select, .btn {
     border: 1px solid black;
 }
 
+.update-warning {
+    width: 100%;
+    background: #800000;
+    color: #eee;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    z-index: 9909;
+    display: none;
+    /* When the time comes, you gotta run and change this to block. This is a warning. */
+}
+
 #main-header {
     display: flex;
     margin: 10px;
@@ -358,7 +370,7 @@ input, textarea, select, .btn {
     border-top: 1px solid #B0B0B0;
     border-bottom: 1px solid #B0B0B0;
     padding: 10px 0;
-    margin: 15px 0;
+    margin: 5px 0 15px 0;
 }
 
 .links-container a {
@@ -555,7 +567,7 @@ input, textarea, select, .btn {
     transition: max-height 400ms linear;
 }
 
-.side-menu .menu-hidden .collection-value {
+.side-menu .collection-value {
     text-align: center;
     border-top: 1px white solid;
     border-bottom: 1px white solid;
@@ -564,28 +576,32 @@ input, textarea, select, .btn {
     justify-content: space-around;
 }
 
-.side-menu .menu-hidden .collection-value a {
+.side-menu .weekly-item-listings .collection-value {
+    margin-bottom: 6px;
+}
+
+.side-menu .collection-value a {
     color: #fff;
 }
 
-.side-menu .menu-hidden .collection-sell, .collection-reset {
+.side-menu .collection-sell, .collection-reset {
     cursor: pointer;
     user-select: none;
 }
 
-.side-menu .menu-hidden .collectible-wrapper {
+.side-menu .collectible-wrapper {
     padding: 6px 12px;
     cursor: pointer;
     user-select: none;
 }
 
-.side-menu .menu-hidden .collectible-icon {
+.side-menu .collectible-icon {
     float: left;
     height: 28px;
     margin-right: 10px;
 }
 
-.side-menu .menu-hidden .collectible-icon.random-encounter {
+.side-menu .collectible-icon.random-encounter {
     width: 32px;
     height: auto;
     margin-top: 1px;
@@ -593,19 +609,19 @@ input, textarea, select, .btn {
     margin-bottom: -3px;
 }
 
-.side-menu .menu-hidden .collectible-text {
+.side-menu .collectible-text {
     display: flex;
     justify-content: space-between;
     font-size: 15px;
 }
 
-.side-menu .menu-hidden .collectible, .input-container label, .menu-option span {
+.side-menu .collectible, .input-container label, .menu-option span {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
-.side-menu .menu-hidden .collectible, .input-container label {
+.side-menu .collectible, .input-container label {
     line-height: 24px;
 }
 
@@ -629,6 +645,10 @@ input, textarea, select, .btn {
     padding: 14px 8px;
     border-radius: 3px;
     display: none;
+}
+
+.lat-lng-container a {
+    color: #fff;
 }
 
 .lat-lng-container #lat-lng-container-close-button {
@@ -667,6 +687,19 @@ a.wiki-page:visited {
 
 .highlight-items {
     filter: drop-shadow(0 0 .5rem #cc0000) drop-shadow(0 0 .4rem #cc0000);
+}
+
+.highlight-low-amount-items-animated {
+    animation: highlight-low-amount-items-animation 1s infinite alternate;
+}
+
+@keyframes highlight-low-amount-items-animation {
+    from {
+        opacity: 0.0;
+    }
+    to {
+        opacity: var(--animation-target-opacity);
+    }
 }
 
 .highlight-important-items-menu {
@@ -740,6 +773,7 @@ a.wiki-page:visited {
     min-width: 12px;
     display: inline-block;
     text-align: center;
+    font-size: 15px;
 }
 
 .counter-button {
@@ -769,7 +803,7 @@ a.wiki-page:visited {
 
 #cycle-changer-container .cycle-data {
     text-align: center;
-    min-width: 100px;
+    min-width: 170px;
     margin: 0 6px;
 }
 
@@ -932,7 +966,7 @@ a.no-style:visited {
 .weekly-item-listing {
     cursor: default;
     display: flex;
-    justify-content: start;
+    justify-content: space-between;
     padding: 2px 12px;
 }
 
@@ -1132,28 +1166,40 @@ a.no-style:visited {
     border: none;
 }
 
-.leaflet-div-icon .overlay, .leaflet-div-icon .icon, .leaflet-div-icon .background, .leaflet-div-icon .shadow {
+.leaflet-div-icon .overlay, .leaflet-div-icon .icon, .leaflet-div-icon .background, .leaflet-div-icon .marker-contour, .leaflet-div-icon .shadow {
     position: absolute;
     text-align: center;
 }
 
 .leaflet-div-icon .overlay {
-    z-index: 4;
+    z-index: 5;
     width: 100%;
     height: auto;
 }
 
 .leaflet-div-icon .icon {
-    z-index: 3;
+    z-index: 4;
     width: 100%;
     height: auto;
     padding-top: 6px;
 }
 
 .leaflet-div-icon .background {
-    z-index: 2;
+    z-index: 3;
     width: 100%;
     height: 100%;
+}
+
+.leaflet-div-icon .marker-contour {
+    z-index: 2;
+    width: 130%;
+    height: 130%;
+    left: -15%;
+    bottom: -15%;
+}
+
+.marker-contour {
+    opacity: 0.0;
 }
 
 .leaflet-div-icon .shadow {
