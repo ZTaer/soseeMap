@@ -229,11 +229,20 @@ var MapBase = {
     var curDate = new Date();
     date = curDate.getUTCFullYear() + '-' + (curDate.getUTCMonth() + 1) + '-' + curDate.getUTCDate();
 
-    if (Settings.resetMarkersDaily && date != $.cookie('date')) {
+    if (date != $.cookie('date')) {
       var markers = MapBase.markers;
+
       $.each(markers, function (key, value) {
-        markers[key].isCollected = false;
-        markers[key].canCollect = true;
+        if (Settings.resetMarkersDaily) {
+          markers[key].isCollected = false;
+          markers[key].canCollect = markers[key].amount < Inventory.stackSize;
+        }
+        else {
+          if (value.category === 'random') {
+            markers[key].isCollected = false;
+            markers[key].canCollect = true;
+          }
+        }
       });
 
       MapBase.markers = markers;
@@ -352,6 +361,8 @@ var MapBase = {
         MapBase.updateLoopAvailable = true;
         MapBase.requestLoopCancel = false;
         Menu.refreshItemsCounter();
+        MapBase.loadImportantItems();
+        Inventory.updateLowAmountItems();
       }
     );
 
@@ -375,7 +386,6 @@ var MapBase = {
     if (Routes.generateOnVisit)
       Routes.generatePath(true);
 
-    MapBase.loadImportantItems();
   },
 
   loadWeeklySet: function () {
@@ -481,7 +491,7 @@ var MapBase = {
       } else {
         $(`[data-type=${subdata}]`).removeClass('disabled');
       }
-    }
+    }    
   },
 
   loadCollectedItems: function () {
@@ -533,7 +543,7 @@ var MapBase = {
       case "card_pentacles":
         return "blue";
       case "lost_bracelet":
-        return "orange";
+        return "beige";
       case "lost_necklaces":
         return "orange";
       case "lost_ring":
@@ -549,7 +559,7 @@ var MapBase = {
       case "family_heirlooms":
         return "purple";
       case "coin":
-        return "orange";
+        return "lightred";
       case "weekly":
         return "green";
       default:
@@ -654,18 +664,20 @@ var MapBase = {
     }).length > 0;
 
     var overlay = '';
-    var markerBackgroundColor = (Settings.markersCustomColor === 7
+    var markerBackgroundColor = (Settings.markersCustomColor === 1
       ? MapBase.getFixedIconColorPerCategory(isWeekly ? 'weekly' : marker.category)
-      : MapBase.getIconColor(isWeekly ? 'weekly' : 'day_' + (Settings.markersCustomColor === 0 ? marker.day : Settings.markersCustomColor)));
+      : MapBase.getIconColor(isWeekly ? 'weekly' : 'day_' + (Settings.markersCustomColor === 0 || Settings.markersCustomColor === 1 ? marker.day : Settings.markersCustomColor - 1)));
 
-    var icon = `./assets/images/icons/${marker.category}.png`;
-    var background = `./assets/images/icons/marker_${markerBackgroundColor}.png`;
+    var icon = `./assets/images/icons/${marker.category}.png?v=${nocache}`;
+    var background = `./assets/images/icons/marker_${markerBackgroundColor}.png?v=${nocache}`;
+    var markerContour = `./assets/images/icons/contours/contour_marker_${markerBackgroundColor}.png?v=${nocache}`;
     var shadow = Settings.isShadowsEnabled ? '<img class="shadow" width="' + 35 * Settings.markerSize + '" height="' + 16 * Settings.markerSize + '" src="./assets/images/markers-shadow.png" alt="Shadow">' : '';
 
     // Random items override
-    if (marker.category == 'random') {
+    if (marker.category === 'random') {
+      var color = (Settings.markersCustomColor == 1 ? (marker.tool == 2 ? "black" : "lightgray") : "lightgray");
       icon = `./assets/images/icons/${MapBase.getToolName(marker.tool)}.png`;
-      background = './assets/images/icons/marker_lightgray.png';
+      background = `./assets/images/icons/marker_${color}.png`;
     }
 
     // highlight unknown cycles markers on red
@@ -686,6 +698,10 @@ var MapBase = {
       overlay = '<img class="overlay" src="./assets/images/icons/overlay_time.png" alt="Overlay">';
     }
 
+    if (marker.tool == '-1') {
+      overlay = '<img class="overlay" src="./assets/images/icons/overlay_cross.png" alt="Overlay">';
+    }
+
     var tempMarker = L.marker([marker.lat, marker.lng], {
       opacity: marker.canCollect ? opacity : opacity / 3,
       icon: new L.DivIcon.DataMarkup({
@@ -694,6 +710,7 @@ var MapBase = {
         popupAnchor: [0 * Settings.markerSize, -28 * Settings.markerSize],
         html: `
           ${overlay}
+          <img class="marker-contour" src="${markerContour}" alt="markerContour">
           <img class="icon" src="${icon}" alt="Icon">
           <img class="background" src="${background}" alt="Background">
           ${shadow}
@@ -745,8 +762,6 @@ var MapBase = {
     Layers.itemMarkersLayer.addLayer(tempMarker);
     if (Settings.markerCluster)
       Layers.oms.addMarker(tempMarker);
-
-    MapBase.loadImportantItems();
   },
 
   gameToMap: function (lat, lng, name = "Debug Marker") {
@@ -757,16 +772,25 @@ var MapBase = {
     MapBase.debugMarker((0.01552 * y + -63.6), (0.01552 * x + 111.29), z);
   },
 
-  highlightImportantItem(text, category) {
-    if (category === 'american_flowers' || category === 'bird_eggs')
-      text = text.replace(/(egg_|flower_)(\w+)(_\d)/, '$2');
+  highlightImportantItem: function (text, category = '') {
+    if (category == 'american_flowers' || category == 'bird_eggs')
+      text = text.replace(/(_\d+)/, '');
 
-    $(`[data-type=${text}]`).toggleClass('highlight-important-items-menu');
+    var textMenu = text.replace(/egg_|flower_/, '');
 
-    if (text === 'eagle') // prevent from highlight eagle coins and eggs together
-      text = 'egg_eagle';
+    $(`[data-type=${textMenu}]`).toggleClass('highlight-important-items-menu');
 
-    $(`[data-marker*=${text}]`).toggleClass('highlight-items');
+    $.each($(`[data-marker*=${text}]`), function (key, marker) {
+      var markerdata = null;
+
+      if (category !== 'random' && category !== '')
+        markerData = $(this).data('marker').replace(/_\d/, '');
+      else
+        markerData = $(this).data('marker');
+
+      if (markerData === text)
+        $(this).toggleClass('highlight-items');
+    });
 
     if ($(`[data-marker*=${text}].highlight-items`).length)
       MapBase.importantItems.push(text);
@@ -780,15 +804,20 @@ var MapBase = {
     localStorage.setItem('importantItems', JSON.stringify(MapBase.importantItems));
   },
 
-  loadImportantItems() {
+  loadImportantItems: function () {
     if (localStorage.importantItems === undefined)
       localStorage.importantItems = "[]";
 
     MapBase.importantItems = JSON.parse(localStorage.importantItems) || [];
 
     $.each(MapBase.importantItems, function (key, value) {
-      $(`[data-marker*=${value}]`).addClass('highlight-items');
-      $(`[data-type=${value}]`).addClass('highlight-important-items-menu');
+      if (/random_item_\d+/.test(value))
+        $(`[data-marker=${value}]`).addClass('highlight-items');
+      else
+        $(`[data-marker*=${value}]`).addClass('highlight-items');
+
+      var textMenu = value.replace(/egg_|flower_/, '');
+      $(`[data-type=${textMenu}]`).addClass('highlight-important-items-menu');
     });
   },
 
@@ -848,7 +877,9 @@ var MapBase = {
     if (Settings.isCoordsEnabled) {
       $('.lat-lng-container').css('display', 'block');
 
-      $('.lat-lng-container p').html(`Latitude: ${parseFloat(coords.latlng.lat.toFixed(4))}<br>Longitude: ${parseFloat(coords.latlng.lng.toFixed(4))}`);
+      var lat = parseFloat(coords.latlng.lat.toFixed(4));
+      var lng = parseFloat(coords.latlng.lng.toFixed(4));
+      $('.lat-lng-container p').html(`Latitude: ${lat}<br>Longitude: ${lng}<br><a href="javascript:void(0)" onclick="Routes.setCustomRouteStart('${lat}', '${lng}')">Set as route start</a>`);
 
       $('#lat-lng-container-close-button').click(function () {
         $('.lat-lng-container').css('display', 'none');
@@ -882,4 +913,5 @@ var MapBase = {
       }
     })();
   }
+
 };

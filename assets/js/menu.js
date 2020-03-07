@@ -120,8 +120,15 @@ Menu.refreshMenu = function () {
       if ($.cookie('right-click') == null)
         e.preventDefault();
 
-      if (marker.subdata != 'agarita' && marker.subdata != 'blood_flower')
-        MapBase.highlightImportantItem(marker.subdata || marker.text);
+      if (marker.subdata !== 'agarita' && marker.subdata !== 'blood_flower') {
+        var prefix = '';
+        if (marker.category === 'american_flowers')
+          prefix = 'flower_';
+
+        else if (marker.category === 'bird_eggs')
+          prefix = 'egg_';
+        MapBase.highlightImportantItem(prefix + (marker.subdata || marker.text), marker.category);
+      }
     });
 
     var collectibleCountElement = $('<span>').addClass('counter').append(collectibleCountDecreaseElement).append(collectibleCountTextElement).append(collectibleCountIncreaseElement);
@@ -186,20 +193,6 @@ Menu.refreshMenu = function () {
     $(`.menu-hidden[data-type=${marker.category}]`).append(collectibleElement.append(collectibleImage).append(collectibleTextWrapperElement.append(collectibleTextElement).append(collectibleCountElement)));
   });
 
-  $('#weekly-container .weekly-item-listings').children('.weekly-item-listing').remove();
-  $('#weekly-container .weekly-item-title').text(Language.get('weekly.desc.' + weeklySetData.current));
-
-  $.each(weeklyItems, function (key, value) {
-    var element = `
-      <div class="weekly-item-listing">
-        <img class="icon" src="./assets/images/icons/game/${value.item}.png" alt="Weekly item icon" />
-        <span>${Language.get(value.item + '.name')}</span>
-      </div>
-    `;
-
-    $('#weekly-container .weekly-item-listings').append(element);
-  });
-
   $('.menu-hidden[data-type]').each(function (key, value) {
     var category = $(this);
 
@@ -208,7 +201,9 @@ Menu.refreshMenu = function () {
     // if the cycle is the same as yesterday highlight category in menu;
     var isSameCycle = Cycles.isSameAsYesterday(category.data('type'));
     var element = `[data-text="menu.${category.data('type')}"]`;
+
     Menu.addCycleWarning(element, isSameCycle);
+    Menu.refreshCollectionCounter(category.data('type'));
 
     if (!Settings.sortItemsAlphabetically) return;
     if (category.data('type').includes('card_')) return;
@@ -232,9 +227,16 @@ Menu.refreshMenu = function () {
   });
 
   Menu.reorderMenu('.menu-hidden[data-type=treasure]');
-  MapBase.loadImportantItems();
+  Menu.refreshWeeklyItems();
 
   $('.map-cycle-alert span').html(Language.get('map.refresh_for_updates_alert'));
+};
+
+Menu.refreshCollectionCounter = function (category) {
+  var collectiblesElement = $(`.menu-hidden[data-type="${category}"]`);
+  collectiblesElement.find('.collection-collected').text(Language.get('menu.collection_counter')
+    .replace('{count}', collectiblesElement.find('.disabled').length)
+    .replace('{max}', collectiblesElement.find('.collectible-wrapper').length));
 };
 
 Menu.showAll = function () {
@@ -270,6 +272,44 @@ Menu.refreshItemsCounter = function () {
 
   // refresh items value counter
   ItemsValue.reloadInventoryItems();
+
+  $.each($(".menu-hidden[data-type]"), function (key, value) {
+    var category = $(value).attr('data-type');
+    Menu.refreshCollectionCounter(category);
+  });
+};
+
+Menu.refreshWeeklyItems = function () {
+  var weeklyItems = weeklySetData.sets[weeklySetData.current];
+
+  $('#weekly-container .weekly-item-listings').children('.weekly-item-listing').remove();
+  $('#weekly-container .weekly-item-title').text(Language.get('weekly.desc.' + weeklySetData.current));
+
+  $.each(weeklyItems, function (key, value) {
+    var inventoryCount = '';
+
+    if (Inventory.isEnabled) {
+      var amount = Inventory.items[value.item];
+
+      if (amount !== undefined) {
+        inventoryCount = $(`<small class="counter-number">${amount}</small>`);
+        inventoryCount.toggleClass('text-danger', amount >= Inventory.stackSize);
+        inventoryCount = inventoryCount.prop('outerHTML');
+      }
+    }
+
+    var element = `
+      <div class="weekly-item-listing">
+        <span>
+          <img class="icon" src="./assets/images/icons/game/${value.item}.png" alt="Weekly item icon" />
+          <span>${Language.get(value.item + '.name')}</span>
+        </span>
+        ${inventoryCount}
+      </div>
+    `;
+
+    $('#weekly-container .weekly-item-listings').append(element);
+  });
 };
 
 // Remove highlight from all important items

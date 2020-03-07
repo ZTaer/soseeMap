@@ -15,7 +15,7 @@ var categories = [
 var categoriesDisabledByDefault = [
   'treasure', 'random', 'treasure_hunter', 'tree_map', 'egg_encounter', 'dog_encounter', 'grave_robber',
   'wounded_animal', 'rival_collector'
-]
+];
 
 var enabledCategories = categories;
 var categoryButtons = $(".clickable[data-type]");
@@ -126,16 +126,6 @@ function init() {
     $.cookie('overlay-opacity', '0.5', { expires: 999 });
   }
 
-  if ($.cookie('clock-or-timer') === undefined) {
-    Settings.displayClockHideTimer = false;
-    $.cookie('clock-or-timer', 'false', { expires: 999 });
-  }
-
-  if ($.cookie('timestamps-24') === undefined) {
-    Settings.display24HoursTimestamps = false;
-    $.cookie('timestamps-24', 'false', { expires: 999 });
-  }
-
   if ($.cookie('show-weekly') === undefined) {
     Settings.showWeeklySettings = 1;
     $.cookie('show-weekly', '1', { expires: 999 });
@@ -159,11 +149,6 @@ function init() {
   if ($.cookie('show-import-export') === undefined) {
     Settings.showImportExportSettings = 1;
     $.cookie('show-import-export', '1', { expires: 999 });
-  }
-
-  if ($.cookie('custom-markers-color') === undefined) {
-    Settings.markersCustomColor = 0;
-    $.cookie('custom-markers-color', '0', { expires: 999 });
   }
 
   MapBase.init();
@@ -250,6 +235,9 @@ function setMapBackground(mapIndex) {
   }
   MapBase.setOverlays();
   $.cookie('map-layer', mapIndex, { expires: 999 });
+
+  // Update the highlighted markers to show the appropriate marker colors
+  Inventory.updateLowAmountItems();  
 }
 
 function changeCursor() {
@@ -352,6 +340,12 @@ $('.timer-container, .clock-container').on('click', function () {
  * jQuery triggers
  */
 
+ /*
+  Hide warning bar
+ */
+$('.update-warning').on('click', function() {
+  $(this).hide();
+});
 //Show all markers on map
 $("#show-all-markers").on("change", function () {
   Settings.showAllMarkers = $("#show-all-markers").prop('checked');
@@ -474,7 +468,7 @@ $("#reset-markers").on("change", function () {
 $("#clear-markers").on("click", function () {
   $.each(MapBase.markers, function (key, marker) {
     marker.isCollected = false;
-    marker.canCollect = true;
+    marker.canCollect = marker.amount < Inventory.stackSize;
   });
 
   MapBase.saveCollectedItems();
@@ -578,7 +572,7 @@ $('#custom-marker-color').on("change", function () {
   Settings.markersCustomColor = parsed ? parsed : 0;
   $.cookie('custom-markers-color', Settings.markersCustomColor, { expires: 999 });
   MapBase.addMarkers();
-})
+});
 
 //Disable & enable collection category
 $('.clickable').on('click', function () {
@@ -586,6 +580,7 @@ $('.clickable').on('click', function () {
   if (menu.data('type') === undefined) return;
 
   $('[data-type=' + menu.data('type') + ']').toggleClass('disabled');
+
   var isDisabled = menu.hasClass('disabled');
 
   if (isDisabled) {
@@ -626,7 +621,7 @@ $('.submenu-only').on('click', function (e) {
 });
 
 //Sell collections on menu
-$('.collection-sell').on('click', function (e) {
+$('.menu-hidden .collection-sell').on('click', function (e) {
   var collectionType = $(this).parent().parent().data('type');
   var getMarkers = MapBase.markers.filter(_m => _m.category == collectionType && _m.day == Cycles.categories[_m.category]);
 
@@ -641,13 +636,25 @@ $('.collection-sell').on('click', function (e) {
   });
 });
 
+$('.weekly-item-listings .collection-sell').on('click', function (e) {
+  var weeklyItems = weeklySetData.sets[weeklySetData.current];
+
+  $.each(weeklyItems, function (key, value) {
+    var amount = Inventory.items[value.item];
+
+    if (amount !== undefined) {
+      Inventory.changeMarkerAmount(value.item, -1);
+    }
+  });
+});
+
 // Reset collections on menu
 $('.collection-reset').on('click', function (e) {
   var collectionType = $(this).parent().parent().data('type');
   var getMarkers = MapBase.markers.filter(_m => !_m.canCollect && _m.category == collectionType && _m.day == Cycles.categories[_m.category]);
 
   $.each(getMarkers, function (key, marker) {
-    MapBase.removeItemFromMap(marker.day, marker.text, marker.subdata, marker.category);
+    MapBase.removeItemFromMap(marker.day, marker.text, marker.subdata, marker.category, !Inventory.resetButtonUpdatesInventory);
   });
 
   $(this).removeClass('disabled');
@@ -796,16 +803,34 @@ $('#enable-inventory').on("change", function () {
   $.cookie('inventory-enabled', Inventory.isEnabled ? '1' : '0', { expires: 999 });
 
   MapBase.addMarkers();
+  Menu.refreshWeeklyItems();
   Inventory.toggleMenuItemsDisabled();
+  Inventory.toggleHighlightLowAmountItems();
   ItemsValue.reloadInventoryItems();
 
-  $('.collection-sell, .counter').toggle(Inventory.isEnabled);
+  $('#weekly-container .collection-value, .collection-sell, .counter, .counter-number').toggle(Inventory.isEnabled);
 });
 
 $('#enable-inventory-popups').on("change", function () {
   Inventory.isPopupEnabled = $("#enable-inventory-popups").prop('checked');
   $.cookie('inventory-popups-enabled', Inventory.isPopupEnabled ? '1' : '0', { expires: 999 });
 
+  MapBase.addMarkers();
+});
+
+$('#highlight_low_amount_items').on("change", function () {
+  Inventory.highlightLowAmountItems = $('#highlight_low_amount_items').prop("checked");
+  $.cookie('highlight_low_amount_items', Inventory.highlightLowAmountItems ? '1' : '0', { expires: 999 });
+
+  Inventory.toggleHighlightLowAmountItems();
+  
+  MapBase.addMarkers();
+});
+
+$('#animated_highlights').on("change", function () {
+  Inventory.animatedHighlights = $('#animated_highlights').prop("checked");
+  $.cookie('animated_highlights', Inventory.animatedHighlights ? '1' : '0', { expires: 999 });
+  
   MapBase.addMarkers();
 });
 
@@ -819,7 +844,7 @@ $('#reset-collection-updates-inventory').on("change", function () {
   $.cookie('reset-updates-inventory-enabled', Inventory.resetButtonUpdatesInventory ? '1' : '0', { expires: 999 });
 });
 
-$('.collection-sell, .counter').toggle(Inventory.isEnabled);
+$('#weekly-container .collection-value, .collection-sell, .counter, .counter-number').toggle(Inventory.isEnabled);
 
 //Enable & disable inventory on menu
 $('#inventory-stack').on("change", function () {
@@ -839,8 +864,8 @@ $('#cookie-export').on("click", function () {
     var storage = localStorage;
 
     // Remove irrelevant properties.
-    delete cookies['_ga'];
-    delete storage['randid'];
+    delete cookies._ga;
+    delete storage.randid;
     delete storage['pinned-items'];
 
     var settings = {
