@@ -10,7 +10,7 @@ var Pins = {
 
   addPin: function (lat, lng, id = null, name = null, desc = null, icon = null, doSave = true) {
     if (lat === null || lat === undefined || lng === null || lng === undefined) return;
-    
+
     var pinAtPositionExists = this.pinsList.some(function (marker) { return marker._latlng.lat == lat && marker._latlng.lng == lng; });
     if (pinAtPositionExists) return;
 
@@ -23,10 +23,10 @@ var Pins = {
       icon_name: icon,
       draggable: Settings.isPinsEditingEnabled,
       icon: L.divIcon({
-        iconSize: [35*Settings.markerSize, 45*Settings.markerSize],
-        iconAnchor: [17*Settings.markerSize, 42*Settings.markerSize],
-        popupAnchor: [0*Settings.markerSize, -28*Settings.markerSize],
-        shadowAnchor: [10*Settings.markerSize, 12*Settings.markerSize],
+        iconSize: [35 * Settings.markerSize, 45 * Settings.markerSize],
+        iconAnchor: [17 * Settings.markerSize, 42 * Settings.markerSize],
+        popupAnchor: [0 * Settings.markerSize, -28 * Settings.markerSize],
+        shadowAnchor: [10 * Settings.markerSize, 12 * Settings.markerSize],
         html: `
                     <img class="icon" src="./assets/images/icons/${icon}.png" alt="Icon">
                     <img class="background" src="./assets/images/icons/marker_red.png" alt="Background">
@@ -112,7 +112,7 @@ var Pins = {
       <p id="${markerId}_desc">${marker.options.desc}</p>`;
 
     if (Settings.isPinsEditingEnabled) {
-      var markerIcons = ["pin", "random", "shovel", "magnet", "american_flowers", "antique_bottles", "arrowhead", "bird_eggs", "card_cups", "card_pentacles", "card_swords", "card_wands", "coin", "family_heirlooms", "fast_travel", "hide", "lost_bracelet", "lost_earrings", "lost_necklaces", "lost_ring", "nazar", "treasure"];
+      var markerIcons = ["pin", "random", "shovel", "magnet", "american_flowers", "antique_bottles", "arrowhead", "bird_eggs", "card_cups", "card_pentacles", "card_swords", "card_wands", "coin", "family_heirlooms", "fast_travel", "lost_bracelet", "lost_earrings", "lost_necklaces", "lost_ring", "nazar", "treasure"];
       var markerIconSelect = $('<select>').attr('id', `${markerId}_icon`).addClass('marker-popup-pin-input-icon');
 
       markerIcons.forEach(icon => {
@@ -185,13 +185,12 @@ var Pins = {
   },
 
   generatePinHash: function (str) {
-    var hash = 0,
-      i, char;
+    var hash = 0;
 
     if (str.length == 0) return hash;
 
     for (var i = 0, l = str.length; i < l; i++) {
-      char = str.charCodeAt(i);
+      var char = str.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
       hash |= 0;
     }

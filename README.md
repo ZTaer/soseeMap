@@ -20,20 +20,26 @@ Note: This project was created to improve the areas near Asia and China, and to 
            a) cycles.json: current: "选择天数";
         2. 设定地图图片地址:
            a) 使用本地地图图片( 切忌不要使用默认的cdn图片链接 )
-           var mapLayers = [
-                L.tileLayer('assets/maps/detailed/{z}/{x}_{y}.jpg', {
+             const mapLayers = {
+                'map.layers.default':
+                    L.tileLayer('assets/maps/detailed/{z}/{x}_{y}.jpg', {
                     noWrap: true,
-                    bounds: L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176))
-                }),
-                L.tileLayer('assets/maps/detailed/{z}/{x}_{y}.jpg', {
+                    bounds: mapBoundary,
+                    attribution: '<a href="https://www.rockstargames.com/" target="_blank">Rockstar Games</a>'
+                    }),
+                'map.layers.detailed':
+                    L.tileLayer((true ? '' : 'https://jeanropke.b-cdn.net/') + 'assets/maps/detailed/{z}/{x}_{y}.jpg', {
                     noWrap: true,
-                    bounds: L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176))
-                }),
-                L.tileLayer('assets/maps/darkmode/{z}/{x}_{y}.jpg', {
+                    bounds: mapBoundary,
+                    attribution: '<a href="https://rdr2map.com/" target="_blank">RDR2Map</a>'
+                    }),
+                'map.layers.dark':
+                    L.tileLayer((true ? '' : 'https://jeanropke.b-cdn.net/') + 'assets/maps/darkmode/{z}/{x}_{y}.jpg', {
                     noWrap: true,
-                    bounds: L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176))
-                })
-            ];
+                    bounds: mapBoundary,
+                    attribution: '<a href="https://github.com/TDLCTV" target="_blank">TDLCTV</a>'
+                    }),
+            };
         3. 设置收藏品分享链接:
            a) map.js中
            b) 找到变量'shareText'修改如下
