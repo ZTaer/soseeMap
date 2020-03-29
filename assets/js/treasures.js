@@ -1,15 +1,21 @@
 var Treasures = {
-  enabledTreasures: $.cookie('treasures-enabled') ? $.cookie('treasures-enabled').split(';') : [],
+  enabledTreasures: [],
   data: [],
   markers: [],
+
   load: function () {
+    Treasures.enabledTreasures = JSON.parse(localStorage.getItem("treasures-enabled"));
+    if (Treasures.enabledTreasures === null) Treasures.enabledTreasures = [];
+
     $.getJSON('data/treasures.json?nocache=' + nocache)
       .done(function (data) {
         Treasures.data = data;
         Treasures.set();
       });
+
     console.info('%c[Treasures] Loaded!', 'color: #bada55; background: #242424');
   },
+
   set: function () {
     Treasures.markers = [];
     var shadow = Settings.isShadowsEnabled ? '<img class="shadow" width="' + 35 * Settings.markerSize + '" height="' + 16 * Settings.markerSize + '" src="./assets/images/markers-shadow.png" alt="Shadow">' : '';
@@ -49,13 +55,17 @@ var Treasures = {
 
       marker.bindPopup(`<h1>${Language.get(value.text)}</h1><button type="button" class="btn btn-info remove-button" onclick="MapBase.removeItemFromMap('${value.text}', '${value.text}')" data-item="${marker.text}">${Language.get("map.remove_add")}</button>`, { minWidth: 300 });
 
-      Treasures.markers.push({ treasure: value.text, marker: marker, circle: circle, treasuresCross: treasuresCross });
+      Treasures.markers.push({
+        treasure: value.text,
+        marker: marker,
+        circle: circle,
+        treasuresCross: treasuresCross
+      });
     });
     Treasures.addToMap();
   },
 
   addToMap: function () {
-
     Layers.miscLayer.clearLayers();
 
     if (!enabledCategories.includes('treasure'))
@@ -74,9 +84,11 @@ var Treasures = {
     Layers.miscLayer.addTo(MapBase.map);
     Menu.refreshTreasures();
   },
+
   save: function () {
-    $.cookie('treasures-enabled', Treasures.enabledTreasures.join(';'), { expires: 999 });
+    localStorage.setItem("treasures-enabled", JSON.stringify(Treasures.enabledTreasures));
   },
+
   showHideAll: function (isToHide) {
     if (isToHide) {
       Treasures.enabledTreasures = [];

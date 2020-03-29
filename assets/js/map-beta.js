@@ -374,7 +374,7 @@ var MapBase = {
       popupContent = (marker.tool == '-1' ? Language.get('map.item.unable') : '') + ' ' + marker.description + ' ' + weeklyText;
     }
 
-    var shareText = `<a href="javascript:void(0)" onclick="setClipboardText('https://jeanropke.github.io/RDR2CollectorsMap/?m=${marker.text}')">Copy marker link</a>`;
+    var shareText = `<a href="javascript:void(0)" onclick="setClipboardText('https://map.sosee.org/?m=${marker.text}')">Copy marker link</a>`;
     var videoText = marker.video != null ? ' | <a href="' + marker.video + '" target="_blank">Video</a>' : '';
     var linksElement = $('<p>').addClass('marker-popup-links').append(shareText).append(videoText);
 
