@@ -19,32 +19,28 @@ var MapBase = {
 
   init: function () {
     'use strict';
-    Object.entries({
-      overlayOpacity: { default: 0.5 },
-      baseLayer: { default: 'map.layers.default' },
-    }).forEach(([name, config]) => CookieProxy.addCookie(Settings, name, config));
 
     const mapBoundary = L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176));
     //Please, do not use the GitHub map tiles. Thanks
     const mapLayers = {
-      'map.layers.default':
-        L.tileLayer('assets/maps/detailed/{z}/{x}_{y}.jpg', {
-          noWrap: true,
-          bounds: mapBoundary,
-          attribution: '<a href="https://www.rockstargames.com/" target="_blank">Rockstar Games</a>'
-        }),
-      'map.layers.detailed':
-        L.tileLayer((true ? '' : 'https://jeanropke.b-cdn.net/') + 'assets/maps/detailed/{z}/{x}_{y}.jpg', {
-          noWrap: true,
-          bounds: mapBoundary,
-          attribution: '<a href="https://rdr2map.com/" target="_blank">RDR2Map</a>'
-        }),
-      'map.layers.dark':
-        L.tileLayer((true ? '' : 'https://jeanropke.b-cdn.net/') + 'assets/maps/darkmode/{z}/{x}_{y}.jpg', {
-          noWrap: true,
-          bounds: mapBoundary,
-          attribution: '<a href="https://github.com/TDLCTV" target="_blank">TDLCTV</a>'
-        }),
+        'map.layers.default':
+            L.tileLayer('assets/maps/detailed/{z}/{x}_{y}.jpg', {
+            noWrap: true,
+            bounds: mapBoundary,
+            attribution: '<a href="https://www.rockstargames.com/" target="_blank">Rockstar Games</a>'
+            }),
+        'map.layers.detailed':
+            L.tileLayer((true ? '' : 'https://jeanropke.b-cdn.net/') + 'assets/maps/detailed/{z}/{x}_{y}.jpg', {
+            noWrap: true,
+            bounds: mapBoundary,
+            attribution: '<a href="https://rdr2map.com/" target="_blank">RDR2Map</a>'
+            }),
+        'map.layers.dark':
+            L.tileLayer((true ? '' : 'https://jeanropke.b-cdn.net/') + 'assets/maps/darkmode/{z}/{x}_{y}.jpg', {
+            noWrap: true,
+            bounds: mapBoundary,
+            attribution: '<a href="https://github.com/TDLCTV" target="_blank">TDLCTV</a>'
+            }),
     };
 
     // Override bindPopup to include mouseover and mouseout logic.
@@ -215,26 +211,23 @@ var MapBase = {
     uniqueSearchMarkers = MapBase.markers;
 
     // Reset markers daily.
-    var curDate = new Date();
-    date = curDate.getUTCFullYear() + '-' + (curDate.getUTCMonth() + 1) + '-' + curDate.getUTCDate();
+    var date = new Date().toISOUTCDateString();
 
-    if (date != $.cookie('date')) {
+    if (localStorage.getItem('main.date') === null || date != localStorage.getItem('main.date')) {
       var markers = MapBase.markers;
 
       $.each(markers, function (key, value) {
 
         if (Settings.resetMarkersDaily) {
           markers[key].isCollected = false;
-          markers[key].canCollect = markers[key].amount < Inventory.stackSize;
+          markers[key].canCollect = markers[key].amount < InventorySettings.stackSize;
         }
-        else {
-          if (value.category === 'random') {
-            markers[key].isCollected = false;
-            markers[key].canCollect = true;
-          }
+        else if (value.category === 'random') {
+          markers[key].isCollected = false;
+          markers[key].canCollect = true;
         }
 
-        if (Inventory.resetInventoryDaily) {
+        if (InventorySettings.resetInventoryDaily) {
           markers[key].amount = 0;
         }
       });
@@ -245,7 +238,7 @@ var MapBase = {
       MapBase.saveCollectedItems();
     }
 
-    $.cookie('date', date, { expires: 999 });
+    localStorage.setItem('main.date', date);
 
     MapBase.addMarkers(true);
 
@@ -280,11 +273,8 @@ var MapBase = {
   },
 
   onSearch: function (searchString) {
-    if (searchString) {
-      Menu.hasSearchFilters = true;
-    } else {
-      Menu.hasSearchFilters = false;
-    }
+
+    Menu.hasSearchFilters = !!searchString;
 
     Menu.updateHasFilters();
 
@@ -304,10 +294,9 @@ var MapBase = {
       uniqueSearchMarkers = [];
       $.each(searchTerms, function (id, term) {
 
-        searchMarkers = searchMarkers.concat(MapBase.markers.filter(function (_marker) {
-          if (_marker.title != null)
-            return _marker.title.toLowerCase().includes(term.toLowerCase());
-        }));
+        searchMarkers = searchMarkers.concat(MapBase.markers.filter(_marker =>
+            Language.get(_marker.itemTranslationKey).toLowerCase().includes(term.toLowerCase())
+        ));
 
         $.each(searchMarkers, function (i, el) {
           if ($.inArray(el, uniqueSearchMarkers) === -1) uniqueSearchMarkers.push(el);
@@ -371,7 +360,7 @@ var MapBase = {
       return;
     }
 
-    if (Routes.generateOnVisit)
+    if (RouteSettings.generateOnVisit)
       Routes.generatePath(true);
   },
 
@@ -435,7 +424,7 @@ var MapBase = {
 
         Inventory.changeMarkerAmount(marker.subdata || marker.text, changeAmount, skipInventory);
 
-        if (!Inventory.isEnabled) {
+        if (!InventorySettings.isEnabled) {
           if (marker.isCollected && marker.day == Cycles.categories[marker.category]) {
             $(`[data-marker=${marker.text}]`).css('opacity', Settings.markerOpacity / 3);
             $(`[data-type=${marker.subdata || marker.text}]`).addClass('disabled');
@@ -458,7 +447,7 @@ var MapBase = {
       });
     }
 
-    if (Routes.ignoreCollected)
+    if (RouteSettings.ignoreCollected)
       Routes.generatePath();
 
     MapBase.saveCollectedItems();
@@ -497,24 +486,20 @@ var MapBase = {
   },
 
   getIconColor: function (marker) {
-    var isWeekly = weeklySetData.sets[weeklySetData.current].filter(weekly => {
-      return weekly.item === (marker.text).replace(/_\d+/, "");
-    }).length > 0;
-
-    if (isWeekly) {
+    if (marker.isWeekly) {
       return "green";
     }
 
-    if (Inventory.isEnabled && Inventory.highlightLowAmountItems &&
-      (Inventory.highlightStyle === Inventory.highlightStyles.STATIC_RECOMMENDED || Inventory.highlightStyle === Inventory.highlightStyles.ANIMATED_RECOMMENDED)) {
+    if (InventorySettings.isEnabled && InventorySettings.highlightLowAmountItems &&
+      (InventorySettings.highlightStyle === Inventory.highlightStyles.STATIC_RECOMMENDED || InventorySettings.highlightStyle === Inventory.highlightStyles.ANIMATED_RECOMMENDED)) {
       return MapBase.isDarkMode ? "darkblue" : "orange";
     }
 
-    if (Settings.markersCustomColor === 1) {
+    if (Settings.markerCustomColor === 1) {
       return MapBase.getCategoryIconColor(marker.category);
     }
 
-    var dailyColor = Settings.markersCustomColor === 0 || Settings.markersCustomColor === 1 ? marker.day : Settings.markersCustomColor - 1;
+    var dailyColor = Settings.markerCustomColor === 0 || Settings.markerCustomColor === 1 ? marker.day : Settings.markerCustomColor - 1;
     return MapBase.getDailyIconColor(dailyColor);
   },
 
@@ -535,9 +520,9 @@ var MapBase = {
       white: "gray"
     };
 
-    if (Inventory.highlightLowAmountItems &&
-      (Inventory.highlightStyle === Inventory.highlightStyles.STATIC_RECOMMENDED ||
-        Inventory.highlightStyle === Inventory.highlightStyles.ANIMATED_RECOMMENDED)) {
+    if (InventorySettings.highlightLowAmountItems &&
+      (InventorySettings.highlightStyle === Inventory.highlightStyles.STATIC_RECOMMENDED ||
+        InventorySettings.highlightStyle === Inventory.highlightStyles.ANIMATED_RECOMMENDED)) {
       return MapBase.isDarkMode ? "orange" : "darkblue";
     }
 
@@ -553,19 +538,19 @@ var MapBase = {
   getCategoryIconColor: function (markerCategory) {
     // object with category colors for fast lookup
     var categoryColors = {
-      american_flowers: "darkred",
-      card_cups: "blue",
-      card_swords: "blue",
-      card_wands: "blue",
-      card_pentacles: "blue",
-      lost_bracelet: "beige",
-      lost_necklaces: "orange",
-      lost_ring: "orange",
-      lost_earrings: "orange",
-      antique_bottles: "cadetblue",
-      bird_eggs: "white",
+      flower: "darkred",
+      cups: "blue",
+      swords: "blue",
+      wands: "blue",
+      pentacles: "blue",
+      bracelet: "beige",
+      necklace: "orange",
+      ring: "orange",
+      earring: "orange",
+      bottle: "cadetblue",
+      egg: "white",
       arrowhead: "darkpurple",
-      family_heirlooms: "purple",
+      heirlooms: "purple",
       coin: "lightred"
     };
     return categoryColors[markerCategory] || "lightred";
@@ -595,53 +580,6 @@ var MapBase = {
       case '2':
         return '<img class="tool-type" src="assets/images/magnet.png">';
     }
-  },
-
-  updateMarkerContent: function (marker) {
-    var popupContent = '';
-
-    var warningText = Cycles.isSameAsYesterday(marker.category) ? `<span class="marker-warning-wrapper"><div><img class="warning-icon" src="./assets/images/same-cycle-alert.png" alt="Alert"></div><p>${Language.get("map.same_cycle_yesterday")}</p></span>` : '';
-
-    if (marker.day == Cycles.unknownCycleNumber)
-      warningText = `<span class="marker-warning-wrapper"><div><img class="warning-icon" src="./assets/images/same-cycle-alert.png" alt="Alert"></div><p>${Language.get("map.unknown_cycle_description").replace('{GitHub}', '<a href="https://github.com/jeanropke/RDR2CollectorsMap/issues" target="_blank">GitHub</a>').replace('{Discord}', '<a href="https://discord.gg/WWru8cP" target="_blank">Discord</a>')}</p></span>`;
-
-    if (marker.category != 'random') {
-      var weeklyText = marker.weeklyCollection != null ? Language.get("weekly.desc").replace('{collection}', Language.get('weekly.desc.' + marker.weeklyCollection)) : '';
-      popupContent += (marker.tool == '-1' ? Language.get('map.item.unable') : '') + ' ' + marker.description + ' ' + weeklyText;
-    } else {
-      // Todo: Maybe make this link translatable on the Wiki?
-      popupContent += Language.get('map.random_spot.desc').replace('{link}', `<a href="https://github.com/jeanropke/RDR2CollectorsMap/wiki/Random-Item-Possible-Loot" target="_blank">${Language.get('map.random_spot.link')}</a>`);
-    }
-
-    var shareText = `<a href="javascript:void(0)" onclick="setClipboardText('https://map.sosee.org/?m=${marker.text}')">${Language.get('map.copy_link')}</a>`;
-    var videoText = marker.video != null ? ' | <a href="' + marker.video + '" target="_blank">' + Language.get('map.video') + '</a>' : '';
-    var importantItem = ((marker.subdata != 'agarita' && marker.subdata != 'blood_flower') ? ` | <a href="javascript:void(0)" onclick="MapBase.highlightImportantItem('${marker.text || marker.subdata}', '${marker.category}')">${Language.get('map.mark_important')}</a>` : '');
-
-    var linksElement = $('<p>').addClass('marker-popup-links').append(shareText).append(videoText).append(importantItem);
-    var debugDisplayLatLng = $('<small>').text(`Latitude: ${marker.lat} / Longitude: ${marker.lng}`);
-
-    var inventoryCount = $(`<small data-item="${marker.text}">${marker.amount}</small>`);
-    inventoryCount.toggleClass('text-danger', marker.amount >= Inventory.stackSize);
-
-    var buttons = marker.category == 'random' ? '' : `
-      <div class="marker-popup-buttons">
-        <button class="btn btn-danger" onclick="Inventory.changeMarkerAmount('${marker.subdata || marker.text}', -1)">↓</button>
-        ${inventoryCount.prop('outerHTML')}
-        <button class="btn btn-success" onclick="Inventory.changeMarkerAmount('${marker.subdata || marker.text}', 1)">↑</button>
-      </div>
-    `;
-
-    return `<h1>${marker.title} - ${Language.get("menu.day")} ${(marker.day != Cycles.unknownCycleNumber ? marker.day : Language.get('map.unknown_cycle'))}</h1>
-        ${warningText}
-        <span class="marker-content-wrapper">
-        <div>${MapBase.getToolIcon(marker.tool)}</div>
-        <p>${popupContent}</p>
-        </span>
-        ${linksElement.prop('outerHTML')}
-        ${Settings.isDebugEnabled ? debugDisplayLatLng.prop('outerHTML') : ''}
-        ${(Inventory.isEnabled && Inventory.isPopupEnabled) ? buttons : ''}
-        <button type="button" class="btn btn-info remove-button" onclick="MapBase.removeItemFromMap('${marker.day || ''}', '${marker.text || ''}', '${marker.subdata || ''}', '${marker.category || ''}')" data-item="${marker.text}">${Language.get("map.remove_add")}</button>
-        `;
   },
 
   addMarkerOnMap: function (marker, opacity = 1) {
@@ -674,7 +612,7 @@ var MapBase = {
 
     // Random items override
     if (marker.category === 'random') {
-      var color = (Settings.markersCustomColor === 1 ? (marker.tool == 2 ? "black" : "lightgray") : "lightgray");
+      var color = (Settings.markerCustomColor === 1 ? (marker.tool == 2 ? "black" : "lightgray") : "lightgray");
       icon = `./assets/images/icons/${MapBase.getToolName(marker.tool)}.png`;
       background = `./assets/images/icons/marker_${color}.png`;
     }
@@ -718,44 +656,17 @@ var MapBase = {
       })
     });
 
-    var isWeekly = weeklySetData.sets[weeklySetData.current].filter(weekly => {
-      return weekly.item === (marker.text).replace(/_\d+/, "");
-    }).length > 0;
-
     tempMarker.id = marker.text;
-    marker.weeklyCollection = isWeekly ? weeklySetData.current : null;
-
-    if (marker.category == 'random')
-      marker.title = `${Language.get("random_item.name")} #${marker.text.split('_').pop()}`;
-    else if (marker.category == 'american_flowers')
-      marker.title = `${Language.get(`flower_${marker.subdata}.name`)} #${marker.text.split('_').pop()}`;
-    else if (marker.category == 'bird_eggs' && (marker.subdata == 'eagle' || marker.subdata == 'hawk'))
-      marker.title = `${Language.get(`egg_${marker.subdata}.name`)} #${marker.text.split('_').pop()}`;
-    else
-      marker.title = Language.get(`${marker.text}.name`);
-
-    if (marker.subdata == 'agarita' || marker.subdata == 'blood_flower')
-      marker.description = Language.get(`${marker.text}_${marker.day}.desc`) + ' ' + Language.get('map.flower_type.night_only');
-    else if (marker.subdata == 'creek_plum')
-      marker.description = Language.get(`${marker.text}_${marker.day}.desc`) + ' ' + Language.get('map.flower_type.bush');
-    else if (marker.subdata == 'spoonbill' || marker.subdata == 'heron' || marker.subdata == 'eagle' || marker.subdata == 'hawk' || marker.subdata == 'egret')
-      marker.description = Language.get(`${marker.text}_${marker.day}.desc`) + ' ' + Language.get('map.egg_type.tree');
-    else if (marker.subdata == 'vulture')
-      marker.description = Language.get(`${marker.text}_${marker.day}.desc`) + ' ' + Language.get('map.egg_type.stump');
-    else if (marker.subdata == 'duck' || marker.subdata == 'goose' || marker.subdata == 'loon')
-      marker.description = Language.get(`${marker.text}_${marker.day}.desc`) + ' ' + Language.get('map.egg_type.ground');
-    else
-      marker.description = Language.get(`${marker.text}_${marker.day}.desc`);
 
     if (Settings.isPopupsEnabled) {
-      tempMarker.bindPopup(MapBase.updateMarkerContent(marker), { minWidth: 300, maxWidth: 400 });
+      tempMarker.bindPopup(marker.popupContent(), { minWidth: 300, maxWidth: 400 });
     }
 
     tempMarker.on("click", function (e) {
       if (!Settings.isPopupsEnabled) MapBase.removeItemFromMap(marker.day || '', marker.text || '', marker.subdata || '', marker.category || '');
 
       Routes.addMarkerOnCustomRoute(marker.text);
-      if (Routes.customRouteEnabled) e.target.closePopup();
+      if (RouteSettings.customRouteEnabled) e.target.closePopup();
     });
 
     tempMarker.on("contextmenu", function (e) {
@@ -763,7 +674,7 @@ var MapBase = {
     });
 
     Layers.itemMarkersLayer.addLayer(tempMarker);
-    if (Settings.markerCluster)
+    if (Settings.isMarkerClusterEnabled)
       Layers.oms.addMarker(tempMarker);
   },
 
@@ -776,7 +687,7 @@ var MapBase = {
   },
 
   highlightImportantItem: function (text, category = '') {
-    if (category == 'american_flowers' || category == 'bird_eggs')
+    if (category == 'flower' || category == 'egg')
       text = text.replace(/(_\d+)/, '');
 
     var textMenu = text.replace(/egg_|flower_/, '');
@@ -784,7 +695,7 @@ var MapBase = {
     $(`[data-type=${textMenu}]`).toggleClass('highlight-important-items-menu');
 
     $.each($(`[data-marker*=${text}]`), function (key, marker) {
-      var markerdata = null;
+      var markerData = null;
 
       if (category !== 'random' && category !== '')
         markerData = $(this).data('marker').replace(/_\d/, '');
@@ -800,18 +711,21 @@ var MapBase = {
     else
       MapBase.importantItems.splice(MapBase.importantItems.indexOf(text), 1);
 
-    $.each(localStorage, function (key) {
-      localStorage.removeItem('importantItems');
-    });
+    localStorage.setItem('importantItems', JSON.stringify(MapBase.importantItems));
+  },
 
+  clearImportantItems: function () {
+    $('.highlight-items').removeClass('highlight-items');
+    $('.highlight-important-items-menu').removeClass('highlight-important-items-menu');
+    MapBase.importantItems = [];
     localStorage.setItem('importantItems', JSON.stringify(MapBase.importantItems));
   },
 
   loadImportantItems: function () {
-    if (localStorage.importantItems === undefined)
-      localStorage.importantItems = "[]";
-
-    MapBase.importantItems = JSON.parse(localStorage.importantItems) || [];
+    if (localStorage.getItem('importantItems') === undefined)
+      MapBase.importantItems = [];
+    else
+      MapBase.importantItems = JSON.parse(localStorage.getItem('importantItems')) || [];
 
     $.each(MapBase.importantItems, function (key, value) {
       if (/random_item_\d+/.test(value))
@@ -877,7 +791,7 @@ var MapBase = {
 
   addCoordsOnMap: function (coords) {
     // Show clicked coordinates (like google maps)
-    if (Settings.isCoordsEnabled) {
+    if (Settings.isCoordsOnClickEnabled) {
       $('.lat-lng-container').css('display', 'block');
 
       var lat = parseFloat(coords.latlng.lat.toFixed(4));

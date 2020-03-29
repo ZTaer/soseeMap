@@ -2,12 +2,16 @@
 //Instead of 1 cycle for each collection in the day, each collection has your own cycle.
 //Eg: Coins can be on cycle 1, Eggs on cycle 3, Flowers on 5... and so on
 
+Object.defineProperty(Date.prototype, 'toISOUTCDateString', {
+  value: function() { return this.toISOString().split('T')[0] },
+});
+
 var searchTerms = [];
 var uniqueSearchMarkers = [];
 
 var categories = [
-  'american_flowers', 'antique_bottles', 'arrowhead', 'bird_eggs', 'coin', 'family_heirlooms', 'lost_bracelet',
-  'lost_earrings', 'lost_necklaces', 'lost_ring', 'card_cups', 'card_pentacles', 'card_swords', 'card_wands', 'nazar',
+  'flower', 'bottle', 'arrowhead', 'egg', 'coin', 'heirlooms', 'bracelet',
+  'earring', 'necklace', 'ring', 'cups', 'pentacles', 'swords', 'wands', 'nazar',
   'fast_travel', 'treasure', 'random', 'user_pins'
 ];
 
@@ -24,48 +28,25 @@ var date;
 var debugMarkersArray = [];
 
 function init() {
-  if (localStorage.getItem("inventory-items") !== null) {
-    var _items = localStorage.getItem("inventory-items");
-
-    if (_items == null) return;
-
-    _items.split(';').forEach(item => {
-      if (item == '') return;
-
-      var properties = item.split(':');
-
-      if (Inventory.items[properties[0].replace(/_\d/, '')] === undefined)
-        Inventory.items[properties[0].replace(/_\d/, '')] = 0;
-
-      Inventory.items[properties[0].replace(/_\d/, '')]++;
-      MapBase.collectedItems[properties[0]] = properties[1] == '1';
-    });
-
-    localStorage.clear("inventory-items");
-
-    MapBase.saveCollectedItems();
-    Inventory.save();
+  var cookies = $.cookie();
+  for (var cookie in cookies) {
+    $.removeCookie(cookie);
   }
 
   MapBase.loadCollectedItems();
   Inventory.load();
 
-  $('.map-alert').toggle($.cookie('alert-closed-1') === undefined);
+  $('.map-alert').toggle(!Settings.alertClosed);
 
-  if ($.cookie('disabled-categories') !== undefined)
-    categoriesDisabledByDefault = $.cookie('disabled-categories').split(',');
-
-  categoriesDisabledByDefault = categoriesDisabledByDefault.filter(function (item) {
-    return ['texas_bluebonnet', 'bitterweed', 'agarita', 'wild_rhubarb', 'cardinal',
-      'creek_plum', 'blood_flower', 'chocolate_daisy', 'wisteria'].indexOf(item) === -1;
-  });
+  categoriesDisabledByDefault = JSON.parse(localStorage.getItem("disabled-categories"));
+  if (categoriesDisabledByDefault === null) categoriesDisabledByDefault = ['random'];
 
   enabledCategories = enabledCategories.filter(function (item) {
     return categoriesDisabledByDefault.indexOf(item) === -1;
   });
 
   const navLang = navigator.language.toLowerCase();
-  CookieProxy.addCookie(Settings, 'language', {
+  SettingProxy.addSetting(Settings, 'language', {
     default: Language.availableLanguages.includes(navLang) ? navLang : 'zh-hans',
   });
 
@@ -80,10 +61,10 @@ function init() {
   $('#language').val(Settings.language);
   $('#marker-opacity').val(Settings.markerOpacity);
   $('#marker-size').val(Settings.markerSize);
-  $('#custom-marker-color').val(Settings.markersCustomColor);
+  $('#custom-marker-color').val(Settings.markerCustomColor);
 
   $('#reset-markers').prop("checked", Settings.resetMarkersDaily);
-  $('#marker-cluster').prop("checked", Settings.markerCluster);
+  $('#marker-cluster').prop("checked", Settings.isMarkerClusterEnabled);
   $('#enable-marker-popups').prop("checked", Settings.isPopupsEnabled);
   $('#enable-marker-popups-hover').prop("checked", Settings.isPopupsHoverEnabled);
   $('#enable-marker-shadows').prop("checked", Settings.isShadowsEnabled);
@@ -91,11 +72,11 @@ function init() {
   $('#pins-place-mode').prop("checked", Settings.isPinsPlacingEnabled);
   $('#pins-edit-mode').prop("checked", Settings.isPinsEditingEnabled);
   $('#show-help').prop("checked", Settings.showHelp);
-  $('#show-coordinates').prop("checked", Settings.isCoordsEnabled);
-  $('#timestamps-24').prop("checked", Settings.display24HoursTimestamps);
+  $('#show-coordinates').prop("checked", Settings.isCoordsOnClickEnabled);
+  $('#timestamps-24').prop("checked", Settings.isClock24Hour);
   $('#sort-items-alphabetically').prop("checked", Settings.sortItemsAlphabetically);
   $('#enable-cycle-input').prop("checked", Settings.isCycleInputEnabled);
-  $("#enable-right-click").prop('checked', $.cookie('right-click') != null);
+  $("#enable-right-click").prop('checked', Settings.isRightClickEnabled);
   $("#enable-debug").prop('checked', Settings.isDebugEnabled);
   $("#enable-cycle-changer").prop('checked', Settings.isCycleChangerEnabled);
 
@@ -108,8 +89,8 @@ function init() {
 
   $("#help-container").toggle(Settings.showHelp);
 
-  $('.timer-container').toggleClass('hidden', Settings.displayClockHideTimer);
-  $('.clock-container').toggleClass('hidden', !(Settings.displayClockHideTimer));
+  $('.timer-container').toggleClass('hidden', Settings.isClockVisible);
+  $('.clock-container').toggleClass('hidden', !(Settings.isClockVisible));
   $('.input-cycle').toggleClass('hidden', !(Settings.isCycleInputEnabled));
   $('.cycle-icon').toggleClass('hidden', Settings.isCycleInputEnabled);
   $('#cycle-changer-container').toggleClass('hidden', !(Settings.isCycleChangerEnabled));
@@ -130,7 +111,7 @@ function isLocalHost() {
 }
 
 function changeCursor() {
-  if (Settings.isCoordsEnabled || Routes.customRouteEnabled)
+  if (Settings.isCoordsOnClickEnabled || RouteSettings.customRouteEnabled)
     $('.leaflet-grab').css('cursor', 'pointer');
   else {
     $('.leaflet-grab').css('cursor', 'grab');
@@ -179,8 +160,10 @@ function clockTick() {
   const gameHour = gameTime.getUTCHours();
   const nightTime = gameHour >= 22 || gameHour < 5;
   const clockFormat = {
-    timeZone: 'UTC', hour: 'numeric', minute: '2-digit',
-    hour12: !Settings.display24HoursTimestamps
+    timeZone: 'UTC',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: !Settings.isClock24Hour
   };
 
   $('#time-in-game').text(gameTime.toLocaleString(Settings.language, clockFormat));
@@ -189,11 +172,14 @@ function clockTick() {
   const cycleResetTime = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
   const delta = new Date(cycleResetTime - now);
   const deltaFormat = {
-    timeZone: 'UTC', hour: '2-digit', minute: '2-digit', second: '2-digit',
-    hourCycle: 'h24'
+    timeZone: 'UTC',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
   };
 
-  $('#countdown').text(`−${delta.toLocaleString([], deltaFormat)}`);
+  $('#countdown').text(delta.toLocaleString([], deltaFormat));
 
   $('[data-marker*="flower_agarita"], [data-marker*="flower_blood"]').css('filter',
     nightTime ? 'drop-shadow(0 0 .5rem #fff) drop-shadow(0 0 .25rem #fff)' : 'none');
@@ -203,7 +189,7 @@ setInterval(clockTick, 1000);
 
 $('.timer-container, .clock-container').on('click', function () {
   $('.timer-container, .clock-container').toggleClass('hidden');
-  Settings.displayClockHideTimer = $('.timer-container').hasClass('hidden');
+  Settings.isClockVisible = $('.timer-container').hasClass('hidden');
 });
 
 /**
@@ -224,11 +210,7 @@ $("#show-all-markers").on("change", function () {
 
 // Give me back my right-click
 $('#enable-right-click').on("change", function () {
-  if ($("#enable-right-click").prop('checked')) {
-    $.cookie('right-click', '1', { expires: 999 });
-  } else {
-    $.removeCookie('right-click');
-  }
+  Settings.isRightClickEnabled = $("#enable-right-click").prop('checked');
 });
 
 $("#show-weekly").on("change", function () {
@@ -307,7 +289,9 @@ $("#reset-markers").on("change", function () {
 $("#clear-markers").on("click", function () {
   $.each(MapBase.markers, function (key, marker) {
     marker.isCollected = false;
-    marker.canCollect = marker.amount < Inventory.stackSize;
+    marker.canCollect = ((marker.category !== 'flower' && marker.amount < InventorySettings.stackSize) ||
+      // Flowers soft stack size
+      (marker.category === 'flower' && marker.amount < InventorySettings.flowersSoftStackSize));
   });
 
   MapBase.saveCollectedItems();
@@ -329,9 +313,7 @@ $("#clear-inventory").on("click", function () {
 
 //Enable & disable custom routes on menu
 $("#custom-routes").on("change", function () {
-  Routes.customRouteEnabled = $("#custom-routes").prop('checked');
-  $.cookie('custom-routes-enabled', Routes.customRouteEnabled ? '1' : '0', { expires: 999 });
-
+  RouteSettings.customRouteEnabled = $("#custom-routes").prop('checked');
   changeCursor();
 });
 
@@ -342,7 +324,7 @@ $("#clear-custom-routes").on("click", function () {
 
 //When map-alert is clicked
 $('.map-alert').on('click', function () {
-  $.cookie('alert-closed-1', 'true', { expires: 999 });
+  Settings.alertClosed = true;
   $('.map-alert').hide();
 });
 
@@ -351,21 +333,21 @@ $('.map-cycle-alert').on('click', function () {
 });
 
 $('#show-coordinates').on('change', function () {
-  Settings.isCoordsEnabled = $("#show-coordinates").prop('checked');
+  Settings.isCoordsOnClickEnabled = $("#show-coordinates").prop('checked');
   changeCursor();
 });
 
 $('#timestamps-24').on('change', function () {
-  Settings.display24HoursTimestamps = $("#timestamps-24").prop('checked');
+  Settings.isClock24Hour = $("#timestamps-24").prop('checked');
   clockTick();
 });
 
 $("#language").on("change", function () {
   Settings.language = $("#language").val();
   Language.setMenuLanguage();
-  MapBase.addMarkers();
   Menu.refreshMenu();
   Cycles.setLocaleDate();
+  MapBase.addMarkers();
 });
 
 $("#marker-opacity").on("change", function () {
@@ -386,7 +368,7 @@ $("#enable-cycle-input").on("change", function () {
 });
 
 $('#custom-marker-color').on("change", function () {
-  Settings.markersCustomColor = Number($("#custom-marker-color").val());
+  Settings.markerCustomColor = Number($("#custom-marker-color").val());
   MapBase.addMarkers();
 });
 
@@ -412,7 +394,7 @@ $('.clickable').on('click', function () {
     });
   }
 
-  $.cookie('disabled-categories', categoriesDisabledByDefault.join(','), { expires: 999 });
+  localStorage.setItem("disabled-categories", JSON.stringify(categoriesDisabledByDefault));
 
   if (menu.data('type') == 'treasure')
     Treasures.addToMap();
@@ -435,18 +417,26 @@ $('.submenu-only').on('click', function (e) {
   $(this).children('.open-submenu').toggleClass('rotate');
 });
 
-//Sell collections on menu
-$('.menu-hidden .collection-sell').on('click', function (e) {
+// Sell collections on menu && collect all (add every item to the inventory from category)
+$('.menu-hidden .collection-sell, .menu-hidden .collection-collect-all').on('click', function (event) {
   var collectionType = $(this).parent().parent().data('type');
   var getMarkers = MapBase.markers.filter(_m => _m.category == collectionType && _m.day == Cycles.categories[_m.category]);
+
+  var changeAmount = 0;
+  var target = $(event.target);
+  if (target.is($(".menu-hidden .collection-sell")))
+    changeAmount = -1;
+
+  else if (target.is($(".menu-hidden .collection-collect-all")))
+    changeAmount = 1;
 
   $.each(getMarkers, function (key, value) {
     if (value.subdata) {
       if (value.text.endsWith('_1') || !value.text.match('[0-9]$'))
-        Inventory.changeMarkerAmount(value.subdata, -1);
+        Inventory.changeMarkerAmount(value.subdata, changeAmount);
     }
     else {
-      Inventory.changeMarkerAmount(value.text, -1);
+      Inventory.changeMarkerAmount(value.text, changeAmount);
     }
   });
 });
@@ -458,7 +448,7 @@ $('.weekly-item-listings .collection-sell').on('click', function (e) {
     var amount = Inventory.items[value.item];
 
     if (amount !== undefined) {
-      Inventory.changeMarkerAmount(value.item, -1);
+      Inventory.changeMarkerAmount(value.item.replace(/flower_/, ''), -1);
     }
   });
 });
@@ -469,10 +459,24 @@ $('.collection-reset').on('click', function (e) {
   var getMarkers = MapBase.markers.filter(_m => !_m.canCollect && _m.category == collectionType && _m.day == Cycles.categories[_m.category]);
 
   $.each(getMarkers, function (key, marker) {
-    MapBase.removeItemFromMap(marker.day, marker.text, marker.subdata, marker.category, !Inventory.resetButtonUpdatesInventory);
+    MapBase.removeItemFromMap(marker.day, marker.text, marker.subdata, marker.category, !InventorySettings.resetButtonUpdatesInventory);
   });
 
   $(this).removeClass('disabled');
+});
+
+// disable only collected items (one or more in the inventory)
+$('.disable-collected-items').on('click', function (e) {
+  var collectionType = $(this).parent().parent().data('type');
+  var getMarkers = MapBase.markers.filter(_m => _m.canCollect && _m.category == collectionType && _m.day == Cycles.categories[_m.category]);
+
+  $.each(getMarkers, function (key, marker) {
+    if (marker.amount > 0) {
+      var textMenu = marker.text.replace(/egg_|flower_(\w+)_\d/, '$1');
+      $(`[data-type=${textMenu}]`).addClass('disabled');
+      MapBase.removeItemFromMap(Cycles.categories[marker.category], marker.text, marker.subdata, marker.category, true);
+    };
+  });
 });
 
 //Remove item from map when using the menu
@@ -495,7 +499,7 @@ $('.menu-toggle').on('click', function () {
 });
 
 $('#marker-cluster').on("change", function () {
-  Settings.markerCluster = $("#marker-cluster").prop('checked');
+  Settings.isMarkerClusterEnabled = $("#marker-cluster").prop('checked');
   MapBase.map.removeLayer(Layers.itemMarkersLayer);
   MapBase.addMarkers();
 });
@@ -592,32 +596,34 @@ $('#pins-import').on('click', function () {
 
 //Enable & disable inventory on menu
 $('#enable-inventory').on("change", function () {
-  Inventory.isEnabled = $("#enable-inventory").prop('checked');
-  $.cookie('inventory-enabled', Inventory.isEnabled ? '1' : '0', { expires: 999 });
+  InventorySettings.isEnabled = $("#enable-inventory").prop('checked');
 
   MapBase.addMarkers();
   Menu.refreshWeeklyItems();
   ItemsValue.reloadInventoryItems();
 
-  $('#weekly-container .collection-value, .collection-sell, .counter, .counter-number').toggle(Inventory.isEnabled);
-  $('#inventory-container').toggleClass("opened", Inventory.isEnabled);
+  $('#weekly-container .collection-value, .collection-sell, .counter, .counter-number').toggle(InventorySettings.isEnabled);
+  $('#inventory-container').toggleClass("opened", InventorySettings.isEnabled);
+  $('.collection-value-bottom').toggleClass('hidden', !InventorySettings.isEnabled);
 });
 
 $('#enable-inventory-popups').on("change", function () {
-  Inventory.isPopupEnabled = $("#enable-inventory-popups").prop('checked');
-  $.cookie('inventory-popups-enabled', Inventory.isPopupEnabled ? '1' : '0', { expires: 999 });
+  InventorySettings.isPopupsEnabled = $("#enable-inventory-popups").prop('checked');
 
   MapBase.addMarkers();
 });
 
 $('#reset-inventory-daily').on("change", function () {
-  Inventory.resetInventoryDaily = $("#reset-inventory-daily").prop('checked');
-  $.cookie('reset-inventory-daily', Inventory.resetInventoryDaily ? '1' : '0', { expires: 999 });
+  InventorySettings.resetInventoryDaily = $("#reset-inventory-daily").prop('checked');
+});
+
+$('#enable-additional-inventory-options').on("change", function () {
+  InventorySettings.enableAdvancedInventoryOptions = $("#enable-additional-inventory-options").prop('checked');
+  $('.collection-value-bottom').toggleClass('hidden', !InventorySettings.enableAdvancedInventoryOptions);
 });
 
 $('#highlight_low_amount_items').on("change", function () {
-  Inventory.highlightLowAmountItems = $('#highlight_low_amount_items').prop("checked");
-  $.cookie('highlight_low_amount_items', Inventory.highlightLowAmountItems ? '1' : '0', { expires: 999 });
+  InventorySettings.highlightLowAmountItems = $('#highlight_low_amount_items').prop("checked");
 
   MapBase.addMarkers();
 });
@@ -625,30 +631,33 @@ $('#highlight_low_amount_items').on("change", function () {
 $('#highlight_style').on("change", function () {
   var parsed = parseInt($("#highlight_style").val());
 
-  Inventory.highlightStyle = !isNaN(parsed) ? parsed : Inventory.highlightStyles.ANIMATED_RECOMMENDED;
-  $.cookie('highlight_style', Inventory.highlightStyle, { expires: 999 });
+  InventorySettings.highlightStyle = !isNaN(parsed) ? parsed : Inventory.highlightStyles.ANIMATED_RECOMMENDED;
 
   MapBase.addMarkers();
 });
 
 $('#enable-inventory-menu-update').on("change", function () {
-  Inventory.isMenuUpdateEnabled = $("#enable-inventory-menu-update").prop('checked');
-  $.cookie('inventory-menu-update-enabled', Inventory.isMenuUpdateEnabled ? '1' : '0', { expires: 999 });
+  InventorySettings.isMenuUpdateEnabled = $("#enable-inventory-menu-update").prop('checked');
 });
 
 $('#reset-collection-updates-inventory').on("change", function () {
-  Inventory.resetButtonUpdatesInventory = $('#reset-collection-updates-inventory').prop('checked');
-  $.cookie('reset-updates-inventory-enabled', Inventory.resetButtonUpdatesInventory ? '1' : '0', { expires: 999 });
+  InventorySettings.resetButtonUpdatesInventory = $('#reset-collection-updates-inventory').prop('checked');
 });
 
-$('#weekly-container .collection-value, .collection-sell, .counter, .counter-number').toggle(Inventory.isEnabled);
+$('#weekly-container .collection-value, .collection-sell, .counter, .counter-number').toggle(InventorySettings.isEnabled);
 
 //Enable & disable inventory on menu
 $('#inventory-stack').on("change", function () {
   var inputValue = parseInt($('#inventory-stack').val());
   inputValue = !isNaN(inputValue) ? inputValue : 10;
-  $.cookie('inventory-stack', inputValue, { expires: 999 });
-  Inventory.stackSize = inputValue;
+  InventorySettings.stackSize = inputValue;
+});
+
+// Flowers soft item stack size
+$('#soft-flowers-inventory-stack').on("change", function () {
+  var inputValue = parseInt($('#soft-flowers-inventory-stack').val());
+  inputValue = !isNaN(inputValue) ? inputValue : 10;
+  InventorySettings.flowersSoftStackSize = inputValue;
 });
 
 /**
@@ -657,18 +666,14 @@ $('#inventory-stack').on("change", function () {
 
 $('#cookie-export').on("click", function () {
   try {
-    var cookies = $.cookie();
-    var storage = localStorage;
+    var settings = localStorage;
 
     // Remove irrelevant properties.
-    delete cookies._ga;
-    delete storage.randid;
-    delete storage['pinned-items'];
+    delete settings.randid;
+    delete settings['pinned-items'];
 
-    var settings = {
-      'cookies': cookies,
-      'local': storage
-    };
+    // Set file version
+    settings.version = 2;
 
     var settingsJson = JSON.stringify(settings, null, 4);
 
@@ -680,18 +685,15 @@ $('#cookie-export').on("click", function () {
 });
 
 function setSettings(settings) {
-  // Import all the settings from the file.
-  if (settings.cookies === undefined && settings.local === undefined) {
-    $.each(settings, function (key, value) {
-      $.cookie(key, value, { expires: 999 });
-    });
+  // Sorry, old settings! :-(
+  if (settings.version === undefined) {
+    location.reload();
+    return;
   }
 
-  $.each(settings.cookies, function (key, value) {
-    $.cookie(key, value, { expires: 999 });
-  });
+  delete settings.version;
 
-  $.each(settings.local, function (key, value) {
+  $.each(settings, function (key, value) {
     localStorage.setItem(key, value);
   });
 
@@ -745,14 +747,9 @@ $('#cookie-import').on('click', function () {
     }
 
     // Remove all current settings.
-    $.each($.cookie(), function (key, value) {
-      $.removeCookie(key);
-    });
-
     $.each(localStorage, function (key, value) {
       localStorage.removeItem(key);
     });
-
   } catch (error) {
     console.error(error);
     alert(Language.get('alerts.feature_not_supported'));
@@ -764,42 +761,32 @@ $('#cookie-import').on('click', function () {
  */
 
 $('#generate-route-generate-on-visit').on("change", function () {
-  Routes.runOnStart = $("#generate-route-generate-on-visit").prop('checked');
-  $.cookie('generator-path-generate-on-visit', Routes.runOnStart ? '1' : '0', { expires: 999 });
+  RouteSettings.runOnStart = $("#generate-route-generate-on-visit").prop('checked');
 });
 
 $('#generate-route-ignore-collected').on("change", function () {
-  Routes.ignoreCollected = $("#generate-route-ignore-collected").prop('checked');
-  $.cookie('generator-path-ignore-collected', Routes.ignoreCollected ? '1' : '0', { expires: 999 });
-
+  RouteSettings.ignoreCollected = $("#generate-route-ignore-collected").prop('checked');
   Routes.generatePath();
 });
 
 $('#generate-route-important-only').on("change", function () {
-  Routes.importantOnly = $("#generate-route-important-only").prop('checked');
-  $.cookie('generator-path-important-only', Routes.importantOnly ? '1' : '0', { expires: 999 });
-
+  RouteSettings.importantOnly = $("#generate-route-important-only").prop('checked');
   Routes.generatePath();
 });
 
 $('#generate-route-auto-update').on("change", function () {
-  Routes.autoUpdatePath = $("#generate-route-auto-update").prop('checked');
-  $.cookie('generator-path-auto-update', Routes.autoUpdatePath ? '1' : '0', { expires: 999 });
+  RouteSettings.autoUpdatePath = $("#generate-route-auto-update").prop('checked');
 });
 
 $('#generate-route-distance').on("change", function () {
   var inputValue = parseInt($('#generate-route-distance').val());
   inputValue = !isNaN(inputValue) && inputValue > 0 ? inputValue : 25;
-  $.cookie('generator-path-distance', inputValue, { expires: 999 });
-  Routes.maxDistance = inputValue;
-
+  RouteSettings.maxDistance = inputValue;
   Routes.generatePath();
 });
 
 $('#generate-route-start').on("change", function () {
   var inputValue = $('#generate-route-start').val();
-  $.cookie('generator-path-start', inputValue, { expires: 999 });
-
   var startLat = null;
   var startLng = null;
 
@@ -837,11 +824,9 @@ $('#generate-route-start').on("change", function () {
   $('#generate-route-start-lat').val(startLat);
   $('#generate-route-start-lng').val(startLng);
 
-  $.cookie('generator-path-start-lat', startLat, { expires: 999 });
-  $.cookie('generator-path-start-lng', startLng, { expires: 999 });
-
-  Routes.startMarkerLat = startLat;
-  Routes.startMarkerLng = startLng;
+  RouteSettings.genPathStart = inputValue;
+  RouteSettings.startMarkerLat = startLat;
+  RouteSettings.startMarkerLng = startLng;
 
   Routes.generatePath();
 });
@@ -849,27 +834,22 @@ $('#generate-route-start').on("change", function () {
 $('#generate-route-start-lat').on("change", function () {
   var inputValue = parseFloat($('#generate-route-start-lat').val());
   inputValue = !isNaN(inputValue) ? inputValue : -119.9063;
-  $.cookie('generator-path-start-lat', inputValue, { expires: 999 });
-  Routes.startMarkerLat = inputValue;
-
+  RouteSettings.startMarkerLat = inputValue;
   Routes.generatePath();
 });
 
 $('#generate-route-start-lng').on("change", function () {
   var inputValue = parseFloat($('#generate-route-start-lng').val());
   inputValue = !isNaN(inputValue) ? inputValue : 8.0313;
-  $.cookie('generator-path-start-lng', inputValue, { expires: 999 });
-  Routes.startMarkerLng = inputValue;
-
+  RouteSettings.startMarkerLng = inputValue;
   Routes.generatePath();
 });
 
 $('#generate-route-use-pathfinder').on("change", function () {
-  Routes.usePathfinder = $("#generate-route-use-pathfinder").prop('checked');
-  $.cookie('generator-path-use-pathfinder', Routes.usePathfinder ? '1' : '0', { expires: 999 });
+  RouteSettings.usePathfinder = $("#generate-route-use-pathfinder").prop('checked');
 
   // Hide incompatible options.
-  if (Routes.usePathfinder) {
+  if (RouteSettings.usePathfinder) {
     $('#generate-route-distance').parent().hide();
     $('#generate-route-auto-update').parent().parent().hide();
     $('#generate-route-fasttravel-weight').parent().show();
@@ -888,16 +868,12 @@ $('#generate-route-use-pathfinder').on("change", function () {
 });
 
 $('#generate-route-fasttravel-weight').on("change", function () {
-  Routes.fasttravelWeight = parseFloat($("#generate-route-fasttravel-weight").val());
-  $.cookie('generator-path-fasttravel-weight', Routes.fasttravelWeight.toString(), { expires: 999 });
-
+  RouteSettings.fasttravelWeight = parseFloat($("#generate-route-fasttravel-weight").val());
   Routes.generatePath();
 });
 
 $('#generate-route-railroad-weight').on("change", function () {
-  Routes.railroadWeight = parseFloat($("#generate-route-railroad-weight").val());
-  $.cookie('generator-path-railroad-weight', Routes.railroadWeight.toString(), { expires: 999 });
-
+  RouteSettings.railroadWeight = parseFloat($("#generate-route-railroad-weight").val());
   Routes.generatePath();
 });
 
@@ -943,21 +919,21 @@ L.LayerGroup.include({
 
 // Disable annoying menu on right mouse click
 $('*').on('contextmenu', function (e) {
-  if ($.cookie('right-click') == null)
+  if (!Settings.isRightClickEnabled)
     e.preventDefault();
 });
 
 // reset all settings & cookies
 $('#delete-all-settings').on('click', function () {
-  var cookies = $.cookie();
-  for (var cookie in cookies) {
-    $.removeCookie(cookie);
-  }
-
   $.each(localStorage, function (key) {
     localStorage.removeItem(key);
   });
 
+  location.reload(true);
+});
+
+// reload map from menu (useful on bugged iOS)
+$('#reload-map').on('click', function () {
   location.reload(true);
 });
 

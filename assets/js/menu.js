@@ -56,12 +56,13 @@ Menu.addCycleWarning = function (element, isSameCycle) {
 };
 
 Menu.refreshMenu = function () {
-  if (weeklySetData.current == null)
-    return;
-
   $('.menu-hidden[data-type]').children('.collectible-wrapper').remove();
 
-  var weeklyItems = weeklySetData.sets[weeklySetData.current];
+  var weeklyItems = [];
+  if (weeklySetData.sets !== null) {
+    weeklyItems = weeklySetData.sets[weeklySetData.current];
+  }
+
   var anyUnavailableCategories = [];
 
   $.each(MapBase.markers, function (_key, marker) {
@@ -72,13 +73,12 @@ Menu.refreshMenu = function () {
 
     var collectibleKey = null;
     var collectibleText = null;
-    var collectibleTitle = null;
 
     switch (marker.category) {
-      case 'american_flowers':
+      case 'flower':
         collectibleKey = `flower_${marker.subdata}`;
         break;
-      case 'bird_eggs':
+      case 'egg':
         collectibleKey = `egg_${marker.subdata}`;
         break;
       default:
@@ -87,16 +87,15 @@ Menu.refreshMenu = function () {
 
     if (marker.subdata) {
       collectibleText = marker.subdata;
-      collectibleTitle = Language.get(`${collectibleKey}.name`);
     } else {
       collectibleText = marker.text;
-      collectibleTitle = marker.title;
     }
-
+    
+    var collectibleTitle = Language.get(`${collectibleKey}.name`);
     var collectibleImage = null;
 
     // Prevents 404 errors. If doing the if-statement the other way round, jQuery tries to load the images.
-    if (marker.category != 'random')
+    if (marker.category !== 'random')
       collectibleImage = $('<img>').attr('src', `./assets/images/icons/game/${collectibleKey}.png`).attr('alt', 'Set icon').addClass('collectible-icon');
 
     var collectibleElement = $('<div>').addClass('collectible-wrapper').attr('data-help', 'item').attr('data-type', collectibleText);
@@ -118,15 +117,15 @@ Menu.refreshMenu = function () {
     });
 
     collectibleElement.on('contextmenu', function (e) {
-      if ($.cookie('right-click') == null)
+      if (!Settings.isRightClickEnabled)
         e.preventDefault();
 
       if (marker.subdata !== 'agarita' && marker.subdata !== 'blood_flower') {
         var prefix = '';
-        if (marker.category === 'american_flowers')
+        if (marker.category === 'flower')
           prefix = 'flower_';
 
-        else if (marker.category === 'bird_eggs')
+        else if (marker.category === 'egg')
           prefix = 'egg_';
         MapBase.highlightImportantItem(prefix + collectibleText, marker.category);
       }
@@ -134,7 +133,7 @@ Menu.refreshMenu = function () {
 
     var collectibleCountElement = $('<span>').addClass('counter').append(collectibleCountDecreaseElement).append(collectibleCountTextElement).append(collectibleCountIncreaseElement);
 
-    if (!Inventory.isEnabled)
+    if (!InventorySettings.isEnabled)
       collectibleCountElement.hide();
 
     var collectibleCategory = $(`.menu-option[data-type=${marker.category}]`);
@@ -149,7 +148,7 @@ Menu.refreshMenu = function () {
     if (collectibleCategory.hasClass('not-found') && !anyUnavailableCategories.includes(marker.category))
       collectibleCategory.attr('data-help', 'item_category').removeClass('not-found');
 
-    collectibleCountTextElement.toggleClass('text-danger', marker.amount >= Inventory.stackSize);
+    collectibleCountTextElement.toggleClass('text-danger', marker.amount >= InventorySettings.stackSize);
 
     if (marker.subdata) {
       if (marker.subdata == 'agarita' || marker.subdata == 'blood_flower')
@@ -168,8 +167,7 @@ Menu.refreshMenu = function () {
       if (currentSubdataMarkers.every(function (marker) { return !marker.canCollect; }))
         collectibleElement.addClass('disabled');
     } else {
-      if (!marker.canCollect)
-        collectibleElement.addClass('disabled');
+      if (!marker.canCollect) collectibleElement.addClass('disabled');
     }
 
     $.each(weeklyItems, function (key, weeklyItem) {
@@ -180,16 +178,10 @@ Menu.refreshMenu = function () {
     });
 
     collectibleElement.hover(function () {
-      let language = Language.get(`help.${$(this).data('help')}`);
-
-      if (language.indexOf('{collection}') !== -1) {
-        language = language.replace('{collection}', Language.get('weekly.desc.' + weeklySetData.current));
-      }
-
-      $('#help-container p').text(language);
-    }, function () {
-      $('#help-container p').text(Language.get(`help.default`));
-    });
+        $('#help-container p').text(Language.get(`help.${$(this).data('help')}`));
+      }, function () {
+        $('#help-container p').text(Language.get(`help.default`));
+      });
 
     $(`.menu-hidden[data-type=${marker.category}]`).append(collectibleElement.append(collectibleImage).append(collectibleTextWrapperElement.append(collectibleTextElement).append(collectibleCountElement)));
   });
@@ -282,17 +274,17 @@ Menu.refreshWeeklyItems = function () {
   var weeklyItems = weeklySetData.sets[weeklySetData.current];
 
   $('#weekly-container .weekly-item-listings').children('.weekly-item-listing').remove();
-  $('#weekly-container .weekly-item-title').text(Language.get('weekly.desc.' + weeklySetData.current));
+  $('#weekly-container .weekly-item-title').text(Language.get('collection'));
 
   $.each(weeklyItems, function (key, value) {
     var inventoryCount = '';
 
-    if (Inventory.isEnabled) {
+    if (InventorySettings.isEnabled) {
       var amount = Inventory.items[value.item];
 
       if (amount !== undefined) {
         inventoryCount = $(`<small class="counter-number">${amount}</small>`);
-        inventoryCount.toggleClass('text-danger', amount >= Inventory.stackSize);
+        inventoryCount.toggleClass('text-danger', amount >= InventorySettings.stackSize);
         inventoryCount = inventoryCount.prop('outerHTML');
       }
     }
@@ -313,10 +305,7 @@ Menu.refreshWeeklyItems = function () {
 
 // Remove highlight from all important items
 $('#clear_highlights').on('click', function () {
-  var tempArray = MapBase.importantItems;
-  $.each(tempArray, function () {
-    MapBase.highlightImportantItem(tempArray[0]);
-  });
+  MapBase.clearImportantItems();
 });
 
 // change cycles from menu (if debug options are enabled)
