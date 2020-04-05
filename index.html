@@ -60,7 +60,7 @@
     <div id="oo7-exp-header">
       <div class="container">
         <div class="row my-3">
-          <div class="col-md-4 px-1 col-6">
+          <div class="col-4 px-1 ">
             <a 
               href="https://zh-cn.socialclub.rockstargames.com/games/rdr2/catalogue/online" 
               class="exp-link btn mx-auto"
@@ -76,7 +76,7 @@
               手持目录
             </a>
           </div>
-          <div class="col-md-4 px-1 col-6">
+          <div class="col-4 px-1 ">
             <a 
               href="https://map.earthlees.com/" 
               class="exp-link btn"
@@ -91,7 +91,7 @@
               动植物地图
             </a>
           </div>
-          <div class="col-md-4 px-1 col-6">
+          <div class="col-4 px-1 ">
             <a 
               href="./assets/images/exp/error.png" 
               data-title="站点出现问题请反馈此QQ群: 177406988" 
@@ -104,18 +104,18 @@
           </div>
         </div>
         <div class="row my-3">
-          <div class="col-md-4 px-1 col-6">
+          <div class="col-4 px-1 ">
             <a 
               href="./assets/images/exp/wechat.png" 
               data-toggle="lightbox" 
               data-gallery="img-header"  
-              data-title="Sosee地图核心QQ群: 148719845" 
+              data-title="Sosee地图 | 官方一群: 148719845" 
               class="exp-link btn mx-auto"
             >
               赞赏支持
             </a>
           </div>
-          <div class="col-md-4 px-1 col-6">
+          <div class="col-4 px-1 ">
             <a 
               href="https://ztaer.github.io/RD2timeList/" 
               data-toggle="lightbox" 
@@ -127,7 +127,7 @@
               线上活动
             </a>
           </div>
-          <div class="col-md-4 px-1 col-6">
+          <div class="col-4 px-1 ">
             <a 
               href="https://fanyi.baidu.com/" 
               data-toggle="lightbox" 
@@ -140,8 +140,43 @@
             </a>
           </div>
         </div>
+        <div class="row">
+          <div class="col-4 px-2 ">
+            <a 
+              href="#" 
+              data-clipboard-text="148719845"
+              data-toggle="tooltip" 
+              data-placement="bottom" 
+              title="成功复制QQ群号码" 
+              data-trigger="focus"
+              class="exp-link btn ">
+              官方Q群一
+          </a>
+          </div>
+          <div class="col-4 px-2 ">
+            <a 
+              href="#" 
+              data-clipboard-text="177406988"
+              data-toggle="tooltip" 
+              data-placement="bottom" 
+              title="成功复制QQ群号码" 
+              data-trigger="focus"
+              class="exp-link btn">
+              官方Q群二
+            </a>
+          </div>
+          <div class="col-4 px-2 ">
+            <a 
+              href="#" 
+              class="exp-link btn">
+              (*^_^*)
+            </a>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- 分割线 -->
     
     <div class="settings-container">
       <div class="input-container">
@@ -1314,6 +1349,7 @@
 	<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
   <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
   <script src="https://cdn.staticfile.org/ekko-lightbox/5.3.0/ekko-lightbox.min.js" integrity="sha256-Y1rRlwTzT5K5hhCBfAFWABD4cU13QGuRN6P5apfWzVs=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
 
 
   <script>
@@ -1326,11 +1362,28 @@
     });
 
     // 提示框
+    $( document ).ready( function(){ $('[data-toggle="tooltip"]').tooltip(); });
     $(document).ready(
       function(){
         $('[data-toggle="popover"]').popover();
       }
     );
+
+    // 复制
+    // 复制初始化
+    var clipboard = new ClipboardJS('.btn', {
+      container: document.getElementById('oo7-exp-header') // bootstrap专用
+    });
+    clipboard.on('success', function(e) {
+      // 当前活动 console.info('Action:', e.action);
+      // 复制的文本 console.info('Text:', e.text);
+      // 目标标签 console.info('Trigger:', e.trigger);
+      e.clearSelection(); // 不显示选中效果
+    });
+    clipboard.on('error', function(e) {
+      console.error('Action:', e.action);
+      console.error('Trigger:', e.trigger);
+    });
 
   </script>
 </body>
