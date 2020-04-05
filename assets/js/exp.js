@@ -1,14 +1,7 @@
 /************ 数据处理模块-BGN  */
 var dataModule = ( function(){
 
-    const langInit = (idName,lang) => {
-        let test = document.getElementById( idName ).value = lang;
-    }
-
     return{
-        langInit: ( idName,lang ) => {
-            langInit( idName,lang );
-        }
 
     }
 
@@ -19,9 +12,6 @@ var dataModule = ( function(){
 /************ ui界面处理模块-BGN  */
 var uiModule = ( function(){
     const String = {
-        zh_s: 'zh-hans',
-        zh_t: 'zh-hant',
-        language: 'language',
         toggleHidden: 'toggle-hidden',
     };
 
@@ -33,28 +23,14 @@ var uiModule = ( function(){
         document.querySelector( items ).style.display = 'block';
     }
 
-    // 保证中英文字体字间距不同
-    const controlFontSpace = () => {
-        let lg = document.getElementById(String.language).value;
-        if( lg !== String.zh_s && lg !== String.zh_t ){
-            document.querySelector('body').style.letterSpacing = '1px';
-        }
-        else{
-            document.querySelector('body').style.letterSpacing = '3px';
-        }
-    }
-
     return{
-        controlFontSpace: ()=>{
-            controlFontSpace();
-        },
         string: String,
         noneItems: ( items ) => {
             noneItems(items);
         },
         blockItems: (items) => {
             blockItems(items);
-        }
+        },
     }
 
 } )()
@@ -75,9 +51,7 @@ var controlModule = ( function( data,ui ){
     
     // 监听
     var setupEventLiteners = ()=>{
-        document.getElementById('language').addEventListener('change',ui.controlFontSpace);
-        window.addEventListener('load',  ui.controlFontSpace, data.langInit( ui.string.language, ui.string.zh_s ) );
-        document.getElementById( ui.string.toggleHidden ).addEventListener('click',displayItems);
+        // 指定隐藏 document.getElementById( ui.string.toggleHidden ).addEventListener('click',displayItems);
     }
     return{
         init: ()=>{

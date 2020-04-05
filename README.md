@@ -7,9 +7,6 @@ Note: This project was created to improve the areas near Asia and China, and to 
     原作者( Author: jeanropke )：<a href="https://github.com/jeanropke/RDR2CollectorsMap">https://github.com/jeanropke/RDR2CollectorsMap</a><br/>
     改进者( helper: __OO7__ ): <a href="https://github.com/ZTaer" >https://github.com/ZTaer</a>
 </h3>
-<h4>
-    赞助广告: <a href="https://update.leigod.com/soft/channel/LeiGodSetup_ZT.exe" > 雷神加速器快捷下载 </a>
-</h4>
 <pre>
     文件解析:
         0. 默认zh-hans: 
@@ -45,18 +42,18 @@ Note: This project was created to improve the areas near Asia and China, and to 
             };
         3. 设置收藏品分享链接:
            a) map.js中
-           b) 找到变量'shareText'修改如下
-           c) var shareText = `<a href="javascript:void(0)" onclick="setClipboardText('https://map.sosee.org/?m=${marker.text}')">${Language.get('map.copy_link')}</a>`;
+           b) 找到'setClipboardText'修改如下
+           c) `<a href="javascript:void(0)" onclick="setClipboardText('https://map.sosee.org/?m=${marker.text}')">${Language.get('map.copy_link')}</a>`;
 </pre>
 <pre>
     Already updated:
-         0. Replaced JS-CDN plug-in to enable high-speed access in Asia
+         1. Replaced JS-CDN plug-in to enable high-speed access in Asia
          Optimized font display
-         2. Supplement some font translation
+         1. Supplement some font translation
      Updating:
-         0. More translations added
+         1. More translations added
      Ready to update:
-         0. Click the icon to display the image of the item's location in the game
+         1. Click the icon to display the image of the item's location in the game
 </pre>
 
 Items locations credits to [GTA Series Videos](https://www.youtube.com/user/GTASeriesVideos), [Gtax Barrett](https://twitter.com/gtaxbarrett), [IronJeff80](https://github.com/IronJeff80) and [/r/RedDeadOnline](https://www.reddit.com/r/RedDeadOnline)

@@ -137,7 +137,7 @@
 	"map.user_pins.icon.bracelet": "Armband",
 	"map.user_pins.icon.earring": "Ohrring",
 	"map.user_pins.icon.necklace": "Halskette",
-	"map.user_pins.icon.ring": "Ring",
+	"map.user_pins.icon.ring": "",
 	"map.user_pins.icon.nazar": "Madam Nazar",
 	"map.user_pins.icon.treasure": "Schatz",
 	"menu.clear_custom_routes": "Benutzerdefinierte Route löschen",
@@ -235,6 +235,9 @@
 	"menu.reset_inventory_daily": "Inventar täglich zurücksetzen",
 	"menu.soft_flowers_inventory_stack": "",
 	"menu.reload_map": "Karte jetzt neu laden",
+	"menu.disable_collected_items": "",
+	"menu.collection_collect_all": "",
+	"menu.enable_additional_inventory_options": "",
 	"help.default": "Fahre mit der Maus oder drücke lange (Mobile-Ansicht) auf einem Option um weitere Informatione zu erhalten.",
 	"help.clear_custom_routes": "Lösche alle benutzerdefinierten Routen auf der Karte.",
 	"help.clear_inventory": "Leere das komplette Inventar (alle Gegenstände).",
@@ -320,5 +323,8 @@
 	"help.collection_collected": "Anzahl der für diese Sammlung gesammelten Gegenstände.",
 	"help.reset_inventory_daily": "Schaltet um, ob das Inventar alle 24 Stunden zurückgesetzt werden soll.",
 	"help.soft_flowers_inventory_stack": "",
-	"help.reload_map": "Ermöglicht das erneute Laden der Karte, falls etwas mit der Website nicht stimmt."
+	"help.reload_map": "Ermöglicht das erneute Laden der Karte, falls etwas mit der Website nicht stimmt.",
+	"help.disable_collected_items": "",
+	"help.collection_collect_all": "",
+	"help.enable_additional_inventory_options": ""
 }
