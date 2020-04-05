@@ -47,10 +47,10 @@ Menu.addCycleWarning = function (element, isSameCycle) {
   var hasCycleWarning = $(`${element} .same-cycle-warning-menu`).length > 0;
   var category = $(element);
   if (isSameCycle && !hasCycleWarning) {
-    category.parent().attr('data-help', 'item_category_same_cycle');
+    category.parent().parent().attr('data-help', 'item_category_same_cycle');
     category.append(`<img class="same-cycle-warning-menu" src="./assets/images/same-cycle-alert.png">`);
   } else if (!isSameCycle && hasCycleWarning) {
-    category.parent().attr('data-help', 'item_category');
+    category.parent().parent().attr('data-help', 'item_category');
     category.children('.same-cycle-warning-menu').remove();
   }
 };
@@ -90,7 +90,7 @@ Menu.refreshMenu = function () {
     } else {
       collectibleText = marker.text;
     }
-    
+
     var collectibleTitle = Language.get(`${collectibleKey}.name`);
     var collectibleImage = null;
 
@@ -164,7 +164,7 @@ Menu.refreshMenu = function () {
         return true;
       });
 
-      if (currentSubdataMarkers.every(function (marker) { return !marker.canCollect; }))
+      if (currentSubdataMarkers.every(marker => !marker.canCollect))
         collectibleElement.addClass('disabled');
     } else {
       if (!marker.canCollect) collectibleElement.addClass('disabled');
@@ -189,7 +189,8 @@ Menu.refreshMenu = function () {
   $('.menu-hidden[data-type]').each(function (key, value) {
     var category = $(this);
 
-    if (category.data('type') == 'treasure') return;
+    if (category.data('type') == 'treasure')
+      return;
 
     // if the cycle is the same as yesterday highlight category in menu;
     var isSameCycle = Cycles.isSameAsYesterday(category.data('type'));
@@ -198,14 +199,16 @@ Menu.refreshMenu = function () {
     Menu.addCycleWarning(element, isSameCycle);
     Menu.refreshCollectionCounter(category.data('type'));
 
-    if (!Settings.sortItemsAlphabetically) return;
-    if (category.data('type').includes('card_')) return;
+    if (Settings.sortItemsAlphabetically) {
+      if (category.data('type').includesOneOf('cups', 'swords', 'wands', 'pentacles'))
+        return;
 
-    var children = category.children('.collectible-wrapper');
+      var children = category.children('.collectible-wrapper');
 
-    children.sort(function (a, b) {
-      return a.innerText.toLowerCase().localeCompare(b.innerText.toLowerCase());
-    }).appendTo(this);
+      children.sort(function (a, b) {
+        return a.innerText.toLowerCase().localeCompare(b.innerText.toLowerCase());
+      }).appendTo(this);
+    }
   });
 
   // Check cycle warning for random spots

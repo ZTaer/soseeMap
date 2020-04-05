@@ -235,6 +235,9 @@
 	"menu.reset_inventory_daily": "Reiniciar inventario diariamente",
 	"menu.soft_flowers_inventory_stack": "",
 	"menu.reload_map": "",
+	"menu.disable_collected_items": "",
+	"menu.collection_collect_all": "",
+	"menu.enable_additional_inventory_options": "",
 	"help.default": "Mantener el cursor o presionar durante un tiempo (móvil) cualquier ajuste para obtener información al respecto.",
 	"help.clear_custom_routes": "Limpia todas las rutas personalizadas en el mapa.",
 	"help.clear_inventory": "Limpia todos los objetos en el inventario.",
@@ -320,5 +323,8 @@
 	"help.collection_collected": "Cantidad de objetos recolectados para esta colección.",
 	"help.reset_inventory_daily": "Alterna si el inventario debe reiniciarse cada 24 horas.",
 	"help.soft_flowers_inventory_stack": "",
-	"help.reload_map": ""
+	"help.reload_map": "",
+	"help.disable_collected_items": "",
+	"help.collection_collect_all": "",
+	"help.enable_additional_inventory_options": ""
 }

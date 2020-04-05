@@ -2,6 +2,9 @@
  * Created by Jean on 2019-10-09.
  */
 
+var fastTravelData;
+var weeklySetData = [];
+
 var MapBase = {
   minZoom: 2,
   maxZoom: 7,
@@ -11,7 +14,6 @@ var MapBase = {
   interiors: false,
   markers: [],
   importantItems: [],
-  collectedItems: {},
   isDarkMode: false,
   updateLoopAvailable: true,
   requestLoopCancel: false,
@@ -23,24 +25,24 @@ var MapBase = {
     const mapBoundary = L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176));
     //Please, do not use the GitHub map tiles. Thanks
     const mapLayers = {
-        'map.layers.default':
-            L.tileLayer('assets/maps/detailed/{z}/{x}_{y}.jpg', {
-            noWrap: true,
-            bounds: mapBoundary,
-            attribution: '<a href="https://www.rockstargames.com/" target="_blank">Rockstar Games</a>'
-            }),
-        'map.layers.detailed':
-            L.tileLayer((true ? '' : 'https://jeanropke.b-cdn.net/') + 'assets/maps/detailed/{z}/{x}_{y}.jpg', {
-            noWrap: true,
-            bounds: mapBoundary,
-            attribution: '<a href="https://rdr2map.com/" target="_blank">RDR2Map</a>'
-            }),
-        'map.layers.dark':
-            L.tileLayer((true ? '' : 'https://jeanropke.b-cdn.net/') + 'assets/maps/darkmode/{z}/{x}_{y}.jpg', {
-            noWrap: true,
-            bounds: mapBoundary,
-            attribution: '<a href="https://github.com/TDLCTV" target="_blank">TDLCTV</a>'
-            }),
+      'map.layers.default':
+          L.tileLayer('assets/maps/detailed/{z}/{x}_{y}.jpg', {
+          noWrap: true,
+          bounds: mapBoundary,
+          attribution: '<a href="https://www.rockstargames.com/" target="_blank">Rockstar Games</a>'
+          }),
+      'map.layers.detailed':
+          L.tileLayer((true ? '' : 'https://jeanropke.b-cdn.net/') + 'assets/maps/detailed/{z}/{x}_{y}.jpg', {
+          noWrap: true,
+          bounds: mapBoundary,
+          attribution: '<a href="https://rdr2map.com/" target="_blank">RDR2Map</a>'
+          }),
+      'map.layers.dark':
+          L.tileLayer((true ? '' : 'https://jeanropke.b-cdn.net/') + 'assets/maps/darkmode/{z}/{x}_{y}.jpg', {
+          noWrap: true,
+          bounds: mapBoundary,
+          attribution: '<a href="https://github.com/TDLCTV" target="_blank">TDLCTV</a>'
+          }),
     };
 
     // Override bindPopup to include mouseover and mouseout logic.
@@ -195,16 +197,15 @@ var MapBase = {
 
   loadMarkers: function () {
     $.getJSON('data/items.json?nocache=' + nocache)
-      .done(function (data) {
-        MapBase.setMarkers(data);
-      });
+      .done(MapBase.setMarkers);
   },
 
   setMarkers: function (data) {
+    'use strict';
     $.each(data, function (_category, _cycles) {
-      $.each(_cycles, function (day, _markers) {
-        $.each(_markers, function (key, marker) {
-          MapBase.markers.push(new Marker(marker.text, marker.lat, marker.lng, marker.tool, day, _category, marker.subdata, marker.video, marker.height));
+      $.each(_cycles, function (cycleName, _markers) {
+        $.each(_markers, function (index, marker) {
+          MapBase.markers.push(new Marker(marker, cycleName, _category));
         });
       });
     });
@@ -220,11 +221,9 @@ var MapBase = {
 
         if (Settings.resetMarkersDaily) {
           markers[key].isCollected = false;
-          markers[key].canCollect = markers[key].amount < InventorySettings.stackSize;
         }
         else if (value.category === 'random') {
           markers[key].isCollected = false;
-          markers[key].canCollect = true;
         }
 
         if (InventorySettings.resetInventoryDaily) {
@@ -235,7 +234,6 @@ var MapBase = {
       MapBase.markers = markers;
       Inventory.save();
       Menu.refreshMenu();
-      MapBase.saveCollectedItems();
     }
 
     localStorage.setItem('main.date', date);
@@ -243,15 +241,15 @@ var MapBase = {
     MapBase.addMarkers(true);
 
     // Do search via URL.
-    var searchParam = getParameterByName('search');
-    if (searchParam != null && searchParam) {
+    const searchParam = getParameterByName('search');
+    if (searchParam) {
       $('#search').val(searchParam);
       MapBase.onSearch(searchParam);
     }
 
     // Navigate to marker via URL.
-    var markerParam = getParameterByName('m');
-    if (markerParam != null && markerParam != '') {
+    const markerParam = getParameterByName('m');
+    if (markerParam) {
       var goTo = MapBase.markers.filter(_m => _m.text == markerParam && _m.day == Cycles.categories[_m.category])[0];
 
       //if a marker is passed on url, check if is valid
@@ -411,15 +409,11 @@ var MapBase = {
             marker.isCollected = true;
             changeAmount = 1;
           }
-
-          marker.canCollect = false;
         } else {
           if (marker.day == Cycles.categories[marker.category]) {
             marker.isCollected = false;
             changeAmount = -1;
           }
-
-          marker.canCollect = true;
         }
 
         Inventory.changeMarkerAmount(marker.subdata || marker.text, changeAmount, skipInventory);
@@ -450,7 +444,6 @@ var MapBase = {
     if (RouteSettings.ignoreCollected)
       Routes.generatePath();
 
-    MapBase.saveCollectedItems();
     Menu.refreshItemsCounter();
   },
 
@@ -462,27 +455,9 @@ var MapBase = {
     }
 
     if (subdata != '' && day != null && day == Cycles.categories[category]) {
-      if ((markers.length == 1 && !markers[0].canCollect) || markers.every(function (marker) { return !marker.canCollect; })) {
-        $(`[data-type=${subdata}]`).addClass('disabled');
-      } else {
-        $(`[data-type=${subdata}]`).removeClass('disabled');
-      }
+      $(`[data-type=${subdata}]`).toggleClass('disabled',
+        markers.every(marker => !marker.canCollect));
     }
-  },
-
-  loadCollectedItems: function () {
-    MapBase.collectedItems = JSON.parse(localStorage.getItem("collected-items"));
-    if (MapBase.collectedItems === null) MapBase.collectedItems = {};
-  },
-
-  saveCollectedItems: function () {
-    $.each(MapBase.markers, function (key, marker) {
-      if (marker.day != Cycles.categories[marker.category]) return;
-
-      MapBase.collectedItems[marker.text] = marker.isCollected;
-    });
-
-    localStorage.setItem("collected-items", JSON.stringify(MapBase.collectedItems));
   },
 
   getIconColor: function (marker) {
@@ -659,7 +634,7 @@ var MapBase = {
     tempMarker.id = marker.text;
 
     if (Settings.isPopupsEnabled) {
-      tempMarker.bindPopup(marker.popupContent(), { minWidth: 300, maxWidth: 400 });
+      tempMarker.bindPopup(marker.popupContent.bind(marker), { minWidth: 300, maxWidth: 400 });
     }
 
     tempMarker.on("click", function (e) {
@@ -805,15 +780,6 @@ var MapBase = {
 
     if (Settings.isPinsPlacingEnabled)
       Pins.addPin(coords.latlng.lat, coords.latlng.lng);
-  },
-
-  formatDate: function (date) {
-    var pad = (e, s) => (1e3 + e + '').slice(-s);
-    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    var _day = date.split('/')[2];
-    var _month = monthNames[date.split('/')[1] - 1];
-    var _year = date.split('/')[0];
-    return `${_month} ${pad(_day, 2)} ${_year}`;
   },
 
   yieldingLoop: function (count, chunksize, callback, finished) {
