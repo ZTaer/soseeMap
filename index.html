@@ -32,15 +32,15 @@
   <link rel="stylesheet" href="assets/css/leaflet.css" />
   <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
   
-  <link rel="stylesheet" href="assets/css/styles.css?nocache=1386" />
+  <link rel="stylesheet" href="assets/css/styles.css?nocache=1411" />
   
   <!-- 扩展 -->
-  <link rel="stylesheet" href="assets/css/exp.css?nocache=1386" />
+  <link rel="stylesheet" href="assets/css/exp.css?nocache=1411" />
   <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css" integrity="sha256-HAaDW5o2+LelybUhfuk0Zh2Vdk8Y2W2UeKmbaXhalfA=" crossorigin="anonymous" />
   
   <script>
-    var nocache = 1386;
+    var nocache = 1411;
   </script>
 </head>
 
@@ -178,10 +178,10 @@
     </div>
 
     <!-- 分割线 -->
-    
     <div class="settings-container">
       <div class="input-container">
         <input class="input-search" type="text" id="search" placeholder="Search items. Separated by ;" autocomplete="off" data-help="search">
+        <div id="clear-search" class="input-action-clear" data-help="search_clear"></div>
         <div id="copy-search-link" class="input-action-copy" data-help="search_copy_link"></div>
       </div>
     </div>
@@ -198,7 +198,10 @@
         <span class="header-border"></span>
       </div>
       <div class="weekly-item-listings">
-        <p data-text="menu.weekly_item_description">This week's collection consists of these items. Collect them all and send them to Madam Nazar for an XP and RDO$ bonus.</p>
+        <p>
+          <span class="weekly-flavor-text"></span>
+          <span data-text="menu.weekly_item_description">Find all the items listed and sell the complete collection to Madam Nazar for an XP and RDO$ reward.</span>
+        </p>
         <div class="collection-value">
           <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
         </div>
@@ -206,8 +209,8 @@
     </div>
 
     <div class="links-container">
-      <a data-text="menu.hide_all" data-help="hide_all" href="javascript:void(0);" onclick="Menu.hideAll()">Hide all</a>
-      <a data-text="menu.show_all" data-help="show_all" href="javascript:void(0);" onclick="Menu.showAll()">Show all</a>
+      <a data-text="menu.hide_all" data-help="hide_all" href="javascript:void(0);">Hide all</a>
+      <a data-text="menu.show_all" data-help="show_all" href="javascript:void(0);">Show all</a>
     </div>
     <div>
       <div class="menu-option clickable" data-type="flower" data-help="item_category">
@@ -581,8 +584,8 @@
         </div>
         <div class="menu-hidden" data-type="treasure">
           <div class="collection-value">
-            <a data-text="menu.hide_all" href="javascript:void(0);" onclick="Treasures.showHideAll(true)">Hide all</a>
-            <a data-text="menu.show_all" href="javascript:void(0);" onclick="Treasures.showHideAll(false)">Show all</a>
+            <a data-text="menu.hide_all" href="javascript:void(0);">Hide all</a>
+            <a data-text="menu.show_all" href="javascript:void(0);">Show all</a>
           </div>
         </div>
       </div>
@@ -601,21 +604,37 @@
       <div class="input-container" data-help="language">
         <label for="language" data-text="menu.language">Language</label>
         <select class="input-text wide-select-menu" id="language">
-          <option value="de-de">Deutsch (German)</option>
-          <option value="en-us" selected>English</option>
-          <option value="es-es">Español (Spanish)</option>
-          <option value="fr-fr">Français (French)</option>
-          <option value="it-it">Italiano (Italian)</option>
-          <option value="hu-hu">Magyar nyelv (Hungarian)</option>
-          <option value="pt-br">Português (Portguese Brazilian)</option>
-          <option value="pl">Polski (Polish)</option>
-          <option value="ru">Русский (Russian)</option>
-          <option value="sv-se">Svenska (Swedish)</option>
-          <option value="ar-ar">ٱلْعَرَبِيَّة (Arabic)</option>
+          <option value="en" selected>English</option>
+          <option value="en-GB">English (UK)</option>
+          <option value="af">Afrikaans (Afrikaans)</option>
+          <option value="ar">ٱلْعَرَبِيَّة (Arabic)</option>
+          <option value="ca">Català (Catalan)</option>
+          <option value="cs">Нохчийн мотт (Chech)</option>
+          <option value="da">Dansk (Danish)</option>
+          <option value="de">Deutsch (German)</option>
+          <option value="el">ελληνικά (Greek)</option>
+          <option value="es">Español (Spanish)</option>
+          <option value="fi">Suomi (Finnish)</option>
+          <option value="fr">Français (French)</option>
+          <option value="he">עברית (Hebrew)</option>
+          <option value="hu">Magyar (Hungarian)</option>
+          <option value="it">Italiano (Italian)</option>
+          <option value="ja">日本語 (Japanese)</option>
           <option value="ko">한국어 (Korean)</option>
-          <option value="th-th">ภาษาไทย (Thai)</option>
-          <option value="zh-hans">简体中文 (Chinese Simplified)</option>
-          <option value="zh-hant">繁体中文 (Chinese Traditional)</option>
+          <option value="no">Norsk (Norwegian)</option>
+          <option value="pl">Polski (Polish)</option>
+          <option value="pt">Português (Portuguese)</option>
+          <option value="pt-BR">Português (Brazilian Portuguese)</option>
+          <option value="ro">Limba română (Romanian)</option>
+          <option value="ru">Русский язык (Russian)</option>
+          <option value="sr">Српски (Serbian)</option>
+          <option value="sv">Svenska (Swedish)</option>
+          <option value="th">ภาษาไทย (Thai)</option>
+          <option value="tr">Türkçe (Turkish)</option>
+          <option value="uk">Українська мова (Ukrainian)</option>
+          <option value="vi">Tiếng Việt (Vietnamese)</option>
+          <option value="zh-Hans">简体中文 (Chinese Simplified)</option>
+          <option value="zh-Hant">繁体中文 (Chinese Traditional)</option>
         </select>
       </div>
       <div class="input-container" data-help="tool_type">
@@ -692,6 +711,13 @@
           <div class="input-checkbox-wrapper">
             <input class="input-checkbox" type="checkbox" name="reset-collection-updates-inventory" value="0" id="reset-collection-updates-inventory" />
             <label class="input-checkbox-label" for="reset-collection-updates-inventory"></label>
+          </div>
+        </div>
+        <div class="input-container" data-help="auto_enable_sold_items">
+          <label for="auto-enable-sold-items" data-text="menu.auto_enable_sold_items">Automatically enable sold items</label>
+          <div class="input-checkbox-wrapper">
+            <input class="input-checkbox" type="checkbox" name="auto-enable-sold-items" value="0" id="auto-enable-sold-items" />
+            <label class="input-checkbox-label" for="auto-enable-sold-items"></label>
           </div>
         </div>
         <div class="input-container" data-help="inventory_stack">
@@ -1121,9 +1147,6 @@
             <label class="input-checkbox-label" for="show-all-markers"></label>
           </div>
         </div>
-        <div class="input-container-noflex">
-          <button id="debug-place-marker" type="button" class="btn btn-default narrow-select-menu" onclick="Language.getLanguageJson()">Generate langs</button>
-        </div>
       </div>
     </div>
 
@@ -1212,7 +1235,6 @@
 
   <div class="map-cycle-alert hidden">
     <span>Today's cycles haven't been updated yet. Please refresh to check for updates.</span>
-    <button class="close-button">×</button>
   </div>
 
   <div class="filter-alert hidden">
@@ -1315,11 +1337,11 @@
       </div>
     </div>
   </div>
-
   <!-- ES6 Compatibility Check -->
   <script>function isES6() { try { return eval("() => {};"), !0 } catch (r) { return !1 } } isES6() || alert("This browser might not be fully supported, and errors will likely occur. Please update your browser if you experience issues.");</script>
 
   <script src="assets/js/lib/jquery-3.4.1.min.js"></script>
+  <script src="assets/js/loader.js?nocache=1411"></script>
   <script src="assets/js/lib/bootstrap.min.js"></script>
   <script src="assets/js/lib/jquery.cookie.js"></script>
   <script src="assets/js/lib/leaflet.js"></script>
@@ -1328,25 +1350,24 @@
   <script>var module = {};</script>
   <script src="assets/js/lib/leaflet.canvas-markers.js"></script>
   <script>module.exports(L);</script>
-  <script src="assets/js/layers.js?nocache=1386"></script>
-  <script src="assets/js/settings.js?nocache=1386"></script>
-  <script src="assets/js/nazar.js?nocache=1386"></script>
-  <script src="assets/js/cycles.js?nocache=1386"></script>
-  <script src="assets/js/marker.js?nocache=1386"></script>
-  <script src="assets/js/inventory.js?nocache=1386"></script>
-  <script src="assets/js/treasures.js?nocache=1386"></script>
-  <script src="assets/js/pins.js?nocache=1386"></script>
-  <script src="assets/js/map.js?nocache=1386"></script>
-  <script src="assets/js/language.js?nocache=1386"></script>
-  <script src="assets/js/language.data.min.js?nocache=1386"></script>
-  <script src="assets/js/menu.js?nocache=1386"></script>
-  <script src="assets/js/itemsValue.js?nocache=1386"></script>
-  <script src="assets/js/routes.js?nocache=1386"></script>
-  <script src="assets/js/pathfinder.js?nocache=1386"></script>
-  <script src="assets/js/scripts.js?nocache=1386"></script>
+  <script src="assets/js/layers.js?nocache=1411"></script>
+  <script src="assets/js/settings.js?nocache=1411"></script>
+  <script src="assets/js/nazar.js?nocache=1411"></script>
+  <script src="assets/js/cycles.js?nocache=1411"></script>
+  <script src="assets/js/marker.js?nocache=1411"></script>
+  <script src="assets/js/inventory.js?nocache=1411"></script>
+  <script src="assets/js/treasures.js?nocache=1411"></script>
+  <script src="assets/js/pins.js?nocache=1411"></script>
+  <script src="assets/js/map.js?nocache=1411"></script>
+  <script src="assets/js/language.js?nocache=1411"></script>
+  <script src="assets/js/menu.js?nocache=1411"></script>
+  <script src="assets/js/items.js?nocache=1411"></script>
+  <script src="assets/js/routes.js?nocache=1411"></script>
+  <script src="assets/js/pathfinder.js?nocache=1411"></script>
+  <script src="assets/js/scripts.js?nocache=1411"></script>
 
   <!-- 扩展 -->
-  <script src="assets/js/exp.js?nocache=1386"></script>
+  <script src="assets/js/exp.js?nocache=1411"></script>
 	<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
   <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
   <script src="https://cdn.staticfile.org/ekko-lightbox/5.3.0/ekko-lightbox.min.js" integrity="sha256-Y1rRlwTzT5K5hhCBfAFWABD4cU13QGuRN6P5apfWzVs=" crossorigin="anonymous"></script>

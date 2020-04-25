@@ -1,28 +1,82 @@
+jQuery.fn.translate = function () {
+    return Language.translateDom(this);
+};
+
 var Language = {
-    availableLanguages: ['ar-ar', 'de-de', 'en-us', 'es-es', 'fr-fr', 'hu-hu', 'it-it', 'ko', 'pt-br', 'pl', 'ru', 'sv-se', 'th-th', 'zh-hans', 'zh-hant'],
+    data: {},
+    availableLanguages: ['en', 'af', 'ar', 'ca', 'cs', 'da', 'de', 'el', 'en-GB', 'es', 'fi', 'fr', 'he', 'hu', 'it', 'ja', 'ko', 'no', 'pl', 'pt', 'pt-BR', 'ro', 'ru', 'sr', 'sv', 'th', 'tr', 'uk', 'vi', 'zh-Hans', 'zh-Hant'],
+
+    init: function () {
+        'use strict';
+        let langs = ['en'];
+
+        if (Settings.language !== 'en') {
+            langs.push(Settings.language);
+        }
+
+        langs.forEach(language => {
+            $.ajax({
+                url: `./langs/${language.replace('-', '_')}.json?nocache=${nocache}`,
+                async: false,
+                dataType: 'json',
+                success: function (json) {
+                    let result = {};
+
+                    for (let propName in json) {
+                        if (json[propName] !== "" && ($.isEmptyObject(Language.data.en) || Language.data.en[propName] !== json[propName])) {
+                            result[propName] = json[propName];
+                        }
+                    }
+
+                    Language.data[language] = result;
+                }
+            });
+        });
+    },
+
+    _links: {
+        'GitHub':
+            ['https://github.com/jeanropke/RDR2CollectorsMap/issues', 'GitHub'],
+        'Discord':
+            ['https://discord.gg/WWru8cP', 'Discord'],
+        'int.nazar.link':
+            ['https://twitter.com/MadamNazarIO', '@MadamNazarIO'],
+        'int.random_spot.link':
+            ['https://github.com/jeanropke/RDR2CollectorsMap/wiki/Random-Item-Possible-Loot'],
+    },
+
+    _externalLink: function (key) {
+        'use strict';
+        const [url, text] = Language._links[key];
+        return `<a href="${url}" target="_blank">${text ? `${text}</a>` : ''}`;
+    },
 
     get: function (transKey, optional) {
         'use strict';
         let translation = false;
-        if (transKey === 'GitHub') {
-            translation = '<a href="https://github.com/jeanropke/RDR2CollectorsMap/issues" target="_blank">GitHub</a>';
-        } else if (transKey === 'Discord') {
-            translation = '<a href="https://discord.gg/WWru8cP" target="_blank">Discord</a>';
-        } else if (transKey === 'int.random_spot.link') {
-            translation = '<a href="https://github.com/jeanropke/RDR2CollectorsMap/wiki/Random-Item-Possible-Loot" target="_blank">';
+
+        if (Settings.isDebugEnabled) optional = false;
+
+        if (Language._links.propertyIsEnumerable(transKey)) {
+            translation = Language._externalLink(transKey);
         } else if (transKey === 'int.end.link') {
             translation = '</a>';
         } else if (transKey === 'collection') {
-            transKey = `weekly.desc.${weeklySetData.current}`;
+            transKey = `weekly.desc.${Collection.weeklySetName}`;
+        } else if (transKey === 'weekly_flavor') {
+            transKey = `weekly.flavor.${Collection.weeklySetName}`;
+        } else if (['count', 'max'].includes(transKey)) {
+            return `{${transKey}}`;
         }
+
         translation =
             translation ||
             Language.data[Settings.language][transKey] ||
-            Language.data['en-us'][transKey] ||
+            Language.data.en[transKey] ||
             (optional ? '' : transKey);
 
-        return translation.replace(/\{([\w.]+)\}/g,
-            (full, key) => this.get(key, true) || `{${key}}`);
+        return translation.replace(/\{([\w.]+)\}/g, (full, key) =>
+            this.get(key, true) || `{${key}}`);
     },
 
     translateDom: function (context) {
@@ -36,63 +90,38 @@ var Language = {
 
     setMenuLanguage: function () {
         'use strict';
+
+        if (Language.data[Settings.language] === undefined) {
+            $.ajax({
+                url: `./langs/${Settings.language.replace('-', '_')}.json?nocache=${nocache}`,
+                async: false,
+                dataType: 'json',
+                success: function (json) {
+                    let result = {};
+
+                    for (let propName in json) {
+                        if (json[propName] !== "" && ($.isEmptyObject(Language.data.en) || Language.data.en[propName] !== json[propName])) {
+                            result[propName] = json[propName];
+                        }
+                    }
+
+                    Language.data[Settings.language] = result;
+                }
+            });
+        }
+
         const wikiBase = 'https://github.com/jeanropke/RDR2CollectorsMap/wiki/';
         const wikiPages = {
-            'de-de': 'RDO-Sammler-Landkarte-Benutzerhandbuch-(German)',
-            'en-us': 'RDO-Collectors-Map-User-Guide-(English)',
-            'fr-fr': 'RDO-Collectors-Map-Guide-d\'Utilisateur-(French)',
-            'pt-br': 'Guia-do-Usu%C3%A1rio---Mapa-de-Colecionador-(Portuguese)',
+            'en': 'RDO-Collectors-Map-User-Guide-(English)',
+            'de': 'RDO-Sammler-Landkarte-Benutzerhandbuch-(German)',
+            'fr': 'RDO-Collectors-Map-Guide-d\'Utilisateur-(French)',
+            'pt': 'Guia-do-Usu%C3%A1rio---Mapa-de-Colecionador-(Portuguese)',
         };
-        const wikiLang = Settings.language in wikiPages ? Settings.language : 'en-us';
+        const wikiLang = Settings.language in wikiPages ? Settings.language : 'en';
         $('.wiki-page').attr('href', wikiBase + wikiPages[wikiLang]);
 
         this.translateDom();
 
         $('#search').attr("placeholder", Language.get('menu.search_placeholder'));
-    },
-
-    // A helper function to "compile" all language files into a single JSON file.
-    getLanguageJson: function () {
-        var object = {};
-
-        // Loop through all available languages and try to retrieve both the `menu.json` and `item.json` files.
-        this.availableLanguages.forEach(language => {
-            try {
-                // Menu language strings.
-                $.ajax({
-                    url: `./langs/menu/${language}.json`,
-                    async: false,
-                    dataType: 'json',
-                    success: function (json) {
-                        object[language] = json;
-                    }
-                });
-                
-                // Item language strings.
-                $.ajax({
-                    url: `./langs/item/${language}.json`,
-                    async: false,
-                    dataType: 'json',
-                    success: function (json) {
-                        $.extend(object[language], json);
-                    }
-                });
-            } catch (error) {
-                // Do nothing for this language in case of a 404-error.
-                return;
-            }
-        });
-
-        // Download the object to a `language.json` file.
-        var element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(object)));
-        element.setAttribute('download', 'language.json');
-
-        element.style.display = 'none';
-        document.body.appendChild(element);
-
-        element.click();
-
-        document.body.removeChild(element);
     }
 };

@@ -7,7 +7,7 @@ var MadamNazar = {
     { "x": "-63.9375", "y": "105.3359" },
     { "x": "-60.875", "y": "130.6172" },
     { "x": "-66.0156", "y": "150.5" },
-    { "x": "-84.4375", "y": "82.0313" },
+    { "x": "-84.3203", "y": "82.4141" },
     { "x": "-90.0464", "y": "135.6875" },
     { "x": "-100.1406", "y": "48.8125" },
     { "x": "-104.7578", "y": "85.7813" },
@@ -22,17 +22,17 @@ var MadamNazar = {
       MadamNazar.currentLocation = _nazarParam;
       MadamNazar.currentDate = '';
       MadamNazar.addMadamNazar();
+      return Promise.resolve();
     }
     else {
-      $.getJSON('https://pepegapi.jeanropke.net/rdo/nazar')
-        .done(function (nazar) {
-          MadamNazar.currentLocation = nazar.nazar_id - 1;
-          MadamNazar.currentDate = new Date(nazar.date).toLocaleString(Settings.language, {
-            day: "2-digit", month: "long", year: "numeric"
-          });
-          MadamNazar.addMadamNazar();
-          console.info('%c[Nazar] Loaded!', 'color: #bada55; background: #242424');
+      return Loader.promises['nazar'].consumeJson(nazar => {
+        MadamNazar.currentLocation = nazar.nazar_id - 1;
+        MadamNazar.currentDate = new Date(nazar.date).toLocaleString(Settings.language, {
+          day: "2-digit", month: "long", year: "numeric"
         });
+        MadamNazar.addMadamNazar();
+        console.info('%c[Nazar] Loaded!', 'color: #bada55; background: #242424');
+      });
     }
   },
 
@@ -61,10 +61,10 @@ var MadamNazar = {
             `
         })
       });
-      const nazarLink = '<a href="https://twitter.com/MadamNazarIO" target="_blank">@MadamNazarIO</a>';
-      marker.bindPopup(`<h1>${Language.get('menu.madam_nazar')} - ${MadamNazar.currentDate}</h1>
-        <p style="text-align: center;">${Language.get('map.madam_nazar.desc')
-        .replace('{link}', nazarLink)}</p>`, { minWidth: 300 });
+      marker.bindPopup($(`<div>
+          <h1><span data-text="menu.madam_nazar"></span> - ${MadamNazar.currentDate}</h1>
+          <p style="text-align: center;" data-text="map.madam_nazar.desc"></p>
+        </div>`).translate().html(), { minWidth: 300 });
       Layers.itemMarkersLayer.addLayer(marker);
     }
   }
