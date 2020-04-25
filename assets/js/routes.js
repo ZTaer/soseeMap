@@ -3,6 +3,10 @@
  */
 
 var Routes = {
+  routesData: [],
+  polylines: null,
+  customRouteConnections: [],
+
   init: function () {
     $('#custom-routes').prop("checked", RouteSettings.customRouteEnabled);
 
@@ -40,6 +44,21 @@ var Routes = {
     }
   },
 
+  getCustomRoute: function () {
+    var customRoute = JSON.parse(localStorage.getItem("routes.customRoute"));
+
+    if (customRoute) {
+      Routes.loadCustomRoute(customRoute);
+      var itemsArray = customRoute.split(",");
+
+      for (var item of itemsArray) {
+        if (!Routes.customRouteConnections.includes(item)) {
+          Routes.addMarkerOnCustomRoute(item, true);
+        }
+      }
+    }
+  },
+
   loadCustomRoute: function (input) {
     try {
       var connections = [];
@@ -47,12 +66,8 @@ var Routes = {
       input = input.replace(/\r?\n|\r/g, '').replace(/\s/g, '').split(',');
 
       $.each(input, function (key, value) {
-        var _marker = MapBase.markers.filter(marker => marker.text == value && marker.day == Cycles.categories[marker.category])[0];
-        if (_marker == null) {
-          console.error(`Item not found on map: '${value}'`);
-        } else {
-          connections.push([_marker.lat, _marker.lng]);
-        }
+        var _marker = MapBase.markers.find(marker => marker.text == value && marker.isCurrent);
+        if (_marker) connections.push([_marker.lat, _marker.lng]);
       });
 
       if (Routes.polylines instanceof L.Polyline) {
@@ -69,8 +84,8 @@ var Routes = {
     }
   },
 
-  addMarkerOnCustomRoute: function (value) {
-    if (RouteSettings.customRouteEnabled) {
+  addMarkerOnCustomRoute: function (value, autoLoad = false) {
+    if (RouteSettings.customRouteEnabled || autoLoad) {
       if (Routes.customRouteConnections.includes(value)) {
         Routes.customRouteConnections = Routes.customRouteConnections.filter(function (item) {
           return item !== value;
@@ -83,7 +98,8 @@ var Routes = {
 
       $.each(Routes.customRouteConnections, function (key, item) {
         var _marker = MapBase.markers.filter(marker => marker.text == item && marker.day == Cycles.categories[marker.category])[0];
-        connections.push([_marker.lat, _marker.lng]);
+        if (_marker != undefined)
+          connections.push([_marker.lat, _marker.lng]);
       });
 
       if (Routes.polylines instanceof L.Polyline) {
@@ -112,10 +128,15 @@ var Routes = {
     }
   },
 
+  clearCustomRoutes: function () {
+    Routes.customRouteConnections = [];
+    RouteSettings.customRoute = '';
+    //this needs to be in try catch because throw an error when is no route to remove
+    try {
+      MapBase.map.removeLayer(Routes.polylines);
+    } catch(e) {};
+  },
 
-  routesData: [],
-  polylines: null,
-  customRouteConnections: [],
 
   /**
    * Path generator by Senexis
@@ -300,7 +321,7 @@ var Routes = {
     // Use path finder when enabled
     try {
       if (RouteSettings.usePathfinder) {
-        PathFinder.routegenStart(last, newMarkers, RouteSettings.fasttravelWeight, RouteSettings.railroadWeight);
+        PathFinder.routegenStart(last, newMarkers, RouteSettings.fasttravelWeight, RouteSettings.railroadWeight, true);
         return;
       }
     } catch (error) {

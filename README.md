@@ -11,10 +11,11 @@ Note: This project was created to improve the areas near Asia and China, and to 
     文件解析:
         0. 默认zh-hans: 
            a) script.js: 
-                const navLang = navigator.language.toLowerCase();
+                const navLang = navigator.language;
                 SettingProxy.addSetting(Settings, 'language', {
                     default: Language.availableLanguages.includes(navLang) ? navLang : 'zh-hans',
                 });
+                Settings.language = Language.availableLanguages.includes(Settings.language) ? Settings.language : 'zh-hans';
            b) index.html: <option value="zh-hans" selected >简体中文</option>
         1. 修改天数:
            a) cycles.json: current: "选择天数";

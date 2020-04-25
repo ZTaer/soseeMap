@@ -2,10 +2,6 @@
 - these statements have no requirements
 - code at multiple places depend on these
 */
-Object.defineProperty(Date.prototype, 'toISOUTCDateString', {
-  value: function () { return this.toISOString().split('T')[0]; },
-});
-
 Object.defineProperty(String.prototype, 'includesOneOf', {
   value: function (...elements) {
     var include = false;
@@ -28,14 +24,11 @@ var categories = [
   'fast_travel', 'treasure', 'random', 'user_pins'
 ];
 
-var categoriesDisabledByDefault =
-  JSON.parse(localStorage.getItem("disabled-categories")) || ['random'];
-
-var enabledCategories = categories.filter(item => !categoriesDisabledByDefault.includes(item));
-
-var categoryButtons = $(".clickable[data-type]");
-
-var debugMarkersArray = [];
+var enabledCategories = JSON.parse(localStorage.getItem("enabled-categories"));
+if (!enabledCategories) {
+  const disabledCats = JSON.parse(localStorage.getItem("disabled-categories")) || ['random'];
+  enabledCategories = categories.filter(item => !disabledCats.includes(item));
+}
 
 /*
 - Leaflet extentions require Leaflet loaded
@@ -60,12 +53,10 @@ L.LayerGroup.include({
 });
 
 /*
-- all <script> will be loaded and executed (because this <script> comes last)
-- DOM will be ready
-- everything in here will be executed
+- DOM will be ready, all scripts will be loaded (all loaded via DOM script elements)
+- everything in this file here will be executed
 - they can depend on their order here
-- unfortunately they do async data loading and no one checks if they finished
-- → NO GUARANTEE json data is available
+- unfortunately some async dependencies are not properly taken care of (yet)
 */
 $(function () {
   try {
@@ -80,25 +71,31 @@ $(function () {
 });
 
 function init() {
-  const navLang = navigator.language.toLowerCase();
+  const navLang = navigator.language;
   SettingProxy.addSetting(Settings, 'language', {
     default: Language.availableLanguages.includes(navLang) ? navLang : 'zh-hans',
   });
 
-  Inventory.load();
-  ItemsValue.load();
-  MapBase.init();
+  Settings.language = Language.availableLanguages.includes(Settings.language) ? Settings.language : 'zh-hans';
+
+  // Item.items, Collection.collections, Collection.weekly*
+  const itemsCollectionsWeekly = Item.init();
+  itemsCollectionsWeekly.then(MapBase.loadOverlays);
+  MapBase.mapInit();  // MapBase.map
+  Language.init();
   Language.setMenuLanguage();
   Pins.addToMap();
   changeCursor();
-  MapBase.loadWeeklySet();
-  Cycles.load();
+  const markers = MapBase.loadMarkers();  // MapBase.markers
+  const cycles = Promise.all([itemsCollectionsWeekly, markers]).then(Cycles.load);
   Inventory.init();
   MapBase.loadFastTravels();
   MadamNazar.loadMadamNazar();
-  Treasures.load();
-  MapBase.loadMarkers();
+  const treasureFinished = Treasure.init();
+  Promise.all([cycles, markers]).then(MapBase.runOncePostLoad);
   Routes.init();
+  // depends on MapBase, Treasure, Pins
+  Promise.all([treasureFinished, markers]).then(Menu.activateHandlers);
 
   if (Settings.isMenuOpened) $('.menu-toggle').click();
 
@@ -323,6 +320,10 @@ $("#copy-search-link").on("click", function () {
   setClipboardText(`https://map.sosee.org/?search=${$('#search').val()}`);
 });
 
+$("#clear-search").on("click", function () {
+  $("#search").val('').trigger("input");
+});
+
 $("#tools").on("change", function () {
   Settings.toolType = Number($("#tools").val());
   MapBase.addMarkers();
@@ -347,7 +348,7 @@ $("#clear-inventory").on("click", function () {
     marker.amount = 0;
   });
 
-  Inventory.save();
+  Item.overwriteAmountFromMarkers();
   Menu.refreshMenu();
   MapBase.addMarkers();
 });
@@ -355,20 +356,23 @@ $("#clear-inventory").on("click", function () {
 $("#custom-routes").on("change", function () {
   RouteSettings.customRouteEnabled = $("#custom-routes").prop('checked');
   changeCursor();
+  var mapRoute = Routes.customRouteConnections.join(',');
+  RouteSettings.customRoute = mapRoute;
 });
 
-$("#clear-custom-routes").on("click", function () {
-  Routes.customRouteConnections = [];
-  MapBase.map.removeLayer(Routes.polylines);
-});
+$("#clear-custom-routes").on("click", Routes.clearCustomRoutes);
 
 $('.map-alert').on('click', function () {
   Settings.alertClosed = true;
-  $('.map-alert').hide();
+  $('.map-alert').addClass('hidden');
 });
 
 $('.map-cycle-alert').on('click', function () {
-  $('.map-cycle-alert').hide();
+  $('.map-cycle-alert').addClass('hidden');
+});
+
+$('.filter-alert').on('click', function () {
+  $('.filter-alert').addClass('hidden');
 });
 
 $('#show-coordinates').on('change', function () {
@@ -387,6 +391,7 @@ $("#language").on("change", function () {
   Menu.refreshMenu();
   Cycles.setLocaleDate();
   MapBase.addMarkers();
+  Treasure.onLanguageChanged();
 });
 
 $("#marker-opacity").on("change", function () {
@@ -397,7 +402,7 @@ $("#marker-opacity").on("change", function () {
 $("#marker-size").on("change", function () {
   Settings.markerSize = Number($("#marker-size").val());
   MapBase.addMarkers();
-  Treasures.set();
+  Treasure.onSettingsChanged();
 });
 
 $("#enable-cycle-input").on("change", function () {
@@ -409,38 +414,6 @@ $("#enable-cycle-input").on("change", function () {
 $('#custom-marker-color').on("change", function () {
   Settings.markerCustomColor = Number($("#custom-marker-color").val());
   MapBase.addMarkers();
-});
-
-//Disable & enable collection category
-$('.clickable').on('click', function () {
-  var menu = $(this);
-  if (menu.data('type') === undefined) return;
-
-  $('[data-type=' + menu.data('type') + ']').toggleClass('disabled');
-  var isDisabled = menu.hasClass('disabled');
-
-  if (isDisabled) {
-    enabledCategories = $.grep(enabledCategories, function (value) {
-      return value != menu.data('type');
-    });
-
-    categoriesDisabledByDefault.push(menu.data('type'));
-  } else {
-    enabledCategories.push(menu.data('type'));
-
-    categoriesDisabledByDefault = $.grep(categoriesDisabledByDefault, function (value) {
-      return value != menu.data('type');
-    });
-  }
-
-  localStorage.setItem("disabled-categories", JSON.stringify(categoriesDisabledByDefault));
-
-  if (menu.data('type') == 'treasure')
-    Treasures.addToMap();
-  else if (menu.data('type') == 'user_pins')
-    Pins.addToMap();
-  else
-    MapBase.addMarkers();
 });
 
 //Open collection submenu
@@ -457,46 +430,33 @@ $('.submenu-only').on('click', function (e) {
 });
 
 // Sell collections on menu && collect all (add every item to the inventory from category)
-$('.menu-hidden .collection-sell, .menu-hidden .collection-collect-all').on('click', function (event) {
-  var collectionType = $(this).parent().parent().data('type');
-  var getMarkers = MapBase.markers.filter(_m => _m.category == collectionType && _m.day == Cycles.categories[_m.category]);
+$('.menu-hidden .collection-sell, .menu-hidden .collection-collect-all').on('click', event => {
+  'use strict';
+  const $target = $(event.target);
+  const category = $target.parent().parent().attr('data-type');
+  const changeAmount = $target.is(".collection-sell") ? -1 : 1;
 
-  var changeAmount = 0;
-  var target = $(event.target);
-  if (target.is($(".menu-hidden .collection-sell")))
-    changeAmount = -1;
+  MapBase.markers.filter(m => m.category === category && m.isCurrent).forEach(marker => {
+    if (marker.itemNumber === 1) Inventory.changeMarkerAmount(marker.legacyItemId, changeAmount);
 
-  else if (target.is($(".menu-hidden .collection-collect-all")))
-    changeAmount = 1;
-
-  $.each(getMarkers, function (key, value) {
-    if (value.subdata) {
-      if (value.text.endsWith('_1') || !value.text.match('[0-9]$'))
-        Inventory.changeMarkerAmount(value.subdata, changeAmount);
-    }
-    else {
-      Inventory.changeMarkerAmount(value.text, changeAmount);
+    if (InventorySettings.autoEnableSoldItems && marker.amount === 0 && marker.isCollected) {
+      MapBase.removeItemFromMap(marker.day, marker.text, marker.subdata, marker.category, true);
     }
   });
 });
 
 $('.weekly-item-listings .collection-sell').on('click', function (e) {
-  var weeklyItems = weeklySetData.sets[weeklySetData.current];
-
-  $.each(weeklyItems, function (key, value) {
-    var amount = Inventory.items[value.item];
-
-    if (amount !== undefined) {
-      Inventory.changeMarkerAmount(value.item.replace(/flower_/, ''), -1);
-    }
+  Collection.weeklyItems.forEach(weeklyItemId => {
+    Inventory.changeMarkerAmount(Item.items[weeklyItemId].legacyItemId, -1);
   });
 });
 
 // Reset collections on menu
 $('.collection-reset').on('click', function (e) {
   var collectionType = $(this).parent().parent().data('type');
-  var getMarkers = MapBase.markers.filter(_m => !_m.canCollect &&
-      _m.category == collectionType && _m.day == Cycles.categories[_m.category]);
+
+  var getMarkers = MapBase.markers.filter(_m =>
+    !_m.canCollect && _m.category == collectionType && _m.day == Cycles.categories[_m.category]);
 
   $.each(getMarkers, function (key, marker) {
     MapBase.removeItemFromMap(marker.day, marker.text, marker.subdata, marker.category,
@@ -509,20 +469,20 @@ $('.collection-reset').on('click', function (e) {
 // disable only collected items (one or more in the inventory)
 $('.disable-collected-items').on('click', function (e) {
   var collectionType = $(this).parent().parent().data('type');
-  var getMarkers = MapBase.markers.filter(_m => _m.canCollect &&
-    _m.category == collectionType && _m.day == Cycles.categories[_m.category]);
 
-  $.each(getMarkers, function (key, marker) {
+  var getMarkers = MapBase.markers.filter(_m =>
+    _m.canCollect && _m.category == collectionType && _m.isCurrent);
+
+  getMarkers.forEach(marker => {
     if (marker.amount > 0) {
-      var textMenu = marker.text.replace(/egg_|flower_(\w+)_\d/, '$1');
-      $(`[data-type=${textMenu}]`).addClass('disabled');
-      MapBase.removeItemFromMap(Cycles.categories[marker.category],
+      $(`[data-type=${marker.legacyItemId}]`).addClass('disabled');
+      MapBase.removeItemFromMap(marker.cycleName,
         marker.text, marker.subdata, marker.category, true);
     };
   });
 });
 
-//Remove item from map when using the menu
+// Remove item from map when using the menu
 $(document).on('click', '.collectible-wrapper[data-type]', function () {
   var collectible = $(this).data('type');
   var category = $(this).parent().data('type');
@@ -559,6 +519,7 @@ $('#enable-marker-popups-hover').on("change", function () {
 
 $('#enable-marker-shadows').on("change", function () {
   Settings.isShadowsEnabled = $("#enable-marker-shadows").prop('checked');
+  Treasure.onSettingsChanged();
   MapBase.map.removeLayer(Layers.itemMarkersLayer);
   MapBase.addMarkers();
 });
@@ -638,7 +599,7 @@ $('#enable-inventory').on("change", function () {
 
   MapBase.addMarkers();
   Menu.refreshWeeklyItems();
-  ItemsValue.reloadInventoryItems();
+  Menu.refreshTotalInventoryValue();
 
   $('#weekly-container .collection-value, .collection-sell, .counter, .counter-number').toggle(InventorySettings.isEnabled);
   $('#inventory-container').toggleClass("opened", InventorySettings.isEnabled);
@@ -682,6 +643,10 @@ $('#reset-collection-updates-inventory').on("change", function () {
   InventorySettings.resetButtonUpdatesInventory = $('#reset-collection-updates-inventory').prop('checked');
 });
 
+$('#auto-enable-sold-items').on("change", function () {
+  InventorySettings.autoEnableSoldItems = $('#auto-enable-sold-items').prop('checked');
+});
+
 $('#weekly-container .collection-value, .collection-sell, .counter, .counter-number').toggle(InventorySettings.isEnabled);
 
 $('#inventory-stack').on("change", function () {
@@ -700,16 +665,22 @@ $('#cookie-export').on("click", function () {
   try {
     var settings = localStorage;
 
-    // Remove irrelevant properties.
+    // Remove irrelevant properties (permanently from localStorage):
     delete settings.randid;
+    delete settings['inventory'];
+
+    // Remove irrelevant properties (from COPY of localStorage, only to do not export them):
+    settings = $.extend(true, {}, localStorage);
     delete settings['pinned-items'];
+    delete settings['routes.customRoute'];
 
     // Set file version
     settings.version = 2;
 
     var settingsJson = JSON.stringify(settings, null, 4);
+    var exportDate = new Date().toISOUTCDateString();
 
-    downloadAsFile("collectible-map-settings.json", settingsJson);
+    downloadAsFile(`collectible-map-settings-(${exportDate}).json`, settingsJson);
   } catch (error) {
     console.error(error);
     alert(Language.get('alerts.feature_not_supported'));

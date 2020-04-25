@@ -187,50 +187,40 @@ select,
     text-align: center;
 }
 
-.map-cycle-alert {
-    background: #000;
-    color: #fff;
-    width: 50%;
-    left: 25%;
-    right: 25%;
+.map-cycle-alert,
+.filter-alert {
     position: absolute;
-    bottom: 20px;
-    z-index: 1020;
-    padding: 10px;
+    z-index: 990;
     text-align: center;
-}
-
-@media (max-width: 1024px) {
-    .filter-alert {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 20px;
-        z-index: 990;
-        text-align: center;
-    }
-}
-
-@media (min-width: 1025px) {
-    .filter-alert {
-        position: absolute;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        bottom: 20px;
-        z-index: 990;
-        text-align: center;
-    }
-}
-
-.filter-alert span {
+    cursor: pointer;
     background-image: url(../images/menu_hover.png);
     background-size: 100% 100%;
     background-repeat: no-repeat;
     color: #fff;
     padding: 10px 25px;
     text-align: center;
-    overflow: hidden;
-    white-space: nowrap;
+}
+
+.map-cycle-alert {
+    z-index: 1010 !important;
+}
+
+@media (max-width: 1024px) {
+    .map-cycle-alert,
+    .filter-alert {
+        left: 2px;
+        right: 2px;
+        bottom: 2px;
+    }
+}
+
+@media (min-width: 1025px) {
+    .map-cycle-alert,
+    .filter-alert {
+        left: 50%;
+        transform: translate(-50%, -50%);
+        bottom: 0;
+    }
 }
 
 .map-alert .close-button,
@@ -744,7 +734,6 @@ a.wiki-page:visited {
     from {
         opacity: 0.0;
     }
-
     to {
         opacity: var(--animation-target-opacity);
     }
@@ -804,6 +793,11 @@ a.wiki-page:visited {
     text-align: center;
     margin-bottom: 12px !important;
     font-size: 14px;
+}
+
+.explain-text a {
+    color: #fff !important;
+    text-decoration: underline;
 }
 
 .no-margin-top {
@@ -869,6 +863,18 @@ a.wiki-page:visited {
     align-items: center;
 }
 
+.marker-content-wrapper p {
+    margin-bottom: 4px !important;
+}
+
+.marker-content-wrapper .unavailable-item {
+    color: #cc0000 !important;
+}
+
+.marker-content-wrapper .weekly-item {
+    color: #478200 !important;
+}
+
 .marker-warning-wrapper {
     display: flex;
     align-items: center;
@@ -890,6 +896,7 @@ a.wiki-page:visited {
 .collection-collected {
     min-width: 5.5rem;
 }
+
 
 /* Custom checkbox styling */
 
@@ -923,6 +930,7 @@ a.wiki-page:visited {
     cursor: not-allowed !important;
 }
 
+
 /* Custom action button styling */
 
 .input-container.clickable,
@@ -949,14 +957,22 @@ a.wiki-page:visited {
     background-image: url(../images/action_indicator_external.png) !important;
 }
 
-.input-action-copy {
+.input-action-copy,
+.input-action-clear {
     width: 30px;
-    background-image: url(../images/action_indicator_copy.png);
     background-size: auto 20px;
     background-repeat: no-repeat;
     background-position: center;
     margin-left: 6px;
     cursor: pointer;
+}
+
+.input-action-copy {
+    background-image: url(../images/action_indicator_copy.png);
+}
+
+.input-action-clear {
+    background-image: url(../images/action_indicator_clear.png);
 }
 
 .input-selection-arrow {
@@ -1030,6 +1046,13 @@ a.no-style:visited {
     margin-right: 10px;
 }
 
+.weekly-item-listing span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
 /* Bootstrap modal styling */
 
 .modal {
@@ -1084,7 +1107,6 @@ a.no-style:visited {
         text-align: center;
         padding: 0 !important;
     }
-
     .modal:before {
         content: '';
         display: inline-block;
@@ -1093,17 +1115,16 @@ a.no-style:visited {
         margin-right: -4px;
         /* Adjusts for spacing */
     }
-
     .modal-dialog {
         display: inline-block;
         text-align: left;
         vertical-align: middle;
     }
-
     .modal-sm {
         width: 450px;
     }
 }
+
 
 /* Fix buttons showing on top of sidebar on mobile menu */
 
@@ -1118,8 +1139,9 @@ a.no-style:visited {
     display: inline-grid;
 }
 
-.leaflet-popup-content > div.handover-wrapper-with-no-influence {
-    display: inherit; /* fallback for Edge18 */
+.leaflet-popup-content>div.handover-wrapper-with-no-influence {
+    display: inherit;
+    /* fallback for Edge18 */
     display: contents;
 }
 
@@ -1131,21 +1153,17 @@ a.no-style:visited {
     .timer-menu-opened {
         display: none;
     }
-
     .counter-menu-opened {
         display: none;
     }
-
     .side-menu .menu-hidden .collectible-icon {
         margin-top: 7px;
     }
-
     .counter-button {
         height: 32px;
         width: 32px;
         line-height: 1.5;
     }
-
     .side-menu .menu-hidden .collectible,
     .input-container label {
         line-height: 38px;
@@ -1158,19 +1176,17 @@ a.no-style:visited {
         left: -390px;
         top: 0;
     }
-
     .menu-opened {
         left: 0;
     }
-
     .timer-menu-opened {
         left: 395px;
     }
-
     .counter-menu-opened {
         left: 410px;
     }
 }
+
 
 /* Tutorial styling */
 
@@ -1186,6 +1202,7 @@ a.no-style:visited {
     background-size: 100% 100%;
     padding: 15px 25px;
 }
+
 
 /* Pathfinder styling */
 
@@ -1231,6 +1248,7 @@ a.no-style:visited {
     font-family: 'Courier New', Courier, monospace;
     text-transform: uppercase;
 }
+
 
 /* Leaflet Marker styling */
 
@@ -1286,6 +1304,7 @@ a.no-style:visited {
     bottom: -2px;
     left: 9px;
 }
+
 
 /* Donate form */
 

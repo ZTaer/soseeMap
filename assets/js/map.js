@@ -3,7 +3,6 @@
  */
 
 var fastTravelData;
-var weeklySetData = [];
 
 var MapBase = {
   minZoom: 2,
@@ -11,38 +10,38 @@ var MapBase = {
   map: null,
   overlays: [],
   // see building interiors in overlays; might not be rotated right
+  // (you also have to load overlays_beta.json instead of overlays.json in loader.js)
   interiors: false,
-  markers: [],
   importantItems: [],
   isDarkMode: false,
   updateLoopAvailable: true,
   requestLoopCancel: false,
   showAllMarkers: false,
 
-  init: function () {
+  mapInit: function () {
     'use strict';
 
     const mapBoundary = L.latLngBounds(L.latLng(-144, 0), L.latLng(0, 176));
     //Please, do not use the GitHub map tiles. Thanks
     const mapLayers = {
-      'map.layers.default':
-          L.tileLayer('assets/maps/detailed/{z}/{x}_{y}.jpg', {
-          noWrap: true,
-          bounds: mapBoundary,
-          attribution: '<a href="https://www.rockstargames.com/" target="_blank">Rockstar Games</a>'
-          }),
-      'map.layers.detailed':
-          L.tileLayer((true ? '' : 'https://jeanropke.b-cdn.net/') + 'assets/maps/detailed/{z}/{x}_{y}.jpg', {
-          noWrap: true,
-          bounds: mapBoundary,
-          attribution: '<a href="https://rdr2map.com/" target="_blank">RDR2Map</a>'
-          }),
-      'map.layers.dark':
-          L.tileLayer((true ? '' : 'https://jeanropke.b-cdn.net/') + 'assets/maps/darkmode/{z}/{x}_{y}.jpg', {
-          noWrap: true,
-          bounds: mapBoundary,
-          attribution: '<a href="https://github.com/TDLCTV" target="_blank">TDLCTV</a>'
-          }),
+        'map.layers.default':
+            L.tileLayer('assets/maps/detailed/{z}/{x}_{y}.jpg', {
+            noWrap: true,
+            bounds: mapBoundary,
+            attribution: '<a href="https://www.rockstargames.com/" target="_blank">Rockstar Games</a>'
+            }),
+        'map.layers.detailed':
+            L.tileLayer((true ? '' : 'https://jeanropke.b-cdn.net/') + 'assets/maps/detailed/{z}/{x}_{y}.jpg', {
+            noWrap: true,
+            bounds: mapBoundary,
+            attribution: '<a href="https://rdr2map.com/" target="_blank">RDR2Map</a>'
+            }),
+        'map.layers.dark':
+            L.tileLayer((true ? '' : 'https://jeanropke.b-cdn.net/') + 'assets/maps/darkmode/{z}/{x}_{y}.jpg', {
+            noWrap: true,
+            bounds: mapBoundary,
+            attribution: '<a href="https://github.com/TDLCTV" target="_blank">TDLCTV</a>'
+            }),
     };
 
     // Override bindPopup to include mouseover and mouseout logic.
@@ -50,7 +49,7 @@ var MapBase = {
       bindPopup: function (content, options) {
         // TODO: Check if we can move this from here.
         if (content instanceof L.Popup) {
-          Util.setOptions(content, options);
+          L.Util.setOptions(content, options);
           this._popup = content;
           content._source = this;
         } else {
@@ -141,7 +140,7 @@ var MapBase = {
 
     MapBase.map.doubleClickZoom[Settings.isDoubleClickZoomEnabled ? 'enable' : 'disable']();
 
-    var southWest = L.latLng(-160, -50),
+    var southWest = L.latLng(-160, -120),
       northEast = L.latLng(25, 250),
       bounds = L.latLngBounds(southWest, northEast);
     MapBase.map.setMaxBounds(bounds);
@@ -150,13 +149,14 @@ var MapBase = {
     Layers.oms.addListener('spiderfy', function (markers) {
       MapBase.map.closePopup();
     });
+  },
 
-    $.getJSON(`data/overlays${MapBase.interiors ? '_beta' : ''}.json?nocache=${nocache}`)
-      .done(function (data) {
-        MapBase.overlays = data;
-        MapBase.setMapBackground();
-        console.info('%c[Overlays] Loaded!', 'color: #bada55; background: #242424');
-      });
+  loadOverlays: function () {
+    return Loader.promises['overlays'].consumeJson(data => {
+      MapBase.overlays = data;
+      MapBase.setMapBackground();
+      console.info('%c[Overlays] Loaded!', 'color: #bada55; background: #242424');
+    });
   },
 
   setMapBackground: function () {
@@ -164,8 +164,7 @@ var MapBase = {
     MapBase.isDarkMode = Settings.baseLayer === 'map.layers.dark' ? true : false;
     $('#map').css('background-color', MapBase.isDarkMode ? '#3d3d3d' : '#d2b790');
     MapBase.setOverlays();
-    // Update the highlighted markers to show the appropriate marker colors
-    Inventory.updateLowAmountItems();
+    Inventory.updateItemHighlights();
   },
 
   setOverlays: function () {
@@ -186,9 +185,14 @@ var MapBase = {
         const scale = 0.00076;
         const x = (value.width / 2) * scale;
         const y = (value.height / 2) * scale;
-        bounds = [[(value.lat + y), (value.lng - x)], [(value.lat - y), (value.lng + x)]];
+        bounds = [
+          [(value.lat + y), (value.lng - x)],
+          [(value.lat - y), (value.lng + x)]
+        ];
       }
-      Layers.overlaysLayer.addLayer(L.imageOverlay(overlay, bounds, { opacity: Settings.overlayOpacity }));
+      Layers.overlaysLayer.addLayer(L.imageOverlay(overlay, bounds, {
+        opacity: Settings.overlayOpacity
+      }));
     };
 
     $.each(MapBase.overlays, addOverlay);
@@ -196,43 +200,34 @@ var MapBase = {
   },
 
   loadMarkers: function () {
-    $.getJSON('data/items.json?nocache=' + nocache)
-      .done(MapBase.setMarkers);
-  },
-
-  setMarkers: function (data) {
     'use strict';
-    $.each(data, function (_category, _cycles) {
-      $.each(_cycles, function (cycleName, _markers) {
-        $.each(_markers, function (index, marker) {
-          MapBase.markers.push(new Marker(marker, cycleName, _category));
+    MapBase.markers = [];
+    return Loader.promises['items'].consumeJson(data => {
+      $.each(data, (category, allCycles) => {
+        $.each(allCycles, (cycleName, markers) => {
+          markers.forEach(marker => MapBase.markers.push(new Marker(marker, cycleName, category)));
         });
       });
     });
+  },
+
+  runOncePostLoad: function () {
+    'use strict';
     uniqueSearchMarkers = MapBase.markers;
 
     // Reset markers daily.
     var date = new Date().toISOUTCDateString();
 
     if (localStorage.getItem('main.date') === null || date != localStorage.getItem('main.date')) {
-      var markers = MapBase.markers;
-
-      $.each(markers, function (key, value) {
-
-        if (Settings.resetMarkersDaily) {
-          markers[key].isCollected = false;
+      MapBase.markers.forEach(marker => {
+        if (Settings.resetMarkersDaily || marker.category === 'random') {
+          marker.isCollected = false;
         }
-        else if (value.category === 'random') {
-          markers[key].isCollected = false;
-        }
-
         if (InventorySettings.resetInventoryDaily) {
-          markers[key].amount = 0;
+          marker.amount = 0;
         }
       });
-
-      MapBase.markers = markers;
-      Inventory.save();
+      Item.overwriteAmountFromMarkers();
       Menu.refreshMenu();
     }
 
@@ -250,22 +245,17 @@ var MapBase = {
     // Navigate to marker via URL.
     const markerParam = getParameterByName('m');
     if (markerParam) {
-      var goTo = MapBase.markers.filter(_m => _m.text == markerParam && _m.day == Cycles.categories[_m.category])[0];
-
-      //if a marker is passed on url, check if is valid
-      if (goTo === undefined || goTo === null) return;
-
-      //set map view with marker lat & lng
+      const goTo = MapBase.markers.find(_m => _m.text === markerParam && _m.isCurrent);
+      if (!goTo) return;
       MapBase.map.setView([goTo.lat, goTo.lng], 6);
 
       //check if marker category is enabled, if not, enable it
-      if (Layers.itemMarkersLayer.getLayerById(goTo.text) == null) {
+      if (!Layers.itemMarkersLayer.getLayerById(goTo.text)) {
         enabledCategories.push(goTo.category);
         MapBase.addMarkers();
         $(`[data-type="${goTo.category}"]`).removeClass('disabled');
       }
 
-      //open marker popup
       Layers.itemMarkersLayer.getLayerById(goTo.text).openPopup();
     }
   },
@@ -293,7 +283,8 @@ var MapBase = {
       $.each(searchTerms, function (id, term) {
 
         searchMarkers = searchMarkers.concat(MapBase.markers.filter(_marker =>
-            Language.get(_marker.itemTranslationKey).toLowerCase().includes(term.toLowerCase())
+          Language.get(_marker.itemTranslationKey).toLowerCase().includes(term.toLowerCase()) ||
+          _marker.itemNumberStr === term
         ));
 
         $.each(searchMarkers, function (i, el) {
@@ -321,8 +312,6 @@ var MapBase = {
 
     if (Layers.itemMarkersLayer != null)
       Layers.itemMarkersLayer.clearLayers();
-    if (Layers.miscLayer != null)
-      Layers.miscLayer.clearLayers();
 
     MapBase.updateLoopAvailable = false;
     MapBase.yieldingLoop(
@@ -338,7 +327,8 @@ var MapBase = {
         MapBase.requestLoopCancel = false;
         Menu.refreshItemsCounter();
         MapBase.loadImportantItems();
-        Inventory.updateLowAmountItems();
+        Inventory.updateItemHighlights();
+        Routes.getCustomRoute();
       }
     );
 
@@ -347,7 +337,6 @@ var MapBase = {
 
     MapBase.addFastTravelMarker();
 
-    Treasures.addToMap();
     MadamNazar.addMadamNazar();
 
     if (refreshMenu) {
@@ -362,102 +351,61 @@ var MapBase = {
       Routes.generatePath(true);
   },
 
-  loadWeeklySet: function () {
-    $.getJSON('data/weekly.json?nocache=' + nocache)
-      .done(function (data) {
-        weeklySetData = data;
-
-        var _weekly = getParameterByName('weekly');
-        if (_weekly != null) {
-          if (weeklySetData.sets[_weekly]) {
-            weeklySetData.current = _weekly;
-          }
-        }
-      });
-    console.info('%c[Weekly Sets] Loaded!', 'color: #bada55; background: #242424');
-  },
-
   removeItemFromMap: function (day, text, subdata, category, skipInventory = false) {
-    if (text.endsWith('_treasure')) {
-      if (Treasures.enabledTreasures.includes(text))
-        Treasures.enabledTreasures = $.grep(Treasures.enabledTreasures, function (treasure) {
-          return treasure !== text;
-        });
-      else
-        Treasures.enabledTreasures.push(text);
+    var markers = MapBase.markers.filter(function (marker) {
+      return marker.day == day && (marker.text == text || marker.subdata == subdata);
+    });
 
-      $(`[data-type=${text}]`).toggleClass('disabled');
+    if (markers == null) return;
 
-      Treasures.addToMap();
-      Treasures.save();
-    } else {
-      var markers = MapBase.markers.filter(function (marker) {
-        return marker.day == day && (marker.text == text || marker.subdata == subdata);
-      });
+    var subdataCategoryIsDisabled =
+      (text == subdata && !$(`[data-type=${subdata}]`).hasClass('disabled'));
 
-      if (markers == null) return;
+    $.each(markers, function (key, marker) {
+      if (text != subdata && marker.text != text) return;
 
-      var subdataCategoryIsDisabled = (text == subdata && !$(`[data-type=${subdata}]`).hasClass('disabled'));
+      var changeAmount = 0;
 
-      $.each(markers, function (key, marker) {
-        if (text != subdata && marker.text != text) return;
-
-        var changeAmount = 0;
-
+      if (marker.isCurrent) {
         if ((marker.subdata == subdata && subdataCategoryIsDisabled) || marker.canCollect) {
-          if (marker.day == Cycles.categories[marker.category]) {
-            marker.isCollected = true;
-            changeAmount = 1;
-          }
+          marker.isCollected = true;
+          changeAmount = 1;
         } else {
-          if (marker.day == Cycles.categories[marker.category]) {
-            marker.isCollected = false;
-            changeAmount = -1;
-          }
+          marker.isCollected = false;
+          changeAmount = -1;
         }
+      }
 
-        Inventory.changeMarkerAmount(marker.subdata || marker.text, changeAmount, skipInventory);
+      Inventory.changeMarkerAmount(marker.legacyItemId, changeAmount, skipInventory);
 
-        if (!InventorySettings.isEnabled) {
-          if (marker.isCollected && marker.day == Cycles.categories[marker.category]) {
-            $(`[data-marker=${marker.text}]`).css('opacity', Settings.markerOpacity / 3);
-            $(`[data-type=${marker.subdata || marker.text}]`).addClass('disabled');
-          } else {
-            $(`[data-marker=${marker.text}]`).css('opacity', Settings.markerOpacity);
-            $(`[data-type=${marker.subdata || marker.text}]`).removeClass('disabled');
-          }
-
-          MapBase.toggleCollectibleMenu(marker.day, marker.text, marker.subdata, marker.category, markers);
+      if (!InventorySettings.isEnabled) {
+        if (marker.isCollected && marker.isCurrent) {
+          $(`[data-marker=${marker.text}]`).css('opacity', Settings.markerOpacity / 3);
+          $(`[data-type=${marker.legacyItemId}]`).addClass('disabled');
+        } else {
+          $(`[data-marker=${marker.text}]`).css('opacity', Settings.markerOpacity);
+          $(`[data-type=${marker.legacyItemId}]`).removeClass('disabled');
         }
-
-        try {
-          if (PathFinder !== undefined) {
-            PathFinder.wasRemovedFromMap(marker);
-          }
-        } catch (error) {
-          alert(Language.get('alerts.feature_not_supported'));
-          console.error(error);
+        if (marker.isCurrent && ['egg', 'flower'].includes(marker.category)) {
+          $(`[data-type=${marker.legacyItemId}]`).toggleClass('disabled',
+            markers.every(m => !m.canCollect));
         }
-      });
-    }
+      }
+
+      try {
+        if (PathFinder !== undefined) {
+          PathFinder.wasRemovedFromMap(marker);
+        }
+      } catch (error) {
+        alert(Language.get('alerts.feature_not_supported'));
+        console.error(error);
+      }
+    });
 
     if (RouteSettings.ignoreCollected)
       Routes.generatePath();
 
     Menu.refreshItemsCounter();
-  },
-
-  toggleCollectibleMenu: function (day, text, subdata, category, markers = null) {
-    if (markers === null) {
-      markers = MapBase.markers.filter(function (marker) {
-        return marker.day == day && (marker.text == text || marker.subdata == subdata);
-      });
-    }
-
-    if (subdata != '' && day != null && day == Cycles.categories[category]) {
-      $(`[data-type=${subdata}]`).toggleClass('disabled',
-        markers.every(marker => !marker.canCollect));
-    }
   },
 
   getIconColor: function (marker) {
@@ -543,29 +491,8 @@ var MapBase = {
     }
   },
 
-  getToolIcon: function (type) {
-    switch (type) {
-      case '-1':
-        return '<img class="tool-type" src="assets/images/cross.png">';
-      default:
-      case '0':
-        return '';
-      case '1':
-        return '<img class="tool-type" src="assets/images/shovel.png">';
-      case '2':
-        return '<img class="tool-type" src="assets/images/magnet.png">';
-    }
-  },
-
   addMarkerOnMap: function (marker, opacity = 1) {
-    marker.isVisible = false;
-
-    if (marker.day != Cycles.categories[marker.category] && !MapBase.showAllMarkers) return;
-    if (!uniqueSearchMarkers.includes(marker)) return;
-    if (!enabledCategories.includes(marker.category)) return;
-    if (marker.subdata != null && categoriesDisabledByDefault.includes(marker.subdata)) return;
-
-    marker.isVisible = true;
+    if (!marker.isVisible) return;
 
     var toolType = Settings.toolType;
     var markerTool = parseInt(marker.tool);
@@ -606,7 +533,7 @@ var MapBase = {
     }
 
     // Timed flower overlay override
-    if (marker.subdata == 'agarita' || marker.subdata == 'blood_flower') {
+    if (['flower_agarita', 'flower_blood_flower'].includes(marker.itemId)) {
       overlay = '<img class="overlay" src="./assets/images/icons/overlay_time.png" alt="Overlay">';
     }
 
@@ -614,7 +541,7 @@ var MapBase = {
       overlay = '<img class="overlay" src="./assets/images/icons/overlay_cross.png" alt="Overlay">';
     }
 
-    var tempMarker = L.marker([marker.lat, marker.lng], {
+    marker.lMarker = L.marker([marker.lat, marker.lng], {
       opacity: marker.canCollect ? opacity : opacity / 3,
       icon: new L.DivIcon.DataMarkup({
         iconSize: [35 * Settings.markerSize, 45 * Settings.markerSize],
@@ -631,26 +558,28 @@ var MapBase = {
       })
     });
 
-    tempMarker.id = marker.text;
+    marker.lMarker.id = marker.text;
 
     if (Settings.isPopupsEnabled) {
-      tempMarker.bindPopup(marker.popupContent.bind(marker), { minWidth: 300, maxWidth: 400 });
+      marker.lMarker.bindPopup(marker.popupContent.bind(marker), { minWidth: 300, maxWidth: 400 });
     }
 
-    tempMarker.on("click", function (e) {
-      if (!Settings.isPopupsEnabled) MapBase.removeItemFromMap(marker.day || '', marker.text || '', marker.subdata || '', marker.category || '');
+    marker.lMarker.on("click", function (e) {
+      if (!Settings.isPopupsEnabled) {
+        MapBase.removeItemFromMap(marker.day, marker.text, marker.subdata || '', marker.category);
+      }
 
       Routes.addMarkerOnCustomRoute(marker.text);
       if (RouteSettings.customRouteEnabled) e.target.closePopup();
     });
 
-    tempMarker.on("contextmenu", function (e) {
-      MapBase.removeItemFromMap(marker.day || '', marker.text || '', marker.subdata || '', marker.category || '');
+    marker.lMarker.on("contextmenu", function (e) {
+      MapBase.removeItemFromMap(marker.day, marker.text, marker.subdata || '', marker.category);
     });
 
-    Layers.itemMarkersLayer.addLayer(tempMarker);
+    Layers.itemMarkersLayer.addLayer(marker.lMarker);
     if (Settings.isMarkerClusterEnabled)
-      Layers.oms.addMarker(tempMarker);
+      Layers.oms.addMarker(marker.lMarker);
   },
 
   gameToMap: function (lat, lng, name = "Debug Marker") {
@@ -714,11 +643,10 @@ var MapBase = {
   },
 
   loadFastTravels: function () {
-    $.getJSON('data/fasttravels.json?nocache=' + nocache)
-      .done(function (data) {
-        fastTravelData = data;
-      });
-    console.info('%c[Fast travels] Loaded!', 'color: #bada55; background: #242424');
+    return Loader.promises['fasttravels'].consumeJson(data => {
+      fastTravelData = data;
+      console.info('%c[Fast travels] Loaded!', 'color: #bada55; background: #242424');
+    });
   },
 
   addFastTravelMarker: function () {
@@ -780,6 +708,11 @@ var MapBase = {
 
     if (Settings.isPinsPlacingEnabled)
       Pins.addPin(coords.latlng.lat, coords.latlng.lng);
+  },
+
+  updateOnDayChange: function () {
+    // put here all functions that needs to be executed on day change
+    Routes.clearCustomRoutes(true);
   },
 
   yieldingLoop: function (count, chunksize, callback, finished) {

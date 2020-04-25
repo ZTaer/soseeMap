@@ -8,16 +8,12 @@ var Cycles = {
   yesterday: [],
 
   load: function () {
-    var date = new Date();
-    var dateString = (date.getUTCMonth() + 1) + '-' + date.getUTCDate() + '-' + date.getUTCFullYear();
-
-    $.getJSON(`data/cycles.json?nocache=${nocache}&date=${dateString}`)
-      .done(function (_data) {
-        Cycles.data = _data;
-        Cycles.getTodayCycle();
-        setInterval(Cycles.checkForUpdate, 1000 * 10);
-      });
-    console.info('%c[Cycles] Loaded!', 'color: #bada55; background: #242424');
+    return Loader.promises['cycles'].consumeJson(_data => {
+      Cycles.data = _data;
+      Cycles.getTodayCycle();
+      setInterval(Cycles.checkForUpdate, 1000 * 10);
+      console.info('%c[Cycles] Loaded!', 'color: #bada55; background: #242424');
+    });
   },
   getFreshSelectedDay: function () {
     'use strict';
@@ -61,10 +57,10 @@ var Cycles = {
     Cycles.categories.heirlooms = _data.heirlooms;
     Cycles.categories.coin = _data.coin;
     Cycles.categories.random = _data.random;
-    Cycles.setCustomCycles();
-    Cycles.setCycles();
     Cycles.setLocaleDate();
     Cycles.nextDayDataExists();
+    Cycles.setCustomCycles();
+    Cycles.setCycles();
   },
 
   setCustomCycles: function () {
@@ -113,12 +109,14 @@ var Cycles = {
   },
   setLocaleDate: function () {
     'use strict';
+    if (Cycles.selectedDay === undefined) return;
     const options = { timeZone: "UTC", day: "2-digit", month: "long" };
     $('.cycle-data').text(Cycles.selectedDay.toLocaleString(Settings.language, options));
   },
 
   checkForUpdate: function () {
     'use strict';
+    if (Cycles.selectedDay === undefined) return;
     if (Cycles.getFreshSelectedDay().valueOf() !== Cycles.selectedDay.valueOf()) {
       if (Cycles.offset !== 1) {
         Cycles.offset = 0;
@@ -128,6 +126,7 @@ var Cycles = {
         Cycles.offset = 0;
         $('div>span.cycle-data').removeClass('not-found');
       }
+      MapBase.updateOnDayChange();
     }
   },
 
