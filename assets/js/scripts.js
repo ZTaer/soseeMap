@@ -73,10 +73,10 @@ $(function () {
 function init() {
   const navLang = navigator.language;
   SettingProxy.addSetting(Settings, 'language', {
-    default: Language.availableLanguages.includes(navLang) ? navLang : 'zh-hans',
+    default: Language.availableLanguages.includes(navLang) ? navLang : 'zh-Hans',
   });
 
-  Settings.language = Language.availableLanguages.includes(Settings.language) ? Settings.language : 'zh-hans';
+  Settings.language = Language.availableLanguages.includes(Settings.language) ? Settings.language : 'zh-Hans';
 
   // Item.items, Collection.collections, Collection.weekly*
   const itemsCollectionsWeekly = Item.init();
