@@ -1,27 +1,14 @@
 {
-  "name": "rdr2collectorsmap",
+  "name": "SoseeMap",
   "version": "1.0.0",
-  "description": "Items locations credits to [GTA Series Videos](https://www.youtube.com/user/GTASeriesVideos), [Gtax Barrett](https://twitter.com/gtaxbarrett), [IronJeff80](https://github.com/IronJeff80) and [/r/RedDeadOnline](https://www.reddit.com/r/RedDeadOnline)",
   "main": "index.js",
+  "repository": "git@github.com:ZTaer/soseeMap.git",
+  "author": "ztaer <ztaerkiller@gmail.com>",
+  "license": "MIT",
   "scripts": {
-    "dev": "webpack --mode development",
-    "build": "webpack --mode production",
-    "start": "webpack-dev-server --mode development --open"
+    "start": "lite-server"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ZTaer/RDR2CollectorsMap.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ZTaer/RDR2CollectorsMap/issues"
-  },
-  "homepage": "https://github.com/ZTaer/RDR2CollectorsMap#readme",
-  "dependencies": {
-    "html-webpack-plugin": "^3.2.0",
-    "webpack": "^4.41.2",
-    "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^3.9.0"
+  "devDependencies": {
+    "lite-server": "^2.5.4"
   }
 }
