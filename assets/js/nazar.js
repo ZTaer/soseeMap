@@ -1,17 +1,17 @@
 var MadamNazar = {
   possibleLocations: [
-    { "x": "-40.5625", "y": "109.0781" },
-    { "x": "-43", "y": "132.8281" },
-    { "x": "-36.75", "y": "153.6875" },
-    { "x": "-56.1719", "y": "78.5938" },
-    { "x": "-63.9375", "y": "105.3359" },
-    { "x": "-60.875", "y": "130.6172" },
-    { "x": "-66.0156", "y": "150.5" },
-    { "x": "-84.3203", "y": "82.4141" },
-    { "x": "-90.0464", "y": "135.6875" },
-    { "x": "-100.1406", "y": "48.8125" },
-    { "x": "-104.7578", "y": "85.7813" },
-    { "x": "-123.8438", "y": "34.7656" }
+    { "x": "-40.7817", "y": "109.4863", "id": "der" },
+    { "x": "-43.1046", "y": "132.8263", "id": "grz" },
+    { "x": "-36.5097", "y": "154.1859", "id": "bbr" },
+    { "x": "-56.1619", "y": "78.5000", "id": "bgv" },
+    { "x": "-63.8927", "y": "105.3496", "id": "hrt_w" },
+    { "x": "-60.9622", "y": "130.6067", "id": "hrt_e" },
+    { "x": "-65.9688", "y": "150.4468", "id": "blu" },
+    { "x": "-84.2973", "y": "82.4512", "id": "tal" },
+    { "x": "-90.0802", "y": "135.6969", "id": "scm" },
+    { "x": "-100.0742", "y": "49.0765", "id": "cho" },
+    { "x": "-104.7679", "y": "85.7222", "id": "hen" },
+    { "x": "-123.9039", "y": "34.8213", "id": "rio" },
   ],
   currentLocation: null,
   currentDate: null,
@@ -37,23 +37,24 @@ var MadamNazar = {
   },
 
   addMadamNazar: function () {
+    const markerSize = Settings.markerSize;
     if (MadamNazar.currentLocation == null)
       return;
 
     if (enabledCategories.includes('nazar')) {
       var shadow = Settings.isShadowsEnabled ?
         `<img class="shadow"
-          width="${35 * Settings.markerSize}"
-          height="${16 * Settings.markerSize}"
+          width="${35 * markerSize}"
+          height="${16 * markerSize}"
           src="./assets/images/markers-shadow.png"
           alt="Shadow">` :
         '';
       const cl = MadamNazar.possibleLocations[MadamNazar.currentLocation];
       var marker = L.marker([cl.x, cl.y], {
         icon: L.divIcon({
-          iconSize: [35 * Settings.markerSize, 45 * Settings.markerSize],
-          iconAnchor: [17 * Settings.markerSize, 42 * Settings.markerSize],
-          popupAnchor: [0 * Settings.markerSize, -28 * Settings.markerSize],
+          iconSize: [35 * markerSize, 45 * markerSize],
+          iconAnchor: [17 * markerSize, 42 * markerSize],
+          popupAnchor: [1 * markerSize, -29 * markerSize],
           html: `
               <img class="icon" src="./assets/images/icons/nazar.png" alt="Icon">
               <img class="background" src="./assets/images/icons/marker_red.png" alt="Background">

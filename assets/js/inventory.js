@@ -1,13 +1,9 @@
 var Inventory = {
-  items: {},
-  highlightStyles: { STATIC_RECOMMENDED: 0, STATIC_DEFAULT: 1, ANIMATED_RECOMMENDED: 2, ANIMATED_DEFAULT: 3 },
-
   init: function () {
     $('#enable-inventory-menu-update').prop("checked", InventorySettings.isMenuUpdateEnabled);
     $('#enable-inventory-popups').prop("checked", InventorySettings.isPopupsEnabled);
     $('#enable-inventory').prop("checked", InventorySettings.isEnabled);
     $('#highlight_low_amount_items').prop("checked", InventorySettings.highlightLowAmountItems);
-    $('#highlight_style').val(InventorySettings.highlightStyle);
     $('#inventory-container').toggleClass("opened", InventorySettings.isEnabled);
     $('#inventory-stack').val(InventorySettings.stackSize);
     $('#soft-flowers-inventory-stack').val(InventorySettings.flowersSoftStackSize);
@@ -39,7 +35,7 @@ var Inventory = {
       return;
     }
     Object.entries(Collection.collections).forEach(([category, collection]) => {
-      const contourImg = $(`[data-marker*=${category}] > img.marker-contour`);
+      const contourImg = $(`[data-marker*=${category}] img.marker-contour`);
       contourImg.removeClass(function (index, className) {
         return (className.match(/highlight-low-amount-items-\S+/gm) || []).join(' ');
       });
@@ -52,19 +48,19 @@ var Inventory = {
 
       const collectionAverage = collection.averageAmount();
       markers.map(_m => {
-        Inventory.updateMarkerColor(_m);
+        _m.updateColor();
 
         if (!_m.canCollect) return;
 
-        const weight = Math.max(0, ((collectionAverage - _m.amount) / InventorySettings.stackSize));
+        const weight = Math.max(0, ((collectionAverage - _m.item.amount) /
+          InventorySettings.stackSize));
         const scaledWeight = Math.min(1, weight * 2.4);
 
-        const contourImg = $(`[data-marker=${_m.text}] > img.marker-contour`);
+        const contourImg = $(`[data-marker=${_m.text}] img.marker-contour`);
         if (weight < 0.02) {
           contourImg.css('opacity', 0.0);
         }
-        else if (weight < 0.3 ||
-          InventorySettings.highlightStyle < Inventory.highlightStyles.ANIMATED_RECOMMENDED) {
+        else if (weight < 0.3 || InventorySettings.highlightStyle === 'static') {
             contourImg.css('opacity', scaledWeight);
         }
         else {
@@ -75,41 +71,29 @@ var Inventory = {
     });
   },
 
-  updateMarkerColor: function (marker) {
-    var markerBackgroundColor = MapBase.getIconColor(marker);
-    var markerContourColor = MapBase.getContourColor(markerBackgroundColor);
+  changeMarkerAmount: function (legacyItemId, changeAmount, skipInventory = false) {
+    var sameItemMarkers = MapBase.markers.filter(marker => marker.legacyItemId === legacyItemId);
 
-    var markerSrc = `./assets/images/icons/marker_${markerBackgroundColor}.png?v=${nocache}`;
-    var markerContourSrc = `./assets/images/icons/contours/contour_marker_${markerContourColor}.png?v=${nocache}`;
-
-    $(`[data-marker=${marker.text}] > img.marker-contour`).attr('src', markerContourSrc);
-    $(`[data-marker=${marker.text}] > img.background`).attr('src', markerSrc);
-  },
-
-  changeMarkerAmount: function (name, amount, skipInventory = false) {
-    var sameItemMarkers = MapBase.markers.filter(marker => marker.legacyItemId === name);
+    const item = sameItemMarkers[0].item;
+    if (item && (!skipInventory || skipInventory && InventorySettings.isMenuUpdateEnabled)) {
+      item.amount += changeAmount;
+    }
 
     sameItemMarkers.forEach(marker => {
-      if (!skipInventory || skipInventory && InventorySettings.isMenuUpdateEnabled) {
-        marker.amount = parseInt(marker.amount) + amount;
-
-        if (marker.amount < 0)
-          marker.amount = 0;
-      }
-
       if (!InventorySettings.isEnabled) return;
 
       const popup = marker.lMarker && marker.lMarker.getPopup();
       if (popup) popup.update();
 
-      $(`[data-type=${name}] .counter-number`)
-        .text(marker.amount)
-        .toggleClass('text-danger', marker.amount >= InventorySettings.stackSize);
+      const amount = marker.item && marker.item.amount;
+      $(`[data-type=${legacyItemId}] .counter-number`)
+        .text(amount)
+        .toggleClass('text-danger', amount >= InventorySettings.stackSize);
 
       if ((marker.isCollected ||
-        (InventorySettings.isEnabled && marker.amount >= InventorySettings.stackSize)) &&
+        (InventorySettings.isEnabled && amount >= InventorySettings.stackSize)) &&
         marker.isCurrent ||
-        (marker.category === 'flower' && marker.amount >= InventorySettings.flowersSoftStackSize)) {
+        (marker.category === 'flower' && amount >= InventorySettings.flowersSoftStackSize)) {
         $(`[data-marker=${marker.text}]`).css('opacity', Settings.markerOpacity / 3);
         $(`[data-type=${marker.legacyItemId}]`).addClass('disabled');
       }
@@ -129,7 +113,7 @@ var Inventory = {
     if ($("#routes").val() == 1)
       Routes.drawLines();
 
-    Item.overwriteAmountFromMarkers();
+    Inventory.updateItemHighlights();
     Menu.refreshItemsCounter();
     Menu.refreshWeeklyItems();
   }
