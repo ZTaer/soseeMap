@@ -43,7 +43,7 @@ Note: This project was created to improve the areas near Asia and China, and to 
             };
         3. 设置收藏品分享链接:
            a) map.js中
-           b) 找到'setClipboardText'修改如下
+           b) 找到'setClipboardText'修改如下: https://jeanropke.github.io/
            c) `<a href="javascript:void(0)" onclick="setClipboardText('https://map.sosee.org/?m=${marker.text}')">${Language.get('map.copy_link')}</a>`;
 </pre>
 <pre>

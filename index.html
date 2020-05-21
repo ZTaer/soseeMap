@@ -55,15 +55,15 @@
   <link rel="stylesheet" href="assets/css/leaflet.css" />
   <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
   
-  <link rel="stylesheet" href="assets/css/styles.css?nocache=1443" />
+  <link rel="stylesheet" href="assets/css/styles.css?nocache=1447" />
   
   <!-- 扩展 -->
-  <link rel="stylesheet" href="assets/css/exp.css?nocache=1443" />
+  <link rel="stylesheet" href="assets/css/exp.css?nocache=1447" />
   <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css" integrity="sha256-HAaDW5o2+LelybUhfuk0Zh2Vdk8Y2W2UeKmbaXhalfA=" crossorigin="anonymous" />
   
   <script>
-    var nocache = 1443;
+    var nocache = 1447;
   </script>
 </head>
 
@@ -201,6 +201,7 @@
     </div>
 
     <!-- 分割线 -->
+
     <div class="settings-container">
       <div class="input-container">
         <input class="input-search" type="text" id="search" placeholder="Search items. Separated by ;" autocomplete="off" data-help="search">
@@ -214,351 +215,12 @@
       <div id="cycle-next" class="input-selection-arrow"><img src="assets/images/selection_right.png" alt="arrow"></div>
     </div>
 
-    <div id="weekly-container">
-      <div class="header">
-        <span class="header-border"></span>
-        <h2 class="header-title weekly-item-title">Weekly Collection</h2>
-        <span class="header-border"></span>
-      </div>
-      <div class="weekly-item-listings">
-        <p>
-          <span class="weekly-flavor-text"></span>
-          <span data-text="menu.weekly_item_description">Find all the items listed and sell the complete collection to Madam Nazar for an XP and RDO$ reward.</span>
-        </p>
-        <div class="collection-value">
-          <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
-        </div>
-      </div>
-    </div>
-
     <div class="links-container">
       <a data-text="menu.hide_all" data-help="hide_all" href="javascript:void(0);">Hide all</a>
       <a data-text="menu.show_all" data-help="show_all" href="javascript:void(0);">Show all</a>
     </div>
-    <div>
-      <div class="menu-option clickable" data-type="flower" data-help="item_category">
-        <span>
-          <img class="icon" src="./assets/images/icons/flower.png" alt="Category icon" />
-          <span class="menu-option-text" data-text="menu.flower">American Wild Flowers</span>
-        </span>
-        <input class="input-text input-cycle" type="number" min="1" max="6" name="flower" data-help="item_manual_cycle">
-        <img class="cycle-icon" src="./assets/images/cycle_1.png" alt="Cycle 1" data-type="flower">
-        <div class="open-submenu"></div>
-      </div>
-      <div class="menu-hidden" data-type="flower">
-        <div class="collection-value">
-          <span class="collection-collected" data-help="collection_collected"></span>
-          <span data-help="item_value">$155.50</span>
-          <span class="collection-reset" data-text="menu.reset" data-help="item_reset">Reset</span>
-          <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
-        </div>
-        <div class="collection-value-bottom hidden">
-          <span class="disable-collected-items" data-text="menu.disable_collected_items" data-help="disable_collected_items">Disable collected</span>
-          <span class="collection-collect-all" data-text="menu.collection_collect_all" data-help="collection_collect_all">Collect all</span>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="menu-option clickable" data-type="cups" data-help="item_category">
-        <span>
-          <img class="icon" src="./assets/images/icons/cups.png" alt="Category icon" />
-          <span class="menu-option-text" data-text="menu.cups">Tarot Cards - Cups</span>
-        </span>
-        <input class="input-text input-cycle" type="number" min="1" max="6" name="cups" data-help="item_manual_cycle">
-        <img class="cycle-icon" src="./assets/images/cycle_2.png" alt="Cycle 2" data-type="cups">
-        <div class="open-submenu"></div>
-      </div>
-      <div class="menu-hidden" data-type="cups">
-        <div class="collection-value">
-          <span class="collection-collected" data-help="collection_collected"></span>
-          <span data-help="item_value">$240.50</span>
-          <span class="collection-reset" data-text="menu.reset" data-help="item_reset">Reset</span>
-          <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
-        </div>
-        <div class="collection-value-bottom hidden">
-          <span class="disable-collected-items" data-text="menu.disable_collected_items" data-help="disable_collected_items">Disable collected</span>
-          <span class="collection-collect-all" data-text="menu.collection_collect_all" data-help="collection_collect_all">Collect all</span>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="menu-option clickable" data-type="swords" data-help="item_category">
-        <span>
-          <img class="icon" src="./assets/images/icons/swords.png" alt="Category icon" />
-          <span class="menu-option-text" data-text="menu.swords">Tarot Cards - Swords</span>
-        </span>
-        <input class="input-text input-cycle" type="number" min="1" max="6" name="swords" data-help="item_manual_cycle">
-        <img class="cycle-icon" src="./assets/images/cycle_3.png" alt="Cycle 3" data-type="swords">
-        <div class="open-submenu"></div>
-      </div>
-      <div class="menu-hidden" data-type="swords">
-        <div class="collection-value">
-          <span class="collection-collected" data-help="collection_collected"></span>
-          <span data-help="item_value">$287.00</span>
-          <span class="collection-reset" data-text="menu.reset" data-help="item_reset">Reset</span>
-          <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
-        </div>
-        <div class="collection-value-bottom hidden">
-          <span class="disable-collected-items" data-text="menu.disable_collected_items" data-help="disable_collected_items">Disable collected</span>
-          <span class="collection-collect-all" data-text="menu.collection_collect_all" data-help="collection_collect_all">Collect all</span>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="menu-option clickable" data-type="wands" data-help="item_category">
-        <span>
-          <img class="icon" src="./assets/images/icons/wands.png" alt="Category icon" />
-          <span class="menu-option-text" data-text="menu.wands">Tarot Cards - Wands</span>
-        </span>
-        <input class="input-text input-cycle" type="number" min="1" max="6" name="wands" data-help="item_manual_cycle">
-        <img class="cycle-icon" src="./assets/images/cycle_4.png" alt="Cycle 4" data-type="wands">
-        <div class="open-submenu"></div>
-      </div>
-      <div class="menu-hidden" data-type="wands">
-        <div class="collection-value">
-          <span class="collection-collected" data-help="collection_collected"></span>
-          <span data-help="item_value">$239.00</span>
-          <span class="collection-reset" data-text="menu.reset" data-help="item_reset">Reset</span>
-          <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
-        </div>
-        <div class="collection-value-bottom hidden">
-          <span class="disable-collected-items" data-text="menu.disable_collected_items" data-help="disable_collected_items">Disable collected</span>
-          <span class="collection-collect-all" data-text="menu.collection_collect_all" data-help="collection_collect_all">Collect all</span>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="menu-option clickable" data-type="pentacles" data-help="item_category">
-        <span>
-          <img class="icon" src="./assets/images/icons/pentacles.png" alt="Category icon" />
-          <span class="menu-option-text" data-text="menu.pentacles">Tarot Cards - Pentacles</span>
-        </span>
-        <input class="input-text input-cycle" type="number" min="1" max="6" name="pentacles" data-help="item_manual_cycle">
-        <img class="cycle-icon" src="./assets/images/cycle_5.png" alt="Cycle 5" data-type="pentacles">
-        <div class="open-submenu"></div>
-      </div>
-      <div class="menu-hidden" data-type="pentacles">
-        <div class="collection-value">
-          <span class="collection-collected" data-help="collection_collected"></span>
-          <span data-help="item_value">$287.00</span>
-          <span class="collection-reset" data-text="menu.reset" data-help="item_reset">Reset</span>
-          <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
-        </div>
-        <div class="collection-value-bottom hidden">
-          <span class="disable-collected-items" data-text="menu.disable_collected_items" data-help="disable_collected_items">Disable collected</span>
-          <span class="collection-collect-all" data-text="menu.collection_collect_all" data-help="collection_collect_all">Collect all</span>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="menu-option clickable" data-type="bracelet" data-help="item_category">
-        <span>
-          <img class="icon" src="./assets/images/icons/bracelet.png" alt="Category icon" />
-          <span class="menu-option-text" data-text="menu.bracelet">Lost Jewelry - Bracelets</span>
-        </span>
-        <input class="input-text input-cycle" type="number" min="1" max="6" name="bracelet" data-help="item_manual_cycle">
-        <img class="cycle-icon" src="./assets/images/cycle_6.png" alt="Cycle 6" data-type="bracelet">
-        <div class="open-submenu"></div>
-      </div>
-      <div class="menu-hidden" data-type="bracelet">
-        <div class="collection-value">
-          <span class="collection-collected" data-help="collection_collected"></span>
-          <span data-help="item_value">$271.50</span>
-          <span class="collection-reset" data-text="menu.reset" data-help="item_reset">Reset</span>
-          <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
-        </div>
-        <div class="collection-value-bottom hidden">
-          <span class="disable-collected-items" data-text="menu.disable_collected_items" data-help="disable_collected_items">Disable collected</span>
-          <span class="collection-collect-all" data-text="menu.collection_collect_all" data-help="collection_collect_all">Collect all</span>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="menu-option clickable" data-type="earring" data-help="item_category">
-        <span>
-          <img class="icon" src="./assets/images/icons/earring.png" alt="Category icon" />
-          <span class="menu-option-text" data-text="menu.earring">Lost Jewelry - Earrings</span>
-        </span>
-        <input class="input-text input-cycle" type="number" min="1" max="6" name="earring" data-help="item_manual_cycle">
-        <img class="cycle-icon" src="./assets/images/cycle_1.png" alt="Cycle 1" data-type="earring">
-        <div class="open-submenu"></div>
-      </div>
-      <div class="menu-hidden" data-type="earring">
-        <div class="collection-value">
-          <span class="collection-collected" data-help="collection_collected"></span>
-          <span data-help="item_value">$364.50</span>
-          <span class="collection-reset" data-text="menu.reset" data-help="item_reset">Reset</span>
-          <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
-        </div>
-        <div class="collection-value-bottom hidden">
-          <span class="disable-collected-items" data-text="menu.disable_collected_items" data-help="disable_collected_items">Disable collected</span>
-          <span class="collection-collect-all" data-text="menu.collection_collect_all" data-help="collection_collect_all">Collect all</span>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="menu-option clickable" data-type="necklace" data-help="item_category">
-        <span>
-          <img class="icon" src="./assets/images/icons/necklace.png" alt="Category icon" />
-          <span class="menu-option-text" data-text="menu.necklace">Lost Jewelry - Necklaces</span>
-        </span>
-        <input class="input-text input-cycle" type="number" min="1" max="6" name="necklace" data-help="item_manual_cycle">
-        <img class="cycle-icon" src="./assets/images/cycle_2.png" alt="Cycle 2" data-type="necklace">
-        <div class="open-submenu"></div>
-      </div>
-      <div class="menu-hidden" data-type="necklace">
-        <div class="collection-value">
-          <span class="collection-collected" data-help="collection_collected"></span>
-          <span data-help="item_value">$335.00</span>
-          <span class="collection-reset" data-text="menu.reset" data-help="item_reset">Reset</span>
-          <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
-        </div>
-        <div class="collection-value-bottom hidden">
-          <span class="disable-collected-items" data-text="menu.disable_collected_items" data-help="disable_collected_items">Disable collected</span>
-          <span class="collection-collect-all" data-text="menu.collection_collect_all" data-help="collection_collect_all">Collect all</span>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="menu-option clickable" data-type="ring" data-help="item_category">
-        <span>
-          <img class="icon" src="./assets/images/icons/ring.png" alt="Category icon" />
-          <span class="menu-option-text" data-text="menu.ring">Lost Jewelry - Rings</span>
-        </span>
-        <input class="input-text input-cycle" type="number" min="1" max="6" name="ring" data-help="item_manual_cycle">
-        <img class="cycle-icon" src="./assets/images/cycle_3.png" alt="Cycle 3" data-type="ring">
-        <div class="open-submenu"></div>
-      </div>
-      <div class="menu-hidden" data-type="ring">
-        <div class="collection-value">
-          <span class="collection-collected" data-help="collection_collected"></span>
-          <span data-help="item_value">$378.00</span>
-          <span class="collection-reset" data-text="menu.reset" data-help="item_reset">Reset</span>
-          <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
-        </div>
-        <div class="collection-value-bottom hidden">
-          <span class="disable-collected-items" data-text="menu.disable_collected_items" data-help="disable_collected_items">Disable collected</span>
-          <span class="collection-collect-all" data-text="menu.collection_collect_all" data-help="collection_collect_all">Collect all</span>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="menu-option clickable" data-type="bottle" data-help="item_category">
-        <span>
-          <img class="icon" src="./assets/images/icons/bottle.png" alt="Category icon" />
-          <span class="menu-option-text" data-text="menu.bottle">Antique Alcohol Bottles</span>
-        </span>
-        <input class="input-text input-cycle" type="number" min="1" max="6" name="bottle" data-help="item_manual_cycle">
-        <img class="cycle-icon" src="./assets/images/cycle_4.png" alt="Cycle 4" data-type="bottle">
-        <div class="open-submenu"></div>
-      </div>
-      <div class="menu-hidden" data-type="bottle">
-        <div class="collection-value">
-          <span class="collection-collected" data-help="collection_collected"></span>
-          <span data-help="item_value">$160.50</span>
-          <span class="collection-reset" data-text="menu.reset" data-help="item_reset">Reset</span>
-          <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
-        </div>
-        <div class="collection-value-bottom hidden">
-          <span class="disable-collected-items" data-text="menu.disable_collected_items" data-help="disable_collected_items">Disable collected</span>
-          <span class="collection-collect-all" data-text="menu.collection_collect_all" data-help="collection_collect_all">Collect all</span>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="menu-option clickable" data-type="egg" data-help="item_category">
-        <span>
-          <img class="icon" src="./assets/images/icons/egg.png" alt="Category icon" />
-          <span class="menu-option-text" data-text="menu.egg">Bird Eggs</span>
-        </span>
-        <input class="input-text input-cycle" type="number" min="1" max="6" name="egg" data-help="item_manual_cycle">
-        <img class="cycle-icon" src="./assets/images/cycle_5.png" alt="Cycle 5" data-type="egg">
-        <div class="open-submenu"></div>
-      </div>
-      <div class="menu-hidden" data-type="egg">
-        <div class="collection-value">
-          <span class="collection-collected" data-help="collection_collected"></span>
-          <span data-help="item_value">$182.50</span>
-          <span class="collection-reset" data-text="menu.reset" data-help="item_reset">Reset</span>
-          <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
-        </div>
-        <div class="collection-value-bottom hidden">
-          <span class="disable-collected-items" data-text="menu.disable_collected_items" data-help="disable_collected_items">Disable collected</span>
-          <span class="collection-collect-all" data-text="menu.collection_collect_all" data-help="collection_collect_all">Collect all</span>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="menu-option clickable" data-type="arrowhead" data-help="item_category">
-        <span>
-          <img class="icon" src="./assets/images/icons/arrowhead.png" alt="Category icon" />
-          <span class="menu-option-text" data-text="menu.arrowhead">Arrowheads</span>
-        </span>
-        <input class="input-text input-cycle" type="number" min="1" max="6" name="arrowhead" data-help="item_manual_cycle">
-        <img class="cycle-icon" src="./assets/images/cycle_6.png" alt="Cycle 6" data-type="arrowhead">
-        <div class="open-submenu"></div>
-      </div>
-      <div class="menu-hidden" data-type="arrowhead">
-        <div class="collection-value">
-          <span class="collection-collected" data-help="collection_collected"></span>
-          <span data-help="item_value">$289.00</span>
-          <span class="collection-reset" data-text="menu.reset" data-help="item_reset">Reset</span>
-          <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
-        </div>
-        <div class="collection-value-bottom hidden">
-          <span class="disable-collected-items" data-text="menu.disable_collected_items" data-help="disable_collected_items">Disable collected</span>
-          <span class="collection-collect-all" data-text="menu.collection_collect_all" data-help="collection_collect_all">Collect all</span>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="menu-option clickable" data-type="heirlooms" data-help="item_category">
-        <span>
-          <img class="icon" src="./assets/images/icons/heirlooms.png" alt="Category icon" />
-          <span class="menu-option-text" data-text="menu.heirlooms">Family Heirlooms</span>
-        </span>
-        <input class="input-text input-cycle" type="number" min="1" max="6" name="heirlooms" data-help="item_manual_cycle">
-        <img class="cycle-icon" src="./assets/images/cycle_1.png" alt="Cycle 1" data-type="heirlooms">
-        <div class="open-submenu"></div>
-      </div>
-      <div class="menu-hidden" data-type="heirlooms">
-        <div class="collection-value">
-          <span class="collection-collected" data-help="collection_collected"></span>
-          <span data-help="item_value">$292.50</span>
-          <span class="collection-reset" data-text="menu.reset" data-help="item_reset">Reset</span>
-          <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
-        </div>
-        <div class="collection-value-bottom hidden">
-          <span class="disable-collected-items" data-text="menu.disable_collected_items" data-help="disable_collected_items">Disable collected</span>
-          <span class="collection-collect-all" data-text="menu.collection_collect_all" data-help="collection_collect_all">Collect all</span>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="menu-option clickable" data-type="coin" data-help="item_category">
-        <span>
-          <img class="icon" src="./assets/images/icons/coin.png" alt="Category icon" />
-          <span class="menu-option-text" data-text="menu.coin">Coins</span>
-        </span>
-        <input class="input-text input-cycle" type="number" min="1" max="6" name="coin" data-help="item_manual_cycle">
-        <img class="cycle-icon" src="./assets/images/cycle_2.png" alt="Cycle 2" data-type="coin">
-        <div class="open-submenu"></div>
-      </div>
-      <div class="menu-hidden" data-type="coin">
-        <div class="collection-value">
-          <span class="collection-collected" data-help="collection_collected"></span>
-          <span data-help="item_value">$540.00</span>
-          <span class="collection-reset" data-text="menu.reset" data-help="item_reset">Reset</span>
-          <span class="collection-sell" data-text="menu.sell" data-help="item_sell">Sell</span>
-        </div>
-        <div class="collection-value-bottom hidden">
-          <span class="disable-collected-items" data-text="menu.disable_collected_items" data-help="disable_collected_items">Disable collected</span>
-          <span class="collection-collect-all" data-text="menu.collection_collect_all" data-help="collection_collect_all">Collect all</span>
-        </div>
-      </div>
-    </div>
 
-    <div>
+    <div id="collection-insertion-before-point">
       <div class="menu-option clickable" data-type="random" data-help="item_category">
         <span>
           <img class="icon" src="./assets/images/icons/random.png" alt="Category icon" />
@@ -627,7 +289,7 @@
       <div class="input-container" data-help="language">
         <label for="language" data-text="menu.language">Language</label>
         <select class="input-text wide-select-menu" id="language">
-          <option value="en" >English</option>
+          <option value="en" selected>English</option>
           <option value="en-GB">English (UK)</option>
           <option value="af">Afrikaans (Afrikaans)</option>
           <option value="ar">ٱلْعَرَبِيَّة (Arabic)</option>
@@ -656,7 +318,7 @@
           <option value="tr">Türkçe (Turkish)</option>
           <option value="uk">Українська мова (Ukrainian)</option>
           <option value="vi">Tiếng Việt (Vietnamese)</option>
-          <option value="zh-Hans" selected>简体中文 (Chinese Simplified)</option>
+          <option value="zh-Hans">简体中文 (Chinese Simplified)</option>
           <option value="zh-Hant">繁体中文 (Chinese Traditional)</option>
         </select>
       </div>
@@ -1302,7 +964,8 @@
   </div>
 
   <div class="map-cycle-alert hidden">
-    <span>Today's cycles haven't been updated yet. Please refresh to check for updates.</span>
+    <span data-text="map.refresh_for_updates_alert">Today's cycles haven't been updated yet.
+      Please refresh to check for updates.</span>
   </div>
 
   <div class="filter-alert hidden">
@@ -1535,7 +1198,7 @@
   <script>function isES6() { try { return eval("() => {};"), !0 } catch (r) { return !1 } } isES6() || alert("This browser might not be fully supported, and errors will likely occur. Please update your browser if you experience issues.");</script>
 
   <script src="assets/js/lib/jquery-3.4.1.min.js"></script>
-  <script src="assets/js/loader.js?nocache=1443"></script>
+  <script src="assets/js/loader.js?nocache=1447"></script>
   <script src="assets/js/lib/bootstrap.min.js"></script>
   <script src="assets/js/lib/jquery.cookie.js"></script>
   <script src="assets/js/lib/leaflet.js"></script>
@@ -1544,25 +1207,25 @@
   <script>var module = {};</script>
   <script src="assets/js/lib/leaflet.canvas-markers.js"></script>
   <script>module.exports(L);</script>
-  <script src="assets/js/layers.js?nocache=1443"></script>
-  <script src="assets/js/settings.js?nocache=1443"></script>
-  <script src="assets/js/nazar.js?nocache=1443"></script>
-  <script src="assets/js/fme.js?nocache=1443"></script>
-  <script src="assets/js/cycles.js?nocache=1443"></script>
-  <script src="assets/js/marker.js?nocache=1443"></script>
-  <script src="assets/js/inventory.js?nocache=1443"></script>
-  <script src="assets/js/treasures.js?nocache=1443"></script>
-  <script src="assets/js/pins.js?nocache=1443"></script>
-  <script src="assets/js/map.js?nocache=1443"></script>
-  <script src="assets/js/language.js?nocache=1443"></script>
-  <script src="assets/js/menu.js?nocache=1443"></script>
-  <script src="assets/js/items.js?nocache=1443"></script>
-  <script src="assets/js/routes.js?nocache=1443"></script>
-  <script src="assets/js/pathfinder.js?nocache=1443"></script>
-  <script src="assets/js/scripts.js?nocache=1443"></script>
+  <script src="assets/js/layers.js?nocache=1447"></script>
+  <script src="assets/js/settings.js?nocache=1447"></script>
+  <script src="assets/js/nazar.js?nocache=1447"></script>
+  <script src="assets/js/fme.js?nocache=1447"></script>
+  <script src="assets/js/cycles.js?nocache=1447"></script>
+  <script src="assets/js/marker.js?nocache=1447"></script>
+  <script src="assets/js/inventory.js?nocache=1447"></script>
+  <script src="assets/js/treasures.js?nocache=1447"></script>
+  <script src="assets/js/pins.js?nocache=1447"></script>
+  <script src="assets/js/map.js?nocache=1447"></script>
+  <script src="assets/js/language.js?nocache=1447"></script>
+  <script src="assets/js/menu.js?nocache=1447"></script>
+  <script src="assets/js/items.js?nocache=1447"></script>
+  <script src="assets/js/routes.js?nocache=1447"></script>
+  <script src="assets/js/pathfinder.js?nocache=1447"></script>
+  <script src="assets/js/scripts.js?nocache=1447"></script>
 
   <!-- 扩展 -->
-  <script src="assets/js/exp.js?nocache=1443"></script>
+  <script src="assets/js/exp.js?nocache=1447"></script>
 	<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
   <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
   <script src="https://cdn.staticfile.org/ekko-lightbox/5.3.0/ekko-lightbox.min.js" integrity="sha256-Y1rRlwTzT5K5hhCBfAFWABD4cU13QGuRN6P5apfWzVs=" crossorigin="anonymous"></script>
