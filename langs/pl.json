@@ -1563,7 +1563,7 @@
     "menu.marker_size.200": "200%",
     "menu.toggle_debug": "Włącz narzędzia debugowania",
     "map.random_spot.desc": "To miejsce zapewnia losowy przedmot, więcej informacji tutaj: {int.random_spot.link}Tabela losowych przedmiotów{int.end.link}.",
-    "map.attribution_prefix": "Części mapy dostarczone przez:",
+    "map.attribution_prefix": "",
     "menu.clear_important_items": "Usuń podświetlanie ważnych przedmiotów",
     "menu.modal_clear_important_items_body": "Ta opcja usunie podświetlenie ze wszystkich ważnych przedmiotów. Tej operacji nie można cofnąć.",
     "menu.modal_clear_important_items_title": "Usunąć podświetlenia?",
@@ -1748,5 +1748,7 @@
     "menu.modal_fme_enabled_events_body": "Umożliwia wybranie zdarzeń, które mają być wyświetlane na mapie, lub na otrzymywanie powiadomień.",
     "menu.modal_fme_general_events_title": "Wydarzenia ogólne gry swobodnej",
     "menu.modal_fme_role_events_title": "Wydarzenia ról gry swobodnej",
-    "menu.close": "Zamknij"
+    "menu.close": "Zamknij",
+    "menu.translate_body": "",
+    "menu.translate_link": ""
 }
