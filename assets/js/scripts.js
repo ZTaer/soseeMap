@@ -2,18 +2,6 @@
 - these statements have no requirements
 - code at multiple places depend on these
 */
-Object.defineProperty(String.prototype, 'includesOneOf', {
-  value: function (...elements) {
-    var include = false;
-    for (var str of elements) {
-      if (this.includes(str)) {
-        include = true;
-        break;
-      }
-    }
-    return include;
-  }
-});
 
 Object.defineProperty(String.prototype, 'filename', {
   value: function (extension) {
@@ -167,10 +155,11 @@ function changeCursor() {
 }
 
 function updateTopWidget() {
-  $('#countdown').toggleClass('hidden', Settings.topWidgetState !== 0);
-  $('#time-in-game').toggleClass('hidden', Settings.topWidgetState !== 1);
-  $('#item-counter').toggleClass('hidden', Settings.topWidgetState !== 2);
-  $('#item-counter-percentage').toggleClass('hidden', Settings.topWidgetState !== 3);
+  const pElements = document.querySelectorAll('.top-widget > p');
+
+  [].forEach.call(pElements, (element, index) => {
+    $(element).toggleClass('hidden', Settings.topWidgetState !== index);
+  });
 }
 
 function getParameterByName(name, url) {
@@ -256,10 +245,8 @@ setInterval(clockTick, 1000);
 - please move them out of here to their respective owners
 */
 $('.top-widget > p').on('click', function () {
-  $('.top-widget > p').toggleClass('hidden');
-
-  Settings.topWidgetState++;
-  Settings.topWidgetState %= 4;
+  const pElements = $('.top-widget > p').length;
+  Settings.topWidgetState = (Settings.topWidgetState + 1) % pElements;
   updateTopWidget();
 });
 
@@ -329,7 +316,7 @@ $("#search").on("input", function () {
 });
 
 $("#copy-search-link").on("click", function () {
-  setClipboardText(`http://jeanropke.github.io/RDR2CollectorsMap/?search=${$('#search').val()}`);
+  setClipboardText(`https://map.sosee.org/?search=${$('#search').val()}`);
 });
 
 $("#clear-search").on("click", function () {
