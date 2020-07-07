@@ -3,7 +3,7 @@
     src: url(../fonts/hapna.woff2) format("woff2"), url(../fonts/hapna.woff) format("woff"), url(../fonts/hapna.ttf) format("truetype");
     font-style: normal;
     font-weight: 400;
-    text-rendering: optimizeLegibility
+    text-rendering: optimizeLegibility;
 }
 
 @font-face {
@@ -11,7 +11,7 @@
     src: url(../fonts/RDRLino-Regular.woff2) format("woff2"), url(../fonts/RDRLino-Regular.woff) format("woff"), url(../fonts/RDRLino-Regular.ttf) format("truetype");
     font-style: normal;
     font-weight: 400;
-    text-rendering: optimizeLegibility
+    text-rendering: optimizeLegibility;
 }
 
 *,
@@ -36,7 +36,7 @@ body {
 }
 
 h1 {
-    font-size: 14px
+    font-size: 14px;
 }
 
 h2 {
@@ -471,7 +471,7 @@ select {
 }
 
 .input-text.input-cycle.random {
-    margin-right: 42px;
+    margin-right: 52px;
 }
 
 .issues-container a {
@@ -523,15 +523,22 @@ select {
     transition: all 200ms ease-out;
 }
 
+.side-menu .menu-option-outer {
+    position: relative;
+    display: flex;
+    padding: 0;
+    user-select: none;
+    cursor: pointer;
+}
+
 .side-menu .menu-option {
     position: relative;
     display: flex;
     justify-content: space-between;
     align-items: start;
-    padding: 0 5px;
-    user-select: none;
-    cursor: pointer;
+    padding: 0 0 0 5px;
     line-height: 36px;
+    flex-grow: 1;
 }
 
 .side-menu .disabled {
@@ -558,10 +565,11 @@ select {
 }
 
 .side-menu .open-submenu {
-    min-width: 32px;
+    min-width: 52px;
     height: 38px;
     background: url(../images/arrow.png) center no-repeat;
     margin: auto 0;
+    padding: 0;
 }
 
 .open-submenu.rotate {
@@ -784,8 +792,8 @@ a.wiki-page:visited {
 }
 
 .menu-option.clickable input {
-    margin: auto 10px auto auto;
-    max-width: 50px;
+    margin: auto 0 auto auto;
+    max-width: 47px;
     min-width: 40px;
     height: 30px;
     padding: 0 0 0 8px;
@@ -819,6 +827,10 @@ a.wiki-page:visited {
     display: inline-block;
     text-align: center;
     font-size: 15px;
+}
+
+.counter-number-weekly {
+    margin: 0 25px;
 }
 
 .counter-button {
@@ -857,7 +869,7 @@ a.wiki-page:visited {
 }
 
 .cycle-icon.random {
-    margin-right: 38px;
+    margin-right: 58px;
 }
 
 .marker-content-wrapper {
@@ -896,6 +908,7 @@ a.wiki-page:visited {
 
 .disable-cycle-changer-arrow {
     opacity: .3;
+    cursor: default !important;
 }
 
 .collection-collected {
@@ -946,6 +959,7 @@ a.wiki-page:visited {
 .input-container.disabled,
 .input-container.disabled label {
     cursor: not-allowed !important;
+    pointer-events: none;
 }
 
 .input-action {
@@ -1013,7 +1027,7 @@ a.no-style:visited {
 }
 
 .text-danger {
-    color: #f95050 !important
+    color: #f95050 !important;
 }
 
 .hidden {
@@ -1178,15 +1192,17 @@ a.no-style:visited {
         line-height: 38px;
     }
 
-    .input-checkbox-wrapper .input-checkbox+.input-checkbox-label, .input-text, .input-action {
+    .input-checkbox-wrapper .input-checkbox+.input-checkbox-label,
+    .input-text,
+    .input-action {
         margin-top: 5px;
     }
 }
 
 @media (min-width: 1025px) {
     .side-menu {
-        width: 390px;
-        left: -390px;
+        width: 400px;
+        left: -400px;
         top: 0;
     }
 
@@ -1195,7 +1211,7 @@ a.no-style:visited {
     }
 
     .top-widget-menu-opened {
-        left: 395px;
+        left: 405px;
     }
 }
 
@@ -1445,7 +1461,7 @@ a.no-style:visited {
 }
 
 #fme-container.fme-menu-opened {
-    left: 395px;
+    left: 405px;
 }
 
 #fme-container .fme-card {
@@ -1519,8 +1535,9 @@ a.no-style:visited {
 }
 
 @media (min-width: 1025px) {
+
     .settings-container .input-container:not(.disabled):after,
-    .side-menu .menu-option:after,
+    .side-menu .menu-option-outer:after,
     .side-menu .collectible-wrapper:after {
         border-color: #d80419;
         border-image-repeat: round;
@@ -1539,7 +1556,7 @@ a.no-style:visited {
         z-index: 10;
     }
 
-    .side-menu .menu-option:after,
+    .side-menu .menu-option-outer:after,
     .side-menu .collectible-wrapper:after {
         top: 1px;
         right: 2px;
@@ -1548,7 +1565,7 @@ a.no-style:visited {
     }
 
     .settings-container .input-container:not(.disabled):hover:after,
-    .side-menu .menu-option:hover:after,
+    .side-menu .menu-option-outer:hover:after,
     .side-menu .collectible-wrapper:hover:after {
         opacity: 1;
     }

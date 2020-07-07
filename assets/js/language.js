@@ -2,13 +2,13 @@ jQuery.fn.translate = function () {
   return Language.translateDom(this);
 };
 
-var Language = {
+const Language = {
   data: {},
   availableLanguages: ['en', 'af', 'ar', 'ca', 'cs', 'da', 'de', 'el', 'en-GB', 'es', 'fi', 'fr', 'he', 'hu', 'it', 'ja', 'ko', 'no', 'pl', 'pt', 'pt-BR', 'ro', 'ru', 'sr', 'sv', 'th', 'tr', 'uk', 'vi', 'zh-Hans', 'zh-Hant'],
 
   init: function () {
     'use strict';
-    let langs = ['en'];
+    const langs = ['en'];
 
     if (Settings.language !== 'en') {
       langs.push(Settings.language);
@@ -22,7 +22,7 @@ var Language = {
         success: function (json) {
           let result = {};
 
-          for (let propName in json) {
+          for (const propName in json) {
             if (json[propName] !== "" && ($.isEmptyObject(Language.data.en) || Language.data.en[propName] !== json[propName])) {
               result[propName] = json[propName];
             }
@@ -96,7 +96,7 @@ var Language = {
         success: function (json) {
           let result = {};
 
-          for (let propName in json) {
+          for (const propName in json) {
             if (json[propName] !== "" && ($.isEmptyObject(Language.data.en) || Language.data.en[propName] !== json[propName])) {
               result[propName] = json[propName];
             }

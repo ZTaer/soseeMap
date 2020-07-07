@@ -33,9 +33,9 @@ class BaseItem {
             src="./assets/images/icons/game/${this.itemId}.png" alt="Weekly item icon"></div>
           <span data-text="${this.itemTranslationKey}"></span>
         </span>
-        <small class="counter-number">${this.amount}</small>
+        <small class="counter-number counter-number-weekly">${this.amount}</small>
       </div>
-    `).translate().appendTo($listParent)
+    `).translate().appendTo($listParent);
     Loader.mapModelLoaded.then(() => {
       SettingProxy.addListener(InventorySettings, 'isEnabled stackSize', () =>
         this.$weeklyMenuButton
@@ -127,12 +127,12 @@ class Weekly extends BaseCollection {
     });
   }
   static _installSettingsAndEventHandlers() {
-    SettingProxy.addSetting(Settings, 'showWeeklySettings', {default: true});
+    SettingProxy.addSetting(Settings, 'showWeeklySettings', { default: true });
     const weeklyCheckbox = $("#show-weekly");
     Loader.mapModelLoaded.then(() => {
       SettingProxy.addListener(Settings, 'showWeeklySettings', () => {
         this.current.$menuEntry.toggleClass('opened', Settings.showWeeklySettings);
-        weeklyCheckbox.prop('checked', Settings.showWeeklySettings)
+        weeklyCheckbox.prop('checked', Settings.showWeeklySettings);
       })();
       weeklyCheckbox.on("change", () => {
         Settings.showWeeklySettings = weeklyCheckbox.prop('checked');
@@ -161,7 +161,7 @@ class Collection extends BaseCollection {
     Loader.mapModelLoaded.then(() => {
       const checkbox = $('#sort-items-alphabetically')
         .prop("checked", Settings.sortItemsAlphabetically)
-        .on("change", () => Settings.sortItemsAlphabetically = checkbox.prop('checked'))
+        .on("change", () => Settings.sortItemsAlphabetically = checkbox.prop('checked'));
       SettingProxy.addListener(Settings, 'sortItemsAlphabetically language', () =>
         Collection.collections.forEach(collection =>
           collection.menuSort(Settings.sortItemsAlphabetically)))();
@@ -216,18 +216,20 @@ class Collection extends BaseCollection {
   _insertMenuElement() {
     const $element = $(`
       <div>
-        <div class="menu-option clickable" data-type="${this.category}" data-help="item_category">
-          <span>
-            <img class="icon" src="assets/images/icons/${this.category}.png" alt="${this.category}">
+        <div class="menu-option-outer" data-help="item_category">
+          <div class="menu-option clickable" data-type="${this.category}">
             <span>
-              <span class="menu-option-text" data-text="menu.${this.category}"></span>
-              <img class="same-cycle-warning-menu" src="assets/images/same-cycle-alert.png">
+              <img class="icon" src="assets/images/icons/${this.category}.png" alt="${this.category}">
+              <span>
+                <span class="menu-option-text" data-text="menu.${this.category}"></span>
+                <img class="same-cycle-warning-menu" src="assets/images/same-cycle-alert.png">
+              </span>
             </span>
-          </span>
-          <input class="input-text input-cycle" type="number" min="1" max="6"
-            name="${this.category}" data-help="item_manual_cycle">
-          <img class="cycle-icon" src="assets/images/cycle_1.png" alt="Cycle 1"
-            data-type="${this.category}">
+            <input class="input-text input-cycle" type="number" min="1" max="6"
+              name="${this.category}" data-help="item_manual_cycle">
+            <img class="cycle-icon" src="assets/images/cycle_1.png" alt="Cycle 1"
+              data-type="${this.category}">
+          </div>
           <div class="open-submenu"></div>
         </div>
         <div class="menu-hidden" data-type="${this.category}">
@@ -248,7 +250,7 @@ class Collection extends BaseCollection {
       .insertBefore('#collection-insertion-before-point');
     $element[0].rdoCollection = this;
     [this.$menuButton, this.$submenu] = $element.children().toArray().map(e => $(e));
-    this.$menuButton.find('.same-cycle-warning-menu').hide().end()
+    this.$menuButton.find('.same-cycle-warning-menu').hide().end();
     Loader.mapModelLoaded.then(() => {
       SettingProxy.addListener(Settings, 'isCycleInputEnabled', () =>
         this.$menuButton
@@ -279,12 +281,13 @@ class Collection extends BaseCollection {
       .toggleClass('not-found', buggy)
       .find('.same-cycle-warning-menu')
       .toggle(isSameCycle)
-      .end()
+      .end();
     this.$submenu
-      .find('.collection-collected').text(Language.get('menu.collection_counter')
+      .find('.collection-collected')
+      .text(Language.get('menu.collection_counter')
         .replace('{count}', this.$submenu.find('.disabled').length)
         .replace('{max}', this.items.length)
-      )
+      );
   }
   menuSort(alphabetically) {
     if (['cups', 'swords', 'wands', 'pentacles'].includes(this.category)) return;
@@ -366,10 +369,12 @@ class Item extends BaseItem {
           );
         } else if (event.target.classList.contains('open-submenu')) {
           event.stopPropagation();
-          $(event.target).toggleClass('rotate')
-            .parent().parent().children('.menu-hidden').toggleClass('opened')
+          $(event.target)
+            .toggleClass('rotate')
+            .parent().parent().children('.menu-hidden')
+            .toggleClass('opened');
         }
-      }, {capture: true});
+      }, { capture: true });
   }
   _insertMenuElement() {
     this.$menuButton = $(`
@@ -395,8 +400,8 @@ class Item extends BaseItem {
     Loader.mapModelLoaded.then(() => {
       SettingProxy.addListener(InventorySettings, 'isEnabled', () =>
         this.$menuButton
-        .find('.counter')
-        .toggle(InventorySettings.isEnabled)
+          .find('.counter')
+          .toggle(InventorySettings.isEnabled)
         .end()
       )();
     });
